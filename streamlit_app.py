@@ -1,7 +1,3 @@
-# =====================================================
-# IMPORT LIBRARY
-# =====================================================
-
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -35,32 +31,605 @@ st.set_page_config(
 
 
 # =====================================================
-# CUSTOM CSS
+# CSS STYLE
 # =====================================================
 
 st.markdown("""
 <style>
 
 .main {
-    background-color: #f5f7fb;
+    background-color: #0f172a;
 }
 
 .unpix-header {
-    background: linear-gradient(90deg,#2563eb,#1e40af);
-    padding: 28px;
-    border-radius: 20px;
-    color: white;
+    background: linear-gradient(135deg,#2563eb,#06b6d4);
+    padding: 30px;
+    border-radius: 25px;
     margin-bottom: 25px;
+    box-shadow: 0px 6px 25px rgba(0,0,0,0.3);
 }
 
 .header-title {
-    font-size: 36px;
+    font-size: 38px;
     font-weight: bold;
+    color: white;
 }
 
 .header-subtitle {
-    font-size: 16px;
-    opacity: 0.9;
+    font-size: 15px;
+    color: #e0f2fe;
+    margin-top: 8px;
+}
+
+.section-title {
+    font-size: 28px;
+    font-weight: bold;
+    color: #2563eb;
+    margin-top: 20px;
+    margin-bottom: 15px;
+}
+
+.metric-grid {
+    display: grid;
+    grid-template-columns: repeat(2,1fr);
+    gap: 20px;
+}
+
+.metric-card {
+    background: #1e293b;
+    padding: 20px;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0px 4px 20px rgba(0,0,0,0.3);
+}
+
+.metric-value {
+    font-size: 28px;
+    font-weight: bold;
+    color: #38bdf8;
+}
+
+.metric-label {
+    font-size: 15px;
+    color: white;
+    margin-top: 10px;
+}
+
+.input-card {
+    background: #111827;
+    padding: 20px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+}
+
+</style>
+""", unsafe_allow_html=True)
+
+
+# =====================================================
+# RUMUS ENGSET
+# =====================================================
+
+def nCr(n, r):
+
+    if r > n:
+        return 0
+
+    return factorial(n) // (
+        factorial(r) * factorial(n - r)
+    )
+
+
+def engset_pb(S, N, M):
+
+    pembilang = (
+        nCr(S - 1, N) * (M ** N)
+    )
+
+    penyebut = sum(
+        nCr(S - 1, k) * (M ** k)
+        for k in range(N + 1)
+    )
+
+    return pembilang / penyebut
+
+
+def iterate(S, N, rho):
+
+    M = rho
+    toleransi = 0.0001
+
+    data_iterasi = []
+
+    i = 1
+
+    while True:
+
+        Pb = engset_pb(S, N, M)
+
+        M_baru = rho * (1 - Pb)
+
+        selisih = abs(M_baru - M)
+
+        data_iterasi.append([
+            i,
+            round(M, 6),
+            round(Pb, 6),
+            round(selisih, 6)
+        ])
+
+        if selisih < toleransi:
+            break
+
+        M = M_baru
+        i += 1
+
+    return M_baru, Pb, data_iterasi, i
+
+
+# =====================================================
+# SESSION STATE
+# =====================================================
+
+if "history" not in st.session_state:
+    st.session_state.history = []
+
+
+# =====================================================
+# HEADER
+# =====================================================
+
+st.markdown("""
+<div class="unpix-header">
+
+    <div class="header-title">
+        🌐 Kalkulator Engset
+    </div>
+
+    <div class="header-subtitle">
+        Sistem Analisis Probabilitas Blocking Engset
+    </div>
+
+</div>
+""", unsafe_allow_html=True)
+
+
+# =====================================================
+# SIDEBAR
+# =====================================================
+
+with st.sidebar:
+
+    st.title("📂 Navigasi")
+
+    page = st.radio(
+        "Pilih Menu",
+        [
+            "🏠 Dashboard",
+            "📊 Analisis",
+            "📁 Riwayat"
+        ]
+    )
+
+    st.markdown("---")
+
+    st.info(
+        "Aplikasi Simulasi Telekomunikasi"
+    )
+
+
+# =====================================================
+# DASHBOARD
+# =====================================================
+
+if page == "🏠 Dashboard":
+
+    st.markdown("""
+    <div class="section-title">
+        📥 Input Parameter Sistem
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.markdown(
+        '<div class="input-card">',
+        unsafe_allow_html=True
+    )
+
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+
+        S = st.number_input(
+            "Jumlah Sumber (S)",
+            min_value=1,
+            value=10
+        )
+
+    with col2:
+
+        N = st.number_input(
+            "Jumlah Kanal (N)",
+            min_value=1,
+            value=3
+        )
+
+    with col3:
+
+        rho = st.number_input(
+            "Traffic per Sumber (ρ)",
+            min_value=0.0,
+            value=0.5,
+            step=0.01,
+            format="%.2f"
+        )
+
+    st.markdown("</div>", unsafe_allow_html=True)
+
+    run = st.button(
+        "🚀 Jalankan Analisis"
+    )
+
+    if run:
+
+        if N >= S:
+
+            st.error(
+                "Jumlah kanal harus lebih kecil dari jumlah sumber"
+            )
+
+        else:
+
+            M, Pb, iterasi, jumlah_iterasi = iterate(
+                S,
+                N,
+                rho
+            )
+
+            status = (
+                "OPTIMAL"
+                if Pb < 0.2
+                else "PADAT"
+            )
+
+            hasil = {
+
+                "S": S,
+                "N": N,
+                "rho": rho,
+                "M": M,
+                "Pb": Pb,
+                "iterasi": iterasi,
+                "jumlah_iterasi": jumlah_iterasi,
+                "status": status,
+                "waktu": datetime.now().strftime(
+                    "%d-%m-%Y %H:%M:%S"
+                )
+            }
+
+            st.session_state.result = hasil
+            st.session_state.history.append(
+                hasil
+            )
+
+    if "result" in st.session_state:
+
+        r = st.session_state.result
+
+        st.markdown("""
+        <div class="section-title">
+            📊 Hasil Simulasi
+        </div>
+        """, unsafe_allow_html=True)
+
+        st.markdown(f"""
+        <div class="metric-grid">
+
+            <div class="metric-card">
+                <div class="metric-value">
+                    {r['Pb']:.6f}
+                </div>
+
+                <div class="metric-label">
+                    Probabilitas Blocking
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-value">
+                    {r['M']:.6f}
+                </div>
+
+                <div class="metric-label">
+                    Traffic Idle
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-value">
+                    {r['jumlah_iterasi']}
+                </div>
+
+                <div class="metric-label">
+                    Jumlah Iterasi
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-value">
+                    {r['status']}
+                </div>
+
+                <div class="metric-label">
+                    Status Sistem
+                </div>
+            </div>
+
+        </div>
+        """, unsafe_allow_html=True)
+
+
+# =====================================================
+# ANALISIS
+# =====================================================
+
+elif page == "📊 Analisis":
+
+    st.markdown("""
+    <div class="section-title">
+        📊 Analisis Sistem
+    </div>
+    """, unsafe_allow_html=True)
+
+    if "result" not in st.session_state:
+
+        st.warning(
+            "Jalankan simulasi terlebih dahulu"
+        )
+
+    else:
+
+        r = st.session_state.result
+
+        df = pd.DataFrame(
+            r["iterasi"],
+            columns=[
+                "Iterasi",
+                "M",
+                "Pb",
+                "Selisih"
+            ]
+        )
+
+        st.dataframe(
+            df,
+            use_container_width=True
+        )
+
+        st.markdown("""
+        <div class="section-title">
+            📈 Grafik Probabilitas Blocking
+        </div>
+        """, unsafe_allow_html=True)
+
+        S = r["S"]
+        rho = r["rho"]
+
+        x = list(range(1, S))
+
+        y = [
+            engset_pb(S, n, rho)
+            for n in x
+        ]
+
+        fig, ax = plt.subplots(
+            figsize=(10, 4)
+        )
+
+        ax.plot(
+            x,
+            y,
+            linewidth=2.5,
+            marker='o'
+        )
+
+        ax.axhline(
+            0.2,
+            linestyle='--',
+            label='Batas 0.2'
+        )
+
+        ax.set_xlabel(
+            "Jumlah Kanal"
+        )
+
+        ax.set_ylabel(
+            "Probabilitas Blocking"
+        )
+
+        ax.grid(True)
+
+        ax.legend()
+
+        st.pyplot(fig)
+
+
+# =====================================================
+# RIWAYAT
+# =====================================================
+
+elif page == "📁 Riwayat":
+
+    st.markdown("""
+    <div class="section-title">
+        📁 Riwayat Simulasi
+    </div>
+    """, unsafe_allow_html=True)
+
+    if st.session_state.history:
+
+        rows = []
+
+        for i, r in enumerate(
+            st.session_state.history,
+            1
+        ):
+
+            rows.append({
+
+                "No": i,
+                "Waktu": r["waktu"],
+                "S": r["S"],
+                "N": r["N"],
+                "ρ": r["rho"],
+                "M": round(r["M"], 6),
+                "Pb": round(r["Pb"], 6),
+                "Status": r["status"]
+
+            })
+
+        df_hist = pd.DataFrame(rows)
+
+        st.dataframe(
+            df_hist,
+            use_container_width=True
+        )
+
+    else:
+
+        st.info(
+            "Belum ada riwayat simulasi"
+        )
+
+
+# =====================================================
+# EXPORT PDF
+# =====================================================
+
+def export_pdf(data, fig):
+
+    buffer = io.BytesIO()
+
+    doc = SimpleDocTemplate(
+        buffer,
+        pagesize=A4
+    )
+
+    styles = getSampleStyleSheet()
+
+    elements = []
+
+    title = Paragraph(
+        "Laporan Kalkulator Engset",
+        styles['Title']
+    )
+
+    elements.append(title)
+
+    elements.append(
+        Spacer(1, 12)
+    )
+
+    tabel = Table([
+
+        ["Parameter", "Nilai"],
+
+        ["Jumlah Sumber", data["S"]],
+        ["Jumlah Kanal", data["N"]],
+        ["Traffic", data["rho"]],
+        ["Blocking Probability", f"{data['Pb']:.6f}"],
+        ["Traffic Idle", f"{data['M']:.6f}"],
+        ["Status", data["status"]]
+
+    ])
+
+    tabel.setStyle(TableStyle([
+
+        ('BACKGROUND', (0,0), (-1,0), colors.blue),
+        ('TEXTCOLOR', (0,0), (-1,0), colors.white),
+        ('GRID', (0,0), (-1,-1), 1, colors.black)
+
+    ]))
+
+    elements.append(tabel)
+
+    img_buffer = io.BytesIO()
+
+    fig.savefig(
+        img_buffer,
+        format='png'
+    )
+
+    img_buffer.seek(0)
+
+    elements.append(
+        Spacer(1, 20)
+    )
+
+    elements.append(
+        Image(
+            img_buffer,
+            width=400,
+            height=200
+        )
+    )
+
+    doc.build(elements)
+
+    buffer.seek(0)
+
+    return buffer
+
+
+# =====================================================
+# DOWNLOAD PDF
+# =====================================================
+
+if "result" in st.session_state:
+
+    st.markdown("---")
+
+    st.markdown("""
+    <div class="section-title">
+        📥 Download Laporan PDF
+    </div>
+    """, unsafe_allow_html=True)
+
+    latest = st.session_state.result
+
+    S = latest["S"]
+    rho = latest["rho"]
+
+    x = list(range(1, S))
+
+    y = [
+        engset_pb(S, n, rho)
+        for n in x
+    ]
+
+    fig, ax = plt.subplots(
+        figsize=(10, 4)
+    )
+
+    ax.plot(
+        x,
+        y,
+        linewidth=2.5,
+        marker='o'
+    )
+
+    ax.grid(True)
+
+    pdf = export_pdf(
+        latest,
+        fig
+    )
+
+    st.download_button(
+        label="⬇️ Download PDF",
+        data=pdf,
+        file_name="Laporan_Engset.pdf",
+        mime="application/pdf"
+    )    opacity: 0.9;
 }
 
 .section-title {
