@@ -593,9 +593,9 @@ P        = engset(S, N, A) if valid else None
 carried  = A * (1 - P) if P is not None else 0.0
 lost     = A * P       if P is not None else 0.0
 util_pct = (carried / N) * 100 if (P is not None and N > 0) else 0.0
-gos_text, gos_cls = gos_label(P) if P is not None else ("—", "gos-ok")
-min_n_1   = find_min_N(S, A, 0.01)  if valid else "—"
-min_n_001 = find_min_N(S, A, 0.001) if valid else "—"
+gos_text, gos_cls = gos_label(P) if P is not None else ("N/A", "gos-ok")
+min_n_1   = find_min_N(S, A, 0.01)  if valid else "N/A"
+min_n_001 = find_min_N(S, A, 0.001) if valid else "N/A"
 
 BLUE  = '#0288D1'
 TEAL  = '#00ACC1'
@@ -641,7 +641,7 @@ if active_page == "🏠  Dashboard":
             '<h1 style="font-size:2rem;font-weight:900;color:#fff;margin:0 0 0.3rem;'
             'line-height:1.1;letter-spacing:-0.02em;">EngsetPro Dashboard</h1>'
             '<p style="font-size:0.9rem;opacity:0.65;margin:0;">'
-            'Analisis probabilitas blocking real-time &#8212; Model Engset Finite Source</p>'
+            'Analisis probabilitas blocking real-time · Model Engset Finite Source</p>'
             '<div style="margin-top:1.6rem;display:flex;gap:0.8rem;flex-wrap:wrap;">'
             # chip S
             '<div style="background:rgba(255,255,255,0.15);border-radius:14px;padding:10px 20px;'
@@ -694,7 +694,7 @@ if active_page == "🏠  Dashboard":
         st.markdown('<p class="sec-title">📋 Ringkasan Sistem</p>', unsafe_allow_html=True)
 
         items = [
-            ("📶", "plan-icon-blue",  "Probabilitas Blocking",  f"{P*100:.3f}%" if P else "—",  f"Grade: {gos_text}"),
+            ("📶", "plan-icon-blue",  "Probabilitas Blocking",  f"{P*100:.3f}%" if P else "N/A",  f"Grade: {gos_text}"),
             ("🔄", "plan-icon-green", "Traffic Carried",         f"{carried:.4f} Erl",            f"Dari {A:.1f} Erl ditawarkan"),
             ("📉", "plan-icon-amber", "Kanal Minimum GoS 1%",   f"N = {min_n_1}",                "Untuk kualitas baik"),
             ("⚡", "plan-icon-teal",  "Utilisasi Kanal",         f"{util_pct:.1f}%",              f"Rata-rata per {N} kanal"),
@@ -721,7 +721,7 @@ if active_page == "🏠  Dashboard":
         ax.pie(sizes, colors=clrs, startangle=90,
                wedgeprops=dict(width=0.44, edgecolor='white', linewidth=4),
                counterclock=False)
-        ax.text(0, 0.08, f"{util_pct:.1f}%" if P else "—",
+        ax.text(0, 0.08, f"{util_pct:.1f}%" if P else "N/A",
                 ha='center', va='center', fontsize=17, fontweight='bold',
                 color='#0a2540', fontfamily='monospace')
         ax.text(0, -0.25, "utilisasi", ha='center', va='center',
@@ -744,7 +744,7 @@ if active_page == "🏠  Dashboard":
             f'<div class="progress-fill" style="width:{pbar_w:.1f}%;background:{bar_col};"></div>'
             '</div></div>'
             '<div style="font-size:0.78rem;color:#90a4ae;margin-top:8px;font-family:\'JetBrains Mono\',monospace;">'
-            f'P = {f"{P:.6f}" if P is not None else "&#8212;"}'
+            f'P = {f"{P:.6f}" if P is not None else "N/A"}'
             '</div></div>',
             unsafe_allow_html=True
         )
@@ -780,7 +780,7 @@ elif active_page == "🧮  Kalkulator Engset":
     # Formula wrap — SVG dan wrapper digabung dalam satu markdown call
     st.markdown(
         '<div class="formula-wrap">'
-        '<span class="formula-tag">&#9889; Rumus Engset &#8212; Finite Source Model</span>'
+        '<span class="formula-tag">&#9889; Rumus Engset · Finite Source Model</span>'
         '<div class="eq-container">'
         + ENGSET_SVG +
         '</div></div>',
@@ -876,16 +876,16 @@ elif active_page == "🧮  Kalkulator Engset":
             )
 
             if P < 0.001:
-                st.markdown(f'<div class="eng-ok">✅ Sangat baik &#8212; blocking hanya {P*100:.4f}%</div>',
+                st.markdown(f'<div class="eng-ok">✅ Sangat baik · blocking hanya {P*100:.4f}%</div>',
                             unsafe_allow_html=True)
             elif P < 0.01:
-                st.markdown(f'<div class="eng-ok">✅ Baik &#8212; blocking {P*100:.3f}%</div>',
+                st.markdown(f'<div class="eng-ok">✅ Baik · blocking {P*100:.3f}%</div>',
                             unsafe_allow_html=True)
             elif P < 0.05:
-                st.markdown('<div class="eng-warn">⚠️ Cukup &#8212; pertimbangkan tambah kanal</div>',
+                st.markdown('<div class="eng-warn">⚠️ Cukup · pertimbangkan tambah kanal</div>',
                             unsafe_allow_html=True)
             else:
-                st.markdown('<div class="eng-warn">🔴 Buruk &#8212; tambah kanal segera!</div>',
+                st.markdown('<div class="eng-warn">🔴 Buruk · tambah kanal segera!</div>',
                             unsafe_allow_html=True)
 
             with st.expander("🔢 Lihat Langkah Perhitungan"):
@@ -940,9 +940,9 @@ elif active_page == "📐  Hitung Traffic A":
 
         c1, c2 = st.columns(2, gap="large")
         with c1:
-            call_rate  = st.number_input("&#955; &#8212; Call Rate (panggilan/jam per pengguna)",
+            call_rate  = st.number_input("&#955; · Call Rate (panggilan/jam per pengguna)",
                                          0.01, 1000.0, 3.0, 0.1, format="%.2f")
-            hold_time  = st.number_input("h &#8212; Hold Time Rata-rata (menit)",
+            hold_time  = st.number_input("h · Hold Time Rata-rata (menit)",
                                          0.1, 120.0, 2.0, 0.1, format="%.1f")
             n_users_t1 = st.number_input("Jumlah Pengguna Aktif (opsional untuk A total)",
                                          1, 10000, S)
@@ -1010,8 +1010,8 @@ elif active_page == "📐  Hitung Traffic A":
 
         c1, c2 = st.columns(2, gap="large")
         with c1:
-            U_val = st.number_input("U &#8212; Pengguna Aktif Jam Sibuk", 1, 10000, 50)
-            BHT   = st.number_input("BHT &#8212; Busy Hour Traffic Per User (Erl)",
+            U_val = st.number_input("U · Pengguna Aktif Jam Sibuk", 1, 10000, 50)
+            BHT   = st.number_input("BHT · Busy Hour Traffic Per User (Erl)",
                                     0.001, 1.0, 0.1, 0.001, format="%.3f")
         with c2:
             A_t2 = U_val * BHT
@@ -1224,7 +1224,7 @@ elif active_page == "📄  Export Laporan":
                         'margin-bottom:1.2rem;">📄 Preview Isi Laporan</div>',
                         unsafe_allow_html=True)
             items_prev = [
-                ("📌", "Judul",           "EngsetPro &#8212; Laporan Perhitungan Engset"),
+                ("📌", "Judul",           "EngsetPro · Laporan Perhitungan Engset"),
                 ("📅", "Tanggal",         datetime.now().strftime('%d %B %Y, %H:%M')),
                 ("🔢", "Parameter",       f"S={S}, N={N}, A={A:.1f} Erl"),
                 ("📡", "P Blocking",      f"{P:.8f}"),
@@ -1338,62 +1338,7 @@ elif active_page == "📄  Export Laporan":
                         f"Laporan Analisis Engset &nbsp;|&nbsp; {datetime.now().strftime('%d %B %Y, %H:%M')}", Sub))
                     el.append(HRFlowable(width="100%", thickness=1.5, color=HDR_BG, spaceAfter=16))
 
-                    el.append(Paragraph("1. Rumus Engset", H2))
-                    el.append(Paragraph(
-                        "Model Engset digunakan untuk menghitung probabilitas blocking pada "
-                        "sistem telekomunikasi dengan jumlah sumber (source) terbatas.", B))
-
-                    # Style untuk rumus box
-                    FormulaBox = ParagraphStyle('FormulaBox',
-                        fontSize=10, fontName='Courier',
-                        textColor=DARK, backColor=LIGHT_BG,
-                        leftIndent=20, rightIndent=20,
-                        spaceBefore=8, spaceAfter=8,
-                        leading=20, borderPadding=12)
-
-                    FormulaTitle = ParagraphStyle('FormulaTitle',
-                        fontSize=9, fontName='Helvetica-Bold',
-                        textColor=HDR_BG, backColor=LIGHT_BG,
-                        leftIndent=20, rightIndent=20,
-                        spaceBefore=8, spaceAfter=2,
-                        leading=14)
-
-                    el.append(Paragraph("Rumus Engset (Finite Source Model):", FormulaTitle))
-
-                    # Buat tabel untuk menampilkan rumus dengan rapi
-                    formula_data = [
-                        ["       C(S\u20121, N) \u00d7 (A/(S\u2212A))\u1d3a"],
-                        ["P  =  \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550"],
-                        ["        N"],
-                        ["       \u03a3  C(S\u20121, i) \u00d7 (A/(S\u2212A))\u2071"],
-                        ["      i=0"],
-                    ]
-                    ft = Table(formula_data, colWidths=[15*cm])
-                    ft.setStyle(TableStyle([
-                        ('BACKGROUND', (0,0), (-1,-1), LIGHT_BG),
-                        ('FONTNAME',   (0,0), (-1,-1), 'Courier'),
-                        ('FONTSIZE',   (0,0), (-1,-1), 10),
-                        ('TEXTCOLOR',  (0,0), (-1,-1), DARK),
-                        ('ALIGN',      (0,0), (-1,-1), 'LEFT'),
-                        ('LEFTPADDING',  (0,0), (-1,-1), 20),
-                        ('RIGHTPADDING', (0,0), (-1,-1), 20),
-                        ('TOPPADDING',   (0,0), (-1,-1), 3),
-                        ('BOTTOMPADDING',(0,0), (-1,-1), 3),
-                        ('TOPPADDING',   (0,0), (0,0), 10),
-                        ('BOTTOMPADDING',(0,-1), (0,-1), 10),
-                        ('BOX',        (0,0), (-1,-1), 0.5, BORDER),
-                        ('ROUNDEDCORNERS', [6]),
-                    ]))
-                    el.append(ft)
-                    el.append(Spacer(1, 4))
-                    el.append(Paragraph(
-                        "<b>P</b> = Probabilitas Blocking &nbsp;&nbsp;|&nbsp;&nbsp; "
-                        "<b>S</b> = Jumlah Source / Pengguna &nbsp;&nbsp;|&nbsp;&nbsp; "
-                        "<b>N</b> = Jumlah Kanal &nbsp;&nbsp;|&nbsp;&nbsp; "
-                        "<b>A</b> = Traffic Offered (Erlang)", B))
-                    el.append(Spacer(1, 8))
-
-                    el.append(Paragraph("2. Parameter Input", H2))
+                    el.append(Paragraph("1. Parameter Input", H2))
                     pd2 = [["Parameter", "Simbol", "Nilai", "Satuan"],
                             ["Jumlah Source", "S", str(S), "Pengguna"],
                             ["Jumlah Kanal", "N", str(N), "Kanal"],
@@ -1416,7 +1361,7 @@ elif active_page == "📄  Export Laporan":
                     el.append(pt)
                     el.append(Spacer(1, 12))
 
-                    el.append(Paragraph("3. Hasil Perhitungan", H2))
+                    el.append(Paragraph("2. Hasil Perhitungan", H2))
                     rd2 = [["Metrik", "Nilai", "Keterangan"],
                             ["Probabilitas Blocking (P)", f"{P:.8f}", "Nilai probabilitas blocking"],
                             ["Blocking (%)", f"{P*100:.4f}%", "Persentase trafik terblokir"],
@@ -1444,7 +1389,7 @@ elif active_page == "📄  Export Laporan":
                     el.append(rt)
                     el.append(Spacer(1, 16))
 
-                    el.append(Paragraph("4. Grafik Analisis", H2))
+                    el.append(Paragraph("3. Grafik Analisis", H2))
                     el.append(Paragraph(
                         f"Grafik berikut menunjukkan pengaruh perubahan jumlah kanal (N) "
                         f"dan traffic offered (A) terhadap probabilitas blocking (S={S}).", B))
