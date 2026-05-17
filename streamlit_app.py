@@ -107,64 +107,51 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # =====================================================
-# FUNGSI ENGSET
+# FUNGSI ENGSET (Sesuai Rumus Dosen)
+#
+# Rumus:
+#   P = [ C(S-1, N) * (A/(S-A))^N ]
+#       / [ sum_{i=0}^{N} C(S-1, i) * (A/(S-A))^i ]
+#
+# Keterangan:
+#   P = Probabilitas blocking
+#   S = Jumlah sumber / pengguna
+#   N = Jumlah server / kanal
+#   A = Traffic offered to group
 # =====================================================
 
 def nCr(n, r):
-
-    if r > n:
+    """Menghitung kombinasi C(n, r)"""
+    if r > n or r < 0:
         return 0
-
     return factorial(n) // (
-        factorial(r) * factorial(n-r)
+        factorial(r) * factorial(n - r)
     )
 
 
-def engset_pb(S, N, M):
+def engset_pb(S, N, A):
+    """
+    Menghitung probabilitas blocking Engset.
 
-    numerator = nCr(S-1, N) * (M**N)
+    Rumus:
+        P = [ C(S-1,N) * (A/(S-A))^N ]
+            / [ sum_{i=0}^{N} C(S-1,i) * (A/(S-A))^i ]
 
-    denominator = 0
+    Parameter:
+        S : Jumlah sumber / pengguna
+        N : Jumlah server / kanal
+        A : Traffic offered to group
+    """
+    ratio = A / (S - A)
 
-    for k in range(N+1):
+    numerator = nCr(S - 1, N) * (ratio ** N)
 
-        denominator += nCr(S-1, k) * (M**k)
+    denominator = sum(
+        nCr(S - 1, i) * (ratio ** i)
+        for i in range(N + 1)
+    )
 
     return numerator / denominator
-
-
-def iterate(S, N, rho):
-
-    M = rho
-    tolerance = 0.0001
-
-    data = []
-
-    iteration = 1
-
-    while True:
-
-        Pb = engset_pb(S, N, M)
-
-        M_new = rho * (1 - Pb)
-
-        diff = abs(M_new - M)
-
-        data.append([
-            iteration,
-            round(M, 6),
-            round(Pb, 6),
-            round(diff, 6)
-        ])
-
-        if diff < tolerance:
-            break
-
-        M = M_new
-
-        iteration += 1
-
-    return M_new, Pb, data, iteration
 
 
 # =====================================================
@@ -198,13 +185,12 @@ def export_pdf(data, fig):
     elements.append(Spacer(1, 12))
 
     info = f"""
-    <b>Jumlah Sumber:</b> {data['S']}<br/>
-    <b>Jumlah Kanal:</b> {data['N']}<br/>
-    <b>Traffic per Sumber:</b> {data['rho']}<br/>
-    <b>Probabilitas Blocking:</b> {data['Pb']:.6f}<br/>
-    <b>Traffic Idle:</b> {data['M']:.6f}<br/>
+    <b>Jumlah Sumber (S):</b> {data['S']}<br/>
+    <b>Jumlah Kanal (N):</b> {data['N']}<br/>
+    <b>Traffic Offered (A):</b> {data['A']}<br/>
+    <b>Probabilitas Blocking (P):</b> {data['Pb']:.6f}<br/>
     <b>Status:</b> {data['status']}<br/>
-    <b>Iterasi:</b> {data['iter']}<br/>
+    <b>Waktu:</b> {data['time']}<br/>
     """
 
     elements.append(
@@ -214,22 +200,19 @@ def export_pdf(data, fig):
     elements.append(Spacer(1, 15))
 
     table_data = [
-        ["Iterasi", "M", "Pb", "Selisih"]
+        ["Jumlah Kanal (N)", "Probabilitas Blocking (P)"]
     ]
 
-    for row in data["iter_data"]:
-
+    for row in data["tabel_data"]:
         table_data.append(row)
 
     table = Table(table_data)
 
     table.setStyle(TableStyle([
-
-        ('BACKGROUND', (0,0), (-1,0), colors.blue),
-        ('TEXTCOLOR', (0,0), (-1,0), colors.white),
-        ('GRID', (0,0), (-1,-1), 1, colors.black),
-        ('ALIGN', (0,0), (-1,-1), 'CENTER')
-
+        ('BACKGROUND', (0, 0), (-1, 0), colors.blue),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER')
     ]))
 
     elements.append(table)
@@ -317,7 +300,7 @@ if page == "🏠 Dashboard":
 
         S = st.number_input(
             "Jumlah Sumber (S)",
-            min_value=1,
+            min_value=2,
             value=10
         )
 
@@ -331,11 +314,13 @@ if page == "🏠 Dashboard":
 
     with col3:
 
-        rho = st.number_input(
-            "Traffic per Sumber (ρ)",
-            min_value=0.0,
-            value=0.5,
-            step=0.01
+        A = st.number_input(
+            "Traffic Offered (A)",
+            min_value=0.01,
+            max_value=float(S - 1),
+            value=min(0.5, float(S - 1)),
+            step=0.01,
+            help="Traffic offered to group. Nilai harus lebih kecil dari S."
         )
 
     st.markdown("</div>", unsafe_allow_html=True)
@@ -345,18 +330,19 @@ if page == "🏠 Dashboard":
     if run:
 
         if N >= S:
-
             st.error(
-                "Jumlah kanal harus lebih kecil dari jumlah sumber"
+                "❌ Jumlah kanal (N) harus lebih kecil dari jumlah sumber (S)."
+            )
+
+        elif A >= S:
+            st.error(
+                "❌ Traffic offered (A) harus lebih kecil dari jumlah sumber (S)."
             )
 
         else:
 
-            M, Pb, iter_data, iteration = iterate(
-                S,
-                N,
-                rho
-            )
+            # Hitung langsung dengan rumus Engset dari dosen
+            Pb = engset_pb(S, N, A)
 
             status = (
                 "OPTIMAL"
@@ -364,16 +350,19 @@ if page == "🏠 Dashboard":
                 else "PADAT"
             )
 
-            result = {
+            # Tabel Pb untuk berbagai nilai N (untuk grafik & PDF)
+            tabel_data = []
+            for n_val in range(1, S):
+                pb_val = engset_pb(S, n_val, A)
+                tabel_data.append([n_val, round(pb_val, 6)])
 
+            result = {
                 "S": S,
                 "N": N,
-                "rho": rho,
-                "M": M,
+                "A": A,
                 "Pb": Pb,
-                "iter": iteration,
                 "status": status,
-                "iter_data": iter_data,
+                "tabel_data": tabel_data,
                 "time": datetime.now().strftime("%d-%m-%Y %H:%M:%S")
             }
 
@@ -401,27 +390,27 @@ if page == "🏠 Dashboard":
                 </div>
 
                 <div class="metric-label">
-                    Probabilitas Blocking
+                    Probabilitas Blocking (P)
                 </div>
             </div>
 
             <div class="metric-card">
                 <div class="metric-value">
-                    {r['M']:.6f}
+                    {r['A']}
                 </div>
 
                 <div class="metric-label">
-                    Traffic Idle
+                    Traffic Offered (A)
                 </div>
             </div>
 
             <div class="metric-card">
                 <div class="metric-value">
-                    {r['iter']}
+                    {r['N']}
                 </div>
 
                 <div class="metric-label">
-                    Jumlah Iterasi
+                    Jumlah Kanal (N)
                 </div>
             </div>
 
@@ -448,7 +437,7 @@ elif page == "📊 Analisis":
     if "result" not in st.session_state:
 
         st.warning(
-            "Jalankan simulasi terlebih dahulu"
+            "⚠️ Jalankan simulasi terlebih dahulu di menu Dashboard."
         )
 
     else:
@@ -457,19 +446,15 @@ elif page == "📊 Analisis":
 
         st.markdown("""
         <div class="section-title">
-            🔁 Tabel Iterasi
+            🔁 Tabel Probabilitas Blocking per Jumlah Kanal
         </div>
         """, unsafe_allow_html=True)
 
         df = pd.DataFrame(
-
-            r["iter_data"],
-
+            r["tabel_data"],
             columns=[
-                "Iterasi",
-                "M",
-                "Pb",
-                "Selisih"
+                "Jumlah Kanal (N)",
+                "Probabilitas Blocking (P)"
             ]
         )
 
@@ -480,37 +465,123 @@ elif page == "📊 Analisis":
 
         st.markdown("""
         <div class="section-title">
-            📈 Grafik Blocking Probability
+            📈 Grafik Probabilitas Blocking
         </div>
         """, unsafe_allow_html=True)
 
         S = r["S"]
+        A = r["A"]
 
-        rho = r["rho"]
+        x = [row[0] for row in r["tabel_data"]]
+        y = [row[1] for row in r["tabel_data"]]
 
-        x = list(range(1, S))
-
-        y = [
-            engset_pb(S, n, rho)
-            for n in x
-        ]
-
-        fig, ax = plt.subplots(figsize=(10,4))
+        fig, ax = plt.subplots(figsize=(10, 4))
 
         ax.plot(
             x,
             y,
             marker='o',
-            linewidth=2
+            linewidth=2,
+            label='Probabilitas Blocking (P)'
         )
 
         ax.axhline(
             0.2,
             linestyle='--',
-            label='Threshold 0.2'
+            color='red',
+            label='Batas Threshold (P = 0.2)'
         )
 
-        ax.set_xlabel("Jumlah Kanal")
+        ax.axvline(
+            r["N"],
+            linestyle=':',
+            color='green',
+            label=f'N terpilih = {r["N"]}'
+        )
+
+        ax.set_xlabel("Jumlah Kanal (N)")
+        ax.set_ylabel("Probabilitas Blocking (P)")
+        ax.set_title("Grafik Probabilitas Blocking Engset")
+        ax.grid(True)
+        ax.legend()
+
+        st.pyplot(fig)
+
+# =====================================================
+# RIWAYAT
+# =====================================================
+
+elif page == "📁 Riwayat":
+
+    if st.session_state.history:
+
+        rows = []
+
+        for i, r in enumerate(
+            st.session_state.history,
+            1
+        ):
+
+            rows.append({
+                "No": i,
+                "Waktu": r["time"],
+                "S": r["S"],
+                "N": r["N"],
+                "A": r["A"],
+                "P (Blocking)": round(r["Pb"], 6),
+                "Status": r["status"]
+            })
+
+        df_history = pd.DataFrame(rows)
+
+        st.dataframe(
+            df_history,
+            use_container_width=True
+        )
+
+    else:
+
+        st.info(
+            "ℹ️ Belum ada riwayat simulasi."
+        )
+
+# =====================================================
+# EXPORT PDF
+# =====================================================
+
+if "result" in st.session_state:
+
+    st.markdown("---")
+
+    st.markdown("""
+    <div class="section-title">
+        📥 Export PDF
+    </div>
+    """, unsafe_allow_html=True)
+
+    latest = st.session_state.result
+
+    x = [row[0] for row in latest["tabel_data"]]
+    y = [row[1] for row in latest["tabel_data"]]
+
+    fig, ax = plt.subplots(figsize=(10, 4))
+
+    ax.plot(x, y, marker='o', linewidth=2)
+    ax.axhline(0.2, linestyle='--', color='red', label='Threshold P = 0.2')
+    ax.set_xlabel("Jumlah Kanal (N)")
+    ax.set_ylabel("Probabilitas Blocking (P)")
+    ax.set_title("Grafik Probabilitas Blocking Engset")
+    ax.grid(True)
+    ax.legend()
+
+    pdf = export_pdf(latest, fig)
+
+    st.download_button(
+        label="⬇️ Download Laporan PDF",
+        data=pdf,
+        file_name="Laporan_Engset.pdf",
+        mime="application/pdf"
+        )lah Kanal")
 
         ax.set_ylabel(
             "Probabilitas Blocking"
