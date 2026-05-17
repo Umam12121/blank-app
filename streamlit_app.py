@@ -28,7 +28,7 @@ st.set_page_config(
     page_title="EngsetPro",
     page_icon="📡",
     layout="wide",
-    initial_sidebar_state="expanded",
+    initial_sidebar_state="collapsed",
 )
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -339,32 +339,43 @@ html, body, [class*="css"] {
 }
 
 /* ═══════════ MOBILE RESPONSIVE ═══════════ */
-#mobile-menu-btn {
-  display: none;
-  position: fixed; top: 8px; left: 8px; z-index: 2147483647;
-  background: linear-gradient(135deg, #1a56ff, #0e3acc);
-  color: white; border: none; border-radius: 12px;
-  width: 48px; height: 48px;
-  align-items: center; justify-content: center;
-  font-size: 1.4rem; cursor: pointer;
-  box-shadow: 0 4px 18px rgba(26,86,255,0.55);
-  -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
-  outline: none;
-}
-#mobile-menu-btn:active {
-  transform: scale(0.93);
-  box-shadow: 0 2px 10px rgba(26,86,255,0.4);
-}
 @media (max-width: 768px) {
-  #mobile-menu-btn { display: flex !important; }
   .main .block-container {
     padding-left: 0.75rem !important;
     padding-right: 0.75rem !important;
-    padding-top: 3.5rem !important;
+    padding-top: 1rem !important;
   }
   .chip-grid { grid-template-columns: 1fr 1fr !important; }
   .formula-legend { grid-template-columns: 1fr !important; }
+}
+
+/* Buat tombol toggle sidebar bawaan Streamlit lebih besar & keliatan di mobile */
+[data-testid="stSidebarCollapsedControl"] {
+  top: 8px !important;
+  left: 8px !important;
+}
+[data-testid="stSidebarCollapsedControl"] button,
+button[data-testid="stSidebarNavToggleButton"],
+button[data-testid="collapsedControl"] {
+  background: linear-gradient(135deg, #1a56ff, #0e3acc) !important;
+  color: white !important;
+  border-radius: 12px !important;
+  width: 48px !important;
+  height: 48px !important;
+  min-width: 48px !important;
+  min-height: 48px !important;
+  box-shadow: 0 4px 18px rgba(26,86,255,0.55) !important;
+  border: none !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+[data-testid="stSidebarCollapsedControl"] button svg,
+button[data-testid="stSidebarNavToggleButton"] svg,
+button[data-testid="collapsedControl"] svg {
+  fill: white !important;
+  color: white !important;
+  width: 22px !important;
+  height: 22px !important;
 }
 
 /* ═══════════ SECTION TITLE ═══════════ */
@@ -503,76 +514,7 @@ html, body, [class*="css"] {
 </style>
 """, unsafe_allow_html=True)
 
-# ── Mobile hamburger menu button ──────────────────────────────────────────────
-import streamlit.components.v1 as components
-components.html("""
-<style>
-  #hbg-btn {
-    display: none;
-    position: fixed; top: 8px; left: 8px; z-index: 2147483647;
-    background: linear-gradient(135deg, #1a56ff, #0e3acc);
-    color: white; border: none; border-radius: 12px;
-    width: 48px; height: 48px;
-    align-items: center; justify-content: center;
-    font-size: 1.4rem; cursor: pointer;
-    box-shadow: 0 4px 18px rgba(26,86,255,0.55);
-    -webkit-tap-highlight-color: transparent;
-    touch-action: manipulation;
-    outline: none;
-    font-family: sans-serif;
-  }
-  #hbg-btn:active { transform: scale(0.93); }
-  @media (max-width: 768px) { #hbg-btn { display: flex !important; } }
-</style>
-<button id="hbg-btn" title="Buka/Tutup Menu">&#9776;</button>
-<script>
-(function() {
-  var btn = document.getElementById('hbg-btn');
-
-  function getToggleBtn() {
-    var doc = window.parent.document;
-    var tries = [
-      'button[data-testid="stSidebarNavToggleButton"]',
-      'button[data-testid="collapsedControl"]',
-      '[data-testid="stSidebarCollapsedControl"] button',
-      'button[data-testid="stBaseButton-headerNoPadding"]',
-      'button[aria-label="Open sidebar"]',
-      'button[aria-label="Close sidebar"]',
-    ];
-    for (var i = 0; i < tries.length; i++) {
-      var el = doc.querySelector(tries[i]);
-      if (el) return el;
-    }
-    var sidebar = doc.querySelector('[data-testid="stSidebar"]');
-    var allBtns = doc.querySelectorAll('button');
-    for (var j = 0; j < allBtns.length; j++) {
-      var b = allBtns[j];
-      if (sidebar && sidebar.contains(b)) continue;
-      var r = b.getBoundingClientRect();
-      if (r.left < 100 && r.top < 100 && r.width > 0) return b;
-    }
-    return null;
-  }
-
-  function toggleManual() {
-    var sb = window.parent.document.querySelector('[data-testid="stSidebar"]');
-    if (!sb) return;
-    var collapsed = sb.offsetWidth < 50 || sb.style.transform.indexOf('-') !== -1;
-    if (collapsed) {
-      sb.style.cssText += '; transform: translateX(0) !important; visibility: visible !important;';
-    } else {
-      sb.style.cssText += '; transform: translateX(-110%) !important;';
-    }
-  }
-
-  btn.addEventListener('click', function(e) {
-    e.preventDefault();
-    var toggle = getToggleBtn();
-    if (toggle) { toggle.click(); } else { toggleManual(); }
-  });
-})();
-</script>
-""", height=0)
+# ── Mobile: tampilkan tombol sidebar bawaan Streamlit dengan styling yang lebih baik ──
 # ═══════════════════════════════════════════════════════════════════════════════
 def log_factorial(n):
     if n <= 1: return 0.0
