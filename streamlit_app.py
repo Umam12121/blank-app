@@ -28,7 +28,7 @@ st.set_page_config(
     page_title="EngsetPro",
     page_icon="📡",
     layout="wide",
-    initial_sidebar_state="collapsed",
+    initial_sidebar_state="expanded",
 )
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -327,34 +327,26 @@ html, body, [class*="css"] {
 .fl-item { font-size: 0.78rem; color: var(--slate); display: flex; align-items: baseline; gap: 8px; }
 .fl-sym  { font-family: 'JetBrains Mono', monospace; font-weight: 700; color: var(--blue-primary); min-width: 22px; }
 
-/* ═══════════ MOBILE MENU BUTTON ═══════════ */
-@media (max-width: 768px) {
-  /* Hamburger toggle button for mobile */
-  #mobile-menu-btn {
-    position: fixed; top: 12px; left: 12px; z-index: 9999;
-    background: linear-gradient(135deg, #1a56ff, #0e3acc);
-    color: white; border: none; border-radius: 10px;
-    width: 44px; height: 44px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1.3rem; cursor: pointer;
-    box-shadow: 0 4px 16px rgba(26,86,255,0.4);
-  }
-  /* Keep sidebar accessible */
-  [data-testid="stSidebar"] {
-    transform: translateX(-110%) !important;
-    transition: transform 0.3s ease !important;
-    position: fixed !important; z-index: 9998 !important;
-    top: 0 !important; left: 0 !important;
-    height: 100vh !important; width: 85vw !important;
-    max-width: 320px !important;
-  }
-  [data-testid="stSidebar"].open {
-    transform: translateX(0) !important;
-  }
-  .main .block-container { padding-left: 1rem !important; padding-right: 1rem !important; }
+/* ═══════════ MOBILE RESPONSIVE ═══════════ */
+#mobile-menu-btn {
+  display: none;
+  position: fixed; top: 10px; left: 10px; z-index: 99999;
+  background: linear-gradient(135deg, #1a56ff, #0e3acc);
+  color: white; border: none; border-radius: 10px;
+  width: 42px; height: 42px;
+  align-items: center; justify-content: center;
+  font-size: 1.25rem; cursor: pointer;
+  box-shadow: 0 4px 14px rgba(26,86,255,0.45);
 }
-@media (min-width: 769px) {
-  #mobile-menu-btn { display: none !important; }
+@media (max-width: 768px) {
+  #mobile-menu-btn { display: flex !important; }
+  .main .block-container {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+    padding-top: 3.5rem !important;
+  }
+  .chip-grid { grid-template-columns: 1fr 1fr !important; }
+  .formula-legend { grid-template-columns: 1fr !important; }
 }
 
 /* ═══════════ SECTION TITLE ═══════════ */
@@ -495,22 +487,19 @@ html, body, [class*="css"] {
 
 # ── Mobile hamburger menu button ──────────────────────────────────────────────
 st.markdown("""
-<button id="mobile-menu-btn" onclick="toggleSidebar()" title="Menu">&#9776;</button>
-<div id="mobile-overlay" onclick="closeSidebar()"
-  style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9997;"></div>
+<button id="mobile-menu-btn" onclick="clickSidebarToggle()" title="Buka Menu">&#9776;</button>
 <script>
-function toggleSidebar() {
-  var sb = document.querySelector('[data-testid="stSidebar"]');
-  var ov = document.getElementById('mobile-overlay');
-  if (sb) {
-    sb.classList.toggle('open');
-    ov.style.display = sb.classList.contains('open') ? 'block' : 'none';
+function clickSidebarToggle() {
+  // Klik tombol collapse/expand bawaan Streamlit agar sidebar tetap fungsional
+  var btn = document.querySelector('[data-testid="collapsedControl"]');
+  if (!btn) btn = document.querySelector('button[kind="header"]');
+  if (!btn) btn = document.querySelector('[data-testid="stSidebarNavToggleButton"]');
+  if (!btn) {
+    // Fallback: cari semua button di area header, klik yang pertama
+    var allBtns = document.querySelectorAll('section[data-testid="stSidebar"] ~ div button');
+    if (allBtns.length) btn = allBtns[0];
   }
-}
-function closeSidebar() {
-  var sb = document.querySelector('[data-testid="stSidebar"]');
-  var ov = document.getElementById('mobile-overlay');
-  if (sb) { sb.classList.remove('open'); ov.style.display = 'none'; }
+  if (btn) btn.click();
 }
 </script>
 """, unsafe_allow_html=True)
