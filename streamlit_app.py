@@ -418,98 +418,147 @@ def find_min_N(S, A, target=0.01):
 # Semua kurung kurawal SVG dihindari, pakai style attribute langsung
 # ═══════════════════════════════════════════════════════════════════════════════
 ENGSET_SVG = (
-    # Viewbox lebih tinggi agar semua elemen muat, layout dipusatkan
-    '<svg viewBox="0 0 560 220" xmlns="http://www.w3.org/2000/svg" '
-    'style="max-width:560px;width:100%;display:block;margin:0 auto;">'
+    # ─────────────────────────────────────────────────────────────────────────
+    # Rumus Engset sesuai notasi dosen:
+    #
+    #          (S-1)!          (  A  )^N
+    #       ─────────────── × (──────)
+    #        N! (S-1-N)!      ( S-A  )
+    # P = ──────────────────────────────────────────────────────
+    #       N   (S-1)!          (  A  )^i
+    #      Σ  ─────────────── × (──────)
+    #      i=0  i! (S-1-i)!     ( S-A  )
+    #
+    # ViewBox: 700 x 310  (lebar cukup untuk notasi faktorial penuh)
+    # ─────────────────────────────────────────────────────────────────────────
+    '<svg viewBox="0 0 700 310" xmlns="http://www.w3.org/2000/svg" '
+    'style="max-width:700px;width:100%;display:block;margin:0 auto;">'
 
     '<defs><style>'
-    '.es { font-family: Georgia, "Times New Roman", serif; }'
-    '.ec { fill: #0288D1; }'
-    '.ed { fill: #0a2540; }'
-    '.eg { fill: #546e7a; font-family: sans-serif; font-size: 11.5px; }'
+    '.es  { font-family: Georgia, "Times New Roman", serif; }'
+    '.ec  { fill: #0288D1; }'
+    '.ed  { fill: #0a2540; }'
+    '.ef  { fill: #0a2540; font-family: Georgia, serif; font-style: italic; }'
+    '.eg  { fill: #546e7a; font-family: sans-serif; font-size: 12px; }'
+    '.esm { font-family: Georgia, "Times New Roman", serif; fill: #0a2540; }'
     '</style></defs>'
 
-    # ─────────────────────────────────────────────
-    # Layout: semua elemen rumus dipusatkan di x=280
-    # P = (x=60-100), garis pecahan (x=110-430)
-    # Pembilang: tengah di x=270
-    # Penyebut:  tengah di x=270
-    # ─────────────────────────────────────────────
+    # ══════════════════════════════════════════════════════
+    # P  =
+    # ══════════════════════════════════════════════════════
+    '<text x="28" y="148" class="es ed" font-size="30" font-style="italic" font-weight="bold">P</text>'
+    '<text x="58" y="148" class="es ed" font-size="28">=</text>'
 
-    # ── P = ──
-    '<text x="68" y="104" class="es ed" font-size="28" font-style="italic" font-weight="bold">P</text>'
-    '<text x="96" y="104" class="es ed" font-size="26">=</text>'
+    # ══════════════════════════════════════════════════════
+    # GARIS PECAHAN UTAMA  (x=88 .. x=670, y=150)
+    # ══════════════════════════════════════════════════════
+    '<line x1="88" y1="150" x2="670" y2="150" stroke="#0288D1" stroke-width="2.8"/>'
 
-    # ══════ NUMERATOR (baris atas garis pecahan) ══════
-    # Semua elemen pembilang berpusat di x≈270, y sekitar 50-88
+    # ══════════════════════════════════════════════════════
+    # PEMBILANG  (di atas garis utama, tengah sekitar y=50-140)
+    # Struktur:   [ (S-1)! / N!(S-1-N)! ]  ×  [ A/(S-A) ]^N
+    # ══════════════════════════════════════════════════════
 
-    # C^{S-1}_N  (x=130)
-    '<text x="133" y="58" class="es ec" font-size="12" font-weight="bold">S&#8722;1</text>'
-    '<text x="130" y="76" class="es ec" font-size="24" font-weight="bold">C</text>'
-    '<text x="153" y="86" class="es ed" font-size="13">N</text>'
+    # ── Sub-pecahan kiri pembilang: (S-1)! / N!(S-1-N)! ──
+    # Pusat sub-pecahan ini di x=200
 
-    # ×
-    '<text x="176" y="75" class="es" fill="#90a4ae" font-size="20">&#215;</text>'
+    # Pembilang sub-pecahan: (S-1)!
+    '<text x="200" y="68" class="es ed" font-size="15" text-anchor="middle">(S&#8722;1)!</text>'
 
-    # ( A / (S-A) )^N
-    # kurung buka
-    '<text x="200" y="79" class="es ed" font-size="32" font-weight="300">(</text>'
-    # A (numerator pecahan kecil)
-    '<text x="222" y="62" class="es ed" font-size="18" text-anchor="middle">A</text>'
-    # garis pecahan kecil
-    '<line x1="210" y1="67" x2="234" y2="67" stroke="#0a2540" stroke-width="1.5"/>'
-    # S-A (denominator pecahan kecil) — pakai &#8722; bukan -
-    '<text x="222" y="83" class="es ed" font-size="13" text-anchor="middle">S&#8722;A</text>'
-    # kurung tutup
-    '<text x="238" y="79" class="es ed" font-size="32" font-weight="300">)</text>'
-    # pangkat N
-    '<text x="262" y="52" class="es ec" font-size="15" font-style="italic" font-weight="bold">N</text>'
+    # Garis sub-pecahan kiri (pembilang)
+    '<line x1="140" y1="76" x2="260" y2="76" stroke="#0a2540" stroke-width="1.6"/>'
 
-    # ══════ GARIS PECAHAN UTAMA ══════
-    '<line x1="118" y1="97" x2="430" y2="97" stroke="#0288D1" stroke-width="2.5"/>'
+    # Penyebut sub-pecahan: N! (S-1-N)!
+    '<text x="200" y="100" class="es ed" font-size="14" text-anchor="middle">N! (S&#8722;1&#8722;N)!</text>'
 
-    # ══════ DENOMINATOR (baris bawah garis pecahan) ══════
+    # ── Tanda kali ──
+    '<text x="282" y="88" class="es" fill="#90a4ae" font-size="22">&#215;</text>'
 
-    # Sigma: N di atas, i=0 di bawah
-    '<text x="124" y="118" class="es ec" font-size="12" font-weight="bold">N</text>'
-    '<text x="116" y="138" class="es ec" font-size="34">&#931;</text>'
-    '<text x="115" y="159" class="es ec" font-size="12" font-weight="bold">i&#61;0</text>'
+    # ── Sub-pecahan kanan pembilang: A / (S-A)  dengan pangkat N ──
+    # Pusat di x=380
 
-    # C^{S-1}_i  (x=168)
-    '<text x="168" y="118" class="es ec" font-size="12" font-weight="bold">S&#8722;1</text>'
-    '<text x="165" y="137" class="es ec" font-size="24" font-weight="bold">C</text>'
-    '<text x="188" y="148" class="es ed" font-size="13" font-style="italic">i</text>'
+    # Kurung buka besar
+    '<text x="308" y="98" class="es ed" font-size="44" font-weight="200">(</text>'
 
-    # ×
-    '<text x="210" y="137" class="es" fill="#90a4ae" font-size="20">&#215;</text>'
+    # A (atas)
+    '<text x="358" y="68" class="es ed" font-size="17" text-anchor="middle">A</text>'
+    # Garis pecahan kecil
+    '<line x1="340" y1="74" x2="376" y2="74" stroke="#0a2540" stroke-width="1.5"/>'
+    # S-A (bawah)
+    '<text x="358" y="96" class="es ed" font-size="14" text-anchor="middle">S&#8722;A</text>'
 
-    # ( A / (S-A) )^i
-    '<text x="234" y="141" class="es ed" font-size="32" font-weight="300">(</text>'
-    # A
-    '<text x="257" y="123" class="es ed" font-size="18" text-anchor="middle">A</text>'
-    # garis pecahan kecil
-    '<line x1="245" y1="128" x2="269" y2="128" stroke="#0a2540" stroke-width="1.5"/>'
-    # S-A
-    '<text x="257" y="144" class="es ed" font-size="13" text-anchor="middle">S&#8722;A</text>'
-    # kurung tutup
-    '<text x="273" y="141" class="es ed" font-size="32" font-weight="300">)</text>'
-    # pangkat i
-    '<text x="298" y="113" class="es ec" font-size="15" font-style="italic" font-weight="bold">i</text>'
+    # Kurung tutup besar
+    '<text x="382" y="98" class="es ed" font-size="44" font-weight="200">)</text>'
 
-    # ══════ GARIS PEMISAH LEGENDA ══════
-    '<line x1="20" y1="175" x2="540" y2="175" stroke="#b2ebf2" stroke-width="1.5"/>'
+    # Pangkat N (superscript)
+    '<text x="416" y="50" class="es ec" font-size="17" font-style="italic" font-weight="bold">N</text>'
 
-    # ══════ LEGENDA ══════
-    # Kiri
-    '<text x="28" y="191" class="es ed" font-size="13" font-style="italic">P</text>'
-    '<text x="40" y="191" class="eg"> = Probabilitas Blocking</text>'
-    '<text x="28" y="208" class="es ed" font-size="13" font-style="italic">S</text>'
-    '<text x="40" y="208" class="eg"> = Jumlah Source / Pengguna</text>'
-    # Kanan
-    '<text x="290" y="191" class="es ed" font-size="13" font-style="italic">N</text>'
-    '<text x="302" y="191" class="eg"> = Jumlah Kanal / Server</text>'
-    '<text x="290" y="208" class="es ed" font-size="13" font-style="italic">A</text>'
-    '<text x="302" y="208" class="eg"> = Traffic Offered (Erlang)</text>'
+    # ══════════════════════════════════════════════════════
+    # PENYEBUT  (di bawah garis utama)
+    # Struktur:  Σ(i=0..N)  [ (S-1)! / i!(S-1-i)! ]  ×  [ A/(S-A) ]^i
+    # ══════════════════════════════════════════════════════
+
+    # ── Sigma dengan batas ──
+    # N (batas atas sigma)
+    '<text x="109" y="172" class="es ec" font-size="13" font-weight="bold" text-anchor="middle">N</text>'
+    # Sigma besar
+    '<text x="100" y="200" class="es ec" font-size="42">&#931;</text>'
+    # i=0 (batas bawah sigma)
+    '<text x="109" y="225" class="es ec" font-size="13" font-weight="bold" text-anchor="middle">i&#61;0</text>'
+
+    # ── Sub-pecahan penyebut: (S-1)! / i!(S-1-i)! ──
+    # Pusat di x=250
+
+    # Pembilang sub-pecahan penyebut: (S-1)!
+    '<text x="250" y="185" class="es ed" font-size="15" text-anchor="middle">(S&#8722;1)!</text>'
+
+    # Garis sub-pecahan penyebut
+    '<line x1="188" y1="193" x2="312" y2="193" stroke="#0a2540" stroke-width="1.6"/>'
+
+    # Penyebut sub-pecahan: i! (S-1-i)!
+    '<text x="250" y="217" class="es ed" font-size="14" text-anchor="middle">i! (S&#8722;1&#8722;i)!</text>'
+
+    # ── Tanda kali penyebut ──
+    '<text x="332" y="206" class="es" fill="#90a4ae" font-size="22">&#215;</text>'
+
+    # ── Sub-pecahan kanan penyebut: A / (S-A)  pangkat i ──
+    # Pusat di x=430
+
+    # Kurung buka besar penyebut
+    '<text x="358" y="215" class="es ed" font-size="44" font-weight="200">(</text>'
+
+    # A (atas penyebut)
+    '<text x="408" y="185" class="es ed" font-size="17" text-anchor="middle">A</text>'
+    # Garis pecahan kecil penyebut
+    '<line x1="390" y1="191" x2="426" y2="191" stroke="#0a2540" stroke-width="1.5"/>'
+    # S-A (bawah penyebut)
+    '<text x="408" y="213" class="es ed" font-size="14" text-anchor="middle">S&#8722;A</text>'
+
+    # Kurung tutup besar penyebut
+    '<text x="432" y="215" class="es ed" font-size="44" font-weight="200">)</text>'
+
+    # Pangkat i (superscript)
+    '<text x="468" y="162" class="es ec" font-size="17" font-style="italic" font-weight="bold">i</text>'
+
+    # ══════════════════════════════════════════════════════
+    # GARIS PEMISAH LEGENDA
+    # ══════════════════════════════════════════════════════
+    '<line x1="20" y1="256" x2="680" y2="256" stroke="#b2ebf2" stroke-width="1.5"/>'
+
+    # ══════════════════════════════════════════════════════
+    # LEGENDA  (2 kolom)
+    # ══════════════════════════════════════════════════════
+    '<text x="28" y="273" class="es ed" font-size="13" font-style="italic">P</text>'
+    '<text x="42" y="273" class="eg">= Probabilitas blocking (blocking probability)</text>'
+
+    '<text x="28" y="291" class="es ed" font-size="13" font-style="italic">S</text>'
+    '<text x="42" y="291" class="eg">= Jumlah source / pengguna</text>'
+
+    '<text x="370" y="273" class="es ed" font-size="13" font-style="italic">N</text>'
+    '<text x="384" y="273" class="eg">= Jumlah server / kanal</text>'
+
+    '<text x="370" y="291" class="es ed" font-size="13" font-style="italic">A</text>'
+    '<text x="384" y="291" class="eg">= Traffic offered to group</text>'
 
     '</svg>'
 )
