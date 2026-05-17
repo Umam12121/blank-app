@@ -1136,8 +1136,7 @@ elif active_page == "📊  Analisis Dan Grafik":
         cg1, cg2 = st.columns(2, gap="large")
 
         with cg1:
-            st.markdown('<div class="card">', unsafe_allow_html=True)
-            st.markdown("##### 📈 Blocking Vs Jumlah Kanal (N)")
+            st.markdown('<div style="font-size:0.95rem;font-weight:800;color:#0a2540;margin-bottom:0.5rem;">📈 Blocking Vs Jumlah Kanal (N)</div>', unsafe_allow_html=True)
             max_n = min(S - 1, 50)
             ns_   = list(range(1, max_n + 1))
             ps_   = [(engset(S, n, A) or 0) * 100 for n in ns_]
@@ -1162,11 +1161,9 @@ elif active_page == "📊  Analisis Dan Grafik":
             plt.tight_layout(pad=1.0)
             st.pyplot(fig1, use_container_width=True)
             plt.close(fig1)
-            st.markdown('</div>', unsafe_allow_html=True)
 
         with cg2:
-            st.markdown('<div class="card">', unsafe_allow_html=True)
-            st.markdown("##### 📉 Blocking Vs Traffic Offered (A)")
+            st.markdown('<div style="font-size:0.95rem;font-weight:800;color:#0a2540;margin-bottom:0.5rem;">📉 Blocking Vs Traffic Offered (A)</div>', unsafe_allow_html=True)
             a_max_ = min(float(S - 1), 30.0)
             av_    = np.linspace(0.1, a_max_, 300)
             pv_    = [(engset(S, N, float(a)) or 0) * 100 for a in av_]
@@ -1189,10 +1186,8 @@ elif active_page == "📊  Analisis Dan Grafik":
             plt.tight_layout(pad=1.0)
             st.pyplot(fig2, use_container_width=True)
             plt.close(fig2)
-            st.markdown('</div>', unsafe_allow_html=True)
 
-        st.markdown('<div class="card">', unsafe_allow_html=True)
-        st.markdown("##### 🌐 Multi-Kurva: Blocking Vs N Untuk Berbagai Nilai A")
+        st.markdown('<div style="font-size:0.95rem;font-weight:800;color:#0a2540;margin:1.2rem 0 0.5rem;">🌐 Multi-Kurva: Blocking Vs N Untuk Berbagai Nilai A</div>', unsafe_allow_html=True)
         palette = [BLUE, TEAL, GREEN, AMBER, RED, '#8B5CF6']
         a_list  = [round(A * m, 2) for m in [0.5, 0.75, 1.0, 1.25, 1.5, 2.0] if 0 < A * m < S][:6]
         max_n3  = min(S - 1, 35)
@@ -1218,10 +1213,8 @@ elif active_page == "📊  Analisis Dan Grafik":
         plt.tight_layout(pad=1.0)
         st.pyplot(fig3, use_container_width=True)
         plt.close(fig3)
-        st.markdown('</div>', unsafe_allow_html=True)
 
-        st.markdown('<div class="card">', unsafe_allow_html=True)
-        st.markdown("##### 📋 Tabel Detail Blocking Vs N")
+        st.markdown('<div style="font-size:0.95rem;font-weight:800;color:#0a2540;margin:1.2rem 0 0.5rem;">📋 Tabel Detail Blocking Vs N</div>', unsafe_allow_html=True)
         rows_html = ""
         for n_i in range(1, min(S, N + 15)):
             p_i = engset(S, n_i, A)
@@ -1248,7 +1241,6 @@ elif active_page == "📊  Analisis Dan Grafik":
             f'&#128309; Baris biru = nilai N yang dipilih saat ini (N={N})</div>',
             unsafe_allow_html=True
         )
-        st.markdown('</div>', unsafe_allow_html=True)
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -1268,9 +1260,7 @@ elif active_page == "📄  Export Laporan":
         c_prev, c_act = st.columns([1.5, 1], gap="large")
 
         with c_prev:
-            st.markdown('<div class="card">', unsafe_allow_html=True)
-            st.markdown('<div style="font-size:0.92rem;font-weight:800;color:#0a2540;'
-                        'margin-bottom:1.2rem;">📄 Preview Isi Laporan</div>',
+            st.markdown('<div style="font-size:0.92rem;font-weight:800;color:#0a2540;margin-bottom:1.2rem;">📄 Preview Isi Laporan</div>',
                         unsafe_allow_html=True)
             items_prev = [
                 ("📌", "Judul",           "EngsetPro · Laporan Perhitungan Engset"),
@@ -1294,16 +1284,15 @@ elif active_page == "📄  Export Laporan":
                     '</div>',
                     unsafe_allow_html=True
                 )
-            st.markdown('</div>', unsafe_allow_html=True)
 
         with c_act:
             st.markdown(
-                '<div class="card" style="text-align:center;padding:2.2rem 1.5rem;">'
-                '<div style="font-size:3.5rem;margin-bottom:1rem;">📄</div>'
-                '<div style="font-size:1.05rem;font-weight:800;color:#0a2540;margin-bottom:0.6rem;">'
+                '<div style="text-align:center;padding:1.5rem 1rem;">'
+                '<div style="font-size:3rem;margin-bottom:0.8rem;">📄</div>'
+                '<div style="font-size:1rem;font-weight:800;color:#0a2540;margin-bottom:0.5rem;">'
                 'Laporan PDF Profesional</div>'
-                '<div style="font-size:0.84rem;color:#90a4ae;margin-bottom:1.5rem;line-height:1.7;">'
-                'Berisi rumus, parameter, hasil perhitungan,<br>grafik analisis, dan tabel detail.'
+                '<div style="font-size:0.82rem;color:#90a4ae;margin-bottom:1rem;line-height:1.7;">'
+                'Berisi parameter, hasil perhitungan,<br>grafik analisis, dan tabel detail.'
                 '</div></div>',
                 unsafe_allow_html=True
             )
