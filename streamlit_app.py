@@ -1,6 +1,5 @@
 import streamlit as st
 import matplotlib.pyplot as plt
-import matplotlib.patches as mpatches
 import numpy as np
 from math import log, exp
 from datetime import datetime
@@ -28,493 +27,268 @@ st.set_page_config(
     page_title="EngsetPro",
     page_icon="📡",
     layout="wide",
-    initial_sidebar_state="collapsed",
+    initial_sidebar_state="expanded",
 )
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# GLOBAL CSS — Inspired by modern telecom UI (blue-teal gradient, clean cards)
+# GLOBAL CSS
 # ═══════════════════════════════════════════════════════════════════════════════
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
 
-:root {
-  --blue-primary: #1a56ff;
-  --blue-dark:    #0e3acc;
-  --blue-deeper:  #0a2aaa;
-  --teal:         #00c8b4;
-  --teal-light:   #4dd9cb;
-  --green:        #22c55e;
-  --amber:        #f59e0b;
-  --red:          #ef4444;
-  --bg:           #f2f5fc;
-  --white:        #ffffff;
-  --navy:         #0d1b3e;
-  --slate:        #3a5098;
-  --muted:        #8899bb;
-  --border:       rgba(26,86,255,0.08);
-  --shadow-sm:    0 2px 12px rgba(26,86,255,0.07);
-  --shadow-md:    0 6px 24px rgba(26,86,255,0.12);
-  --shadow-lg:    0 12px 40px rgba(26,86,255,0.20);
-  --radius-sm:    12px;
-  --radius-md:    18px;
-  --radius-lg:    24px;
-}
-
-html, body, [class*="css"] {
-  font-family: 'Sora', sans-serif !important;
-}
-
-.stApp {
-  background: var(--bg) !important;
-}
-
+html, body, [class*="css"] { font-family: 'Plus Jakarta Sans', sans-serif !important; }
+.stApp { background: #f0f4ff; }
 #MainMenu, footer, header { visibility: hidden; }
 .stDeployButton { display: none; }
 
-/* ═══════════ SIDEBAR ═══════════ */
+/* ── Sidebar ── */
 [data-testid="stSidebar"] {
-  background: linear-gradient(175deg, #1246e8 0%, #0c35c0 45%, #072590 100%) !important;
-  border-right: none !important;
-  box-shadow: 6px 0 30px rgba(10,42,170,0.30);
+    background: linear-gradient(180deg,#1a56ff 0%,#0e3acc 60%,#0a2aaa 100%) !important;
+    border-right: none !important;
+    box-shadow: 4px 0 24px rgba(26,86,255,0.25);
 }
 [data-testid="stSidebar"] > div:first-child { padding-top: 0 !important; }
 [data-testid="stSidebar"] * { color: rgba(255,255,255,0.9) !important; }
 [data-testid="stSidebar"] .stSlider label,
 [data-testid="stSidebar"] .stNumberInput label {
-  color: rgba(255,255,255,0.65) !important;
-  font-size: 0.72rem !important;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
+    color: rgba(255,255,255,0.7) !important;
+    font-size: 0.75rem !important;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
 }
-[data-testid="stSidebar"] hr {
-  border-color: rgba(255,255,255,0.12) !important;
-}
+[data-testid="stSidebar"] hr { border-color: rgba(255,255,255,0.15) !important; }
 
-/* Radio nav items */
-[data-testid="stSidebar"] [data-testid="stRadio"] > div {
-  gap: 4px !important;
-}
-[data-testid="stSidebar"] [data-testid="stRadio"] label {
-  border-radius: 12px !important;
-  padding: 10px 14px !important;
-  transition: background 0.2s ease !important;
-  font-size: 0.88rem !important;
-  font-weight: 500 !important;
-}
-[data-testid="stSidebar"] [data-testid="stRadio"] label:hover {
-  background: rgba(255,255,255,0.12) !important;
-}
-[data-testid="stSidebar"] [data-testid="stRadio"] [aria-checked="true"] + div label,
-[data-testid="stSidebar"] [data-testid="stRadio"] input:checked + div {
-  background: rgba(255,255,255,0.18) !important;
-  font-weight: 700 !important;
-}
-
-/* Group labels in sidebar */
-.nav-group-label {
-  font-size: 0.65rem;
-  font-weight: 700;
-  color: rgba(255,255,255,0.4) !important;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  margin: 16px 0 6px 6px;
-}
-
-/* ═══════════ BASE CARDS ═══════════ */
+/* ── Cards ── */
 .card {
-  background: var(--white);
-  border-radius: var(--radius-md);
-  padding: 1.4rem 1.6rem;
-  box-shadow: var(--shadow-sm);
-  border: 1px solid var(--border);
-  margin-bottom: 1rem;
+    background: #fff;
+    border-radius: 20px;
+    padding: 1.4rem 1.6rem;
+    box-shadow: 0 4px 20px rgba(26,86,255,0.07);
+    border: 1px solid rgba(26,86,255,0.06);
+    margin-bottom: 1rem;
 }
 
-.card-sm {
-  background: var(--white);
-  border-radius: var(--radius-sm);
-  padding: 1rem 1.2rem;
-  box-shadow: var(--shadow-sm);
-  border: 1px solid var(--border);
-  margin-bottom: 0.75rem;
-}
-
-/* ═══════════ HERO GRADIENT CARD ═══════════ */
+/* ── Hero ── */
 .hero-card {
-  background: linear-gradient(135deg, #1a56ff 0%, #0a8fe8 55%, #00c8b4 100%);
-  border-radius: var(--radius-lg);
-  padding: 2rem 2rem 1.8rem;
-  color: white;
-  margin-bottom: 1rem;
-  position: relative;
-  overflow: hidden;
-  box-shadow: 0 10px 40px rgba(26,86,255,0.40);
+    background: linear-gradient(135deg,#1a56ff 0%,#0e3acc 100%);
+    border-radius: 24px;
+    padding: 2rem 2rem 1.6rem;
+    color: white;
+    margin-bottom: 1rem;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(26,86,255,0.35);
 }
 .hero-card::before {
-  content: "";
-  position: absolute; top: -80px; right: -50px;
-  width: 260px; height: 260px; border-radius: 50%;
-  background: rgba(255,255,255,0.07);
+    content:""; position:absolute; top:-60px; right:-40px;
+    width:220px; height:220px; border-radius:50%;
+    background:rgba(255,255,255,0.08);
 }
 .hero-card::after {
-  content: "";
-  position: absolute; bottom: -60px; left: 35%;
-  width: 200px; height: 200px; border-radius: 50%;
-  background: rgba(255,255,255,0.05);
-}
-.hero-badge {
-  display: inline-flex; align-items: center; gap: 6px;
-  background: rgba(255,255,255,0.18);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(255,255,255,0.25);
-  border-radius: 100px;
-  padding: 4px 14px;
-  font-size: 0.7rem; font-weight: 700;
-  letter-spacing: 0.1em; text-transform: uppercase;
-  margin-bottom: 1rem;
-  color: #fff;
-}
-.hero-stat-pill {
-  background: rgba(255,255,255,0.16);
-  backdrop-filter: blur(6px);
-  border: 1px solid rgba(255,255,255,0.2);
-  border-radius: 14px; padding: 10px 20px;
+    content:""; position:absolute; bottom:-50px; left:30%;
+    width:180px; height:180px; border-radius:50%;
+    background:rgba(255,255,255,0.05);
 }
 
-/* ═══════════ METRIC CHIPS ═══════════ */
+/* ── Chip grid ── */
 .chip-grid {
-  display: grid; grid-template-columns: 1fr 1fr 1fr;
-  gap: 10px; margin-bottom: 1rem;
+    display:grid; grid-template-columns:1fr 1fr 1fr;
+    gap:10px; margin-bottom:1rem;
 }
 .chip {
-  background: var(--white);
-  border-radius: var(--radius-sm);
-  padding: 1.1rem 0.8rem;
-  text-align: center;
-  box-shadow: var(--shadow-sm);
-  border: 1px solid var(--border);
-  position: relative; overflow: hidden;
+    background:#fff; border-radius:16px; padding:1rem 0.8rem;
+    text-align:center; box-shadow:0 2px 12px rgba(26,86,255,0.07);
+    border:1px solid rgba(26,86,255,0.06);
 }
-.chip::before {
-  content: "";
-  position: absolute; top: 0; left: 0; right: 0; height: 3px;
-  background: linear-gradient(90deg, var(--blue-primary), var(--teal));
-  border-radius: 3px 3px 0 0;
-}
-.chip-icon { font-size: 1.2rem; margin-bottom: 6px; }
-.chip-val  {
-  font-size: 1.05rem; font-weight: 700; color: var(--navy);
-  font-family: 'JetBrains Mono', monospace;
-}
-.chip-lbl  {
-  font-size: 0.65rem; color: var(--muted);
-  text-transform: uppercase; letter-spacing: 0.07em; margin-top: 3px;
-}
+.chip-icon { font-size:1.3rem; margin-bottom:4px; }
+.chip-val  { font-size:1.1rem; font-weight:700; color:#0d1b3e; font-family:'JetBrains Mono',monospace; }
+.chip-lbl  { font-size:0.68rem; color:#8899bb; text-transform:uppercase; letter-spacing:0.06em; margin-top:2px; }
 
-/* ═══════════ PLAN / RESULT ROWS ═══════════ */
+/* ── Plan card ── */
 .plan-card {
-  background: var(--white);
-  border-radius: var(--radius-sm);
-  padding: 0.95rem 1.2rem;
-  display: flex; align-items: center; gap: 14px;
-  margin-bottom: 8px;
-  box-shadow: var(--shadow-sm);
-  border: 1px solid var(--border);
-  transition: box-shadow 0.2s, transform 0.2s;
-}
-.plan-card:hover {
-  box-shadow: var(--shadow-md);
-  transform: translateY(-1px);
+    background:#fff; border-radius:16px; padding:1rem 1.2rem;
+    display:flex; align-items:center; gap:14px; margin-bottom:10px;
+    box-shadow:0 2px 12px rgba(26,86,255,0.06); border:1px solid rgba(26,86,255,0.05);
 }
 .plan-icon-wrap {
-  width: 44px; height: 44px; border-radius: 13px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 1.2rem; flex-shrink: 0;
+    width:46px; height:46px; border-radius:14px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:1.3rem; flex-shrink:0;
 }
-.plan-icon-blue  { background: rgba(26,86,255,0.10); }
-.plan-icon-teal  { background: rgba(0,200,180,0.10); }
-.plan-icon-green { background: rgba(34,197,94,0.10); }
-.plan-icon-amber { background: rgba(245,158,11,0.10); }
-.plan-icon-red   { background: rgba(239,68,68,0.10); }
-.plan-info { flex: 1; }
-.plan-name { font-size: 0.88rem; font-weight: 600; color: var(--navy); margin: 0; }
-.plan-desc { font-size: 0.75rem; color: var(--muted); margin: 2px 0 0; }
-.plan-val  {
-  font-size: 0.95rem; font-weight: 700; color: var(--blue-primary);
-  font-family: 'JetBrains Mono', monospace;
-}
+.plan-icon-blue  { background:rgba(26,86,255,0.1); }
+.plan-icon-green { background:rgba(34,197,94,0.1); }
+.plan-icon-amber { background:rgba(245,158,11,0.1); }
+.plan-icon-red   { background:rgba(239,68,68,0.1); }
+.plan-info { flex:1; }
+.plan-name { font-size:0.92rem; font-weight:600; color:#0d1b3e; margin:0; }
+.plan-desc { font-size:0.78rem; color:#8899bb; margin:2px 0 0; }
+.plan-val  { font-size:1rem; font-weight:700; color:#1a56ff; font-family:'JetBrains Mono',monospace; }
 
-/* ═══════════ GoS BADGE ═══════════ */
-.gos {
-  display: inline-block; padding: 4px 14px; border-radius: 100px;
-  font-size: 0.75rem; font-weight: 700; letter-spacing: 0.04em;
-}
-.gos-great { background: #dcfce7; color: #166534; }
-.gos-good  { background: #d1fae5; color: #065f46; }
-.gos-ok    { background: #fef9c3; color: #713f12; }
-.gos-bad   { background: #fee2e2; color: #7f1d1d; }
+/* ── GoS badge ── */
+.gos { display:inline-block; padding:4px 14px; border-radius:100px;
+       font-size:0.78rem; font-weight:700; letter-spacing:0.04em; }
+.gos-great { background:#dcfce7; color:#166534; }
+.gos-good  { background:#d1fae5; color:#065f46; }
+.gos-ok    { background:#fef9c3; color:#713f12; }
+.gos-bad   { background:#fee2e2; color:#7f1d1d; }
 
-/* ═══════════ FORMULA BLOCK ═══════════ */
+/* ── Formula ── */
 .formula-wrap {
-  background: linear-gradient(135deg, #eef3ff 0%, #e4edff 100%);
-  border: 1.5px solid #c7d7ff;
-  border-radius: var(--radius-md);
-  padding: 1.6rem 1.8rem; margin-bottom: 1rem;
+    background: linear-gradient(135deg,#f0f4ff 0%,#e8efff 100%);
+    border: 1.5px solid #c7d7ff; border-radius:20px;
+    padding:1.6rem 1.8rem; margin-bottom:1rem;
 }
 .formula-tag {
-  display: inline-block; background: var(--blue-primary); color: #fff;
-  font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em;
-  text-transform: uppercase; padding: 3px 12px; border-radius: 100px; margin-bottom: 1rem;
+    display:inline-block; background:#1a56ff; color:#fff;
+    font-size:0.68rem; font-weight:700; letter-spacing:0.1em;
+    text-transform:uppercase; padding:3px 12px; border-radius:100px; margin-bottom:1rem;
 }
 .formula-body {
-  font-family: 'JetBrains Mono', monospace; font-size: 0.85rem;
-  color: #0d2060; line-height: 2.2;
-  background: rgba(255,255,255,0.65); border-radius: 10px;
-  padding: 1rem 1.4rem;
+    font-family:'JetBrains Mono',monospace; font-size:0.85rem; color:#0d2060;
+    line-height:2.2; background:rgba(255,255,255,0.6); border-radius:12px;
+    padding:1rem 1.4rem;
 }
+.formula-legend { display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:1rem; }
+.fl-item { font-size:0.8rem; color:#3a5098; display:flex; align-items:baseline; gap:8px; }
+.fl-sym  { font-family:'JetBrains Mono',monospace; font-weight:700; color:#1a56ff; min-width:18px; }
 
-/* ── Proper fraction layout ── */
-.formula-fraction-wrap {
-  display: flex; flex-direction: column; align-items: flex-start; gap: 1rem;
-}
-.formula-eq-label {
-  font-size: 1rem; font-weight: 700; color: #0d2060;
-  font-family: 'JetBrains Mono', monospace;
-}
-.formula-fraction {
-  display: flex; flex-direction: column; align-items: center;
-  margin-left: 2rem;
-}
-.formula-num {
-  padding: 6px 16px; font-size: 1rem; font-weight: 600;
-  color: #0d2060; text-align: center;
-  font-family: 'JetBrains Mono', monospace;
-}
-.formula-divider {
-  width: 100%; height: 2px;
-  background: linear-gradient(90deg, var(--blue-primary), var(--teal));
-  border-radius: 2px; margin: 2px 0;
-}
-.formula-den {
-  padding: 6px 16px; font-size: 1rem; font-weight: 600;
-  color: #0d2060; text-align: center;
-  display: flex; align-items: center; gap: 8px;
-  font-family: 'JetBrains Mono', monospace;
-}
-.formula-sigma {
-  display: inline-flex; flex-direction: column; align-items: center;
-  font-size: 0.75rem; line-height: 1.15; margin-right: 4px;
-  color: var(--blue-primary); font-weight: 700;
-}
-.formula-rho-def {
-  display: flex; align-items: center; gap: 8px;
-  font-size: 0.9rem; color: #3a5098; margin-left: 2rem;
-  font-family: 'JetBrains Mono', monospace;
-}
-.formula-rho-frac {
-  display: inline-flex; flex-direction: column; align-items: center;
-  margin-left: 4px;
-}
-.formula-rho-num { font-size: 0.85rem; font-weight: 700; color: #0d2060; }
-.formula-rho-bar {
-  display: block; width: 100%; height: 1.5px;
-  background: var(--blue-primary); margin: 2px 0;
-}
-.formula-rho-den { font-size: 0.85rem; font-weight: 700; color: #0d2060; }
+/* ── Section ── */
+.sec-title { font-size:1.05rem; font-weight:700; color:#0d1b3e; margin:0 0 0.8rem; }
 
-.formula-legend { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 1rem; }
-.fl-item { font-size: 0.78rem; color: var(--slate); display: flex; align-items: baseline; gap: 8px; }
-.fl-sym  { font-family: 'JetBrains Mono', monospace; font-weight: 700; color: var(--blue-primary); min-width: 22px; }
-
-/* ═══════════ DASHBOARD TOP ROW (chips + GoS) ═══════════ */
-.dash-top-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1.4fr;
-  gap: 10px; margin-bottom: 1rem;
-}
-.chip-gos { text-align: center; }
-@media (max-width: 768px) {
-  .dash-top-row { grid-template-columns: 1fr 1fr !important; }
-}
-
-/* ═══════════ MOBILE RESPONSIVE ═══════════ */
-@media (max-width: 768px) {
-  .main .block-container {
-    padding-left: 0.75rem !important;
-    padding-right: 0.75rem !important;
-    padding-top: 1rem !important;
-  }
-  .chip-grid { grid-template-columns: 1fr 1fr !important; }
-  .formula-legend { grid-template-columns: 1fr !important; }
-}
-
-/* Buat tombol toggle sidebar bawaan Streamlit lebih besar & keliatan di mobile */
-[data-testid="stSidebarCollapsedControl"] {
-  top: 8px !important;
-  left: 8px !important;
-}
-[data-testid="stSidebarCollapsedControl"] button,
-button[data-testid="stSidebarNavToggleButton"],
-button[data-testid="collapsedControl"] {
-  background: linear-gradient(135deg, #1a56ff, #0e3acc) !important;
-  color: white !important;
-  border-radius: 12px !important;
-  width: 48px !important;
-  height: 48px !important;
-  min-width: 48px !important;
-  min-height: 48px !important;
-  box-shadow: 0 4px 18px rgba(26,86,255,0.55) !important;
-  border: none !important;
-  opacity: 1 !important;
-  visibility: visible !important;
-}
-[data-testid="stSidebarCollapsedControl"] button svg,
-button[data-testid="stSidebarNavToggleButton"] svg,
-button[data-testid="collapsedControl"] svg {
-  fill: white !important;
-  color: white !important;
-  width: 22px !important;
-  height: 22px !important;
-}
-
-/* ═══════════ SECTION TITLE ═══════════ */
-.sec-title {
-  font-size: 1rem; font-weight: 700; color: var(--navy); margin: 0 0 0.8rem;
-  display: flex; align-items: center; gap: 6px;
-}
-
-/* ═══════════ ALERT BANNERS ═══════════ */
+/* ── Banners ── */
 .eng-warn {
-  background: #fff7ed; border: 1px solid #fed7aa;
-  border-left: 4px solid #f59e0b;
-  border-radius: var(--radius-sm); padding: 0.85rem 1.1rem;
-  color: #92400e; font-size: 0.85rem; margin-bottom: 1rem;
+    background:#fff7ed; border:1px solid #fed7aa;
+    border-radius:12px; padding:0.85rem 1.1rem;
+    color:#92400e; font-size:0.85rem; margin-bottom:1rem;
 }
 .eng-info {
-  background: #eff6ff; border: 1px solid #bfdbfe;
-  border-left: 4px solid var(--blue-primary);
-  border-radius: var(--radius-sm); padding: 0.85rem 1.1rem;
-  color: #1e40af; font-size: 0.85rem; margin-bottom: 1rem;
+    background:#eff6ff; border:1px solid #bfdbfe;
+    border-radius:12px; padding:0.85rem 1.1rem;
+    color:#1e40af; font-size:0.85rem; margin-bottom:1rem;
 }
 .eng-ok {
-  background: #f0fdf4; border: 1px solid #bbf7d0;
-  border-left: 4px solid var(--green);
-  border-radius: var(--radius-sm); padding: 0.85rem 1.1rem;
-  color: #166534; font-size: 0.85rem; margin-bottom: 1rem;
+    background:#f0fdf4; border:1px solid #bbf7d0;
+    border-radius:12px; padding:0.85rem 1.1rem;
+    color:#166534; font-size:0.85rem; margin-bottom:1rem;
 }
 
-/* ═══════════ TABLE ═══════════ */
-.eng-table {
-  width: 100%; border-collapse: collapse; font-size: 0.83rem;
-  border-radius: var(--radius-sm); overflow: hidden;
-}
+/* ── Table ── */
+.eng-table { width:100%; border-collapse:collapse; font-size:0.85rem; border-radius:16px; overflow:hidden; }
 .eng-table th {
-  background: linear-gradient(90deg, var(--blue-primary), var(--blue-dark));
-  color: #fff; font-size: 0.68rem;
-  text-transform: uppercase; letter-spacing: 0.08em;
-  padding: 10px 14px; text-align: left; font-weight: 600;
+    background:#1a56ff; color:#fff; font-size:0.7rem;
+    text-transform:uppercase; letter-spacing:0.08em;
+    padding:10px 14px; text-align:left; font-weight:600;
 }
 .eng-table td {
-  padding: 9px 14px; border-bottom: 1px solid #f0f4ff;
-  color: #2d3a5e; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem;
+    padding:9px 14px; border-bottom:1px solid #f0f4ff;
+    color:#2d3a5e; font-family:'JetBrains Mono',monospace; font-size:0.82rem;
 }
-.eng-table tr:hover td { background: #f5f8ff; }
-.eng-table tr.active td { background: #eff6ff; font-weight: 600; color: var(--navy); }
+.eng-table tr:hover td { background:#f8faff; }
+.eng-table tr.active td { background:#eff6ff; font-weight:600; }
 
-/* ═══════════ BUTTONS ═══════════ */
+/* ── Buttons ── */
 .stButton > button {
-  background: linear-gradient(135deg, #1a56ff, #0e3acc) !important;
-  color: #fff !important; border: none !important;
-  border-radius: var(--radius-sm) !important;
-  padding: 0.65rem 1.6rem !important; font-weight: 700 !important;
-  font-size: 0.88rem !important;
-  box-shadow: 0 4px 16px rgba(26,86,255,0.3) !important;
-  transition: all 0.2s ease !important;
-  font-family: 'Sora', sans-serif !important;
+    background:linear-gradient(135deg,#1a56ff,#0e3acc) !important;
+    color:#fff !important; border:none !important; border-radius:14px !important;
+    padding:0.65rem 1.6rem !important; font-weight:700 !important;
+    font-size:0.9rem !important; box-shadow:0 4px 16px rgba(26,86,255,0.3) !important;
 }
-.stButton > button:hover {
-  transform: translateY(-2px) !important;
-  box-shadow: 0 8px 24px rgba(26,86,255,0.4) !important;
-}
+.stButton > button:hover { transform:translateY(-2px) !important; }
 
-/* ═══════════ PROGRESS BAR ═══════════ */
-.progress-wrap {
-  background: #e8efff; border-radius: 100px; height: 8px;
-  margin: 6px 0; overflow: hidden;
-}
-.progress-fill {
-  height: 100%; border-radius: 100px;
-  background: linear-gradient(90deg, var(--blue-primary), var(--teal));
-  transition: width 0.5s ease;
-}
+/* ── Progress ── */
+.progress-wrap { background:#e8efff; border-radius:100px; height:8px; margin:6px 0; overflow:hidden; }
+.progress-fill { height:100%; border-radius:100px; background:linear-gradient(90deg,#1a56ff,#00c8b4); }
 
-/* ═══════════ TABS ═══════════ */
+/* ── Tabs ── */
 .stTabs [data-baseweb="tab-list"] {
-  background: #edf1fb; border-radius: 14px; padding: 4px; gap: 4px; border: none;
+    background:#f0f4ff; border-radius:14px; padding:4px; gap:4px; border:none;
 }
 .stTabs [data-baseweb="tab"] {
-  border-radius: 10px; font-weight: 600; font-size: 0.86rem;
-  color: var(--muted); padding: 8px 20px;
-  font-family: 'Sora', sans-serif;
+    border-radius:10px; font-weight:600; font-size:0.88rem; color:#8899bb; padding:8px 20px;
 }
 .stTabs [aria-selected="true"] {
-  background: var(--white) !important; color: var(--blue-primary) !important;
-  box-shadow: 0 2px 10px rgba(26,86,255,0.14) !important;
+    background:#fff !important; color:#1a56ff !important;
+    box-shadow:0 2px 8px rgba(26,86,255,0.12);
 }
 
-/* ═══════════ PAGE HEADER ═══════════ */
-.page-header {
-  margin-bottom: 1.6rem;
-  padding-bottom: 1rem;
-  border-bottom: 2px solid #eaeffe;
+/* ── Mobile nav bar ── */
+.mobile-nav-bar {
+    display: none;
+    position: sticky; top: 0; z-index: 9999;
+    background: linear-gradient(135deg,#1a56ff,#0e3acc);
+    padding: 0.6rem 1rem;
+    margin-bottom: 1rem;
+    border-radius: 0 0 16px 16px;
+    box-shadow: 0 4px 20px rgba(26,86,255,0.3);
 }
-.page-header-tag {
-  font-size: 0.68rem; color: var(--blue-primary); font-weight: 700;
-  text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 4px;
+.mobile-nav-bar select {
+    width: 100%;
+    background: rgba(255,255,255,0.15) !important;
+    color: #fff !important;
+    border: 1px solid rgba(255,255,255,0.3) !important;
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 1rem;
+    font-weight: 600;
+    outline: none;
+    cursor: pointer;
 }
-.page-header-title {
-  font-size: 1.75rem; font-weight: 800; color: var(--navy); margin: 0;
-  letter-spacing: -0.02em;
+.mobile-nav-bar select option {
+    background: #1a56ff;
+    color: #fff;
 }
-.page-header-sub {
-  color: var(--muted); margin: 4px 0 0; font-size: 0.88rem;
-}
-
-/* ═══════════ STAT RESULT BOX ═══════════ */
-.result-hero {
-  background: linear-gradient(135deg, #eef3ff, #e4edff);
-  border: 1.5px solid #c7d7ff;
-  border-radius: var(--radius-md);
-  padding: 1.4rem; text-align: center; margin-bottom: 1rem;
-}
-.result-hero-label {
-  font-size: 0.7rem; color: var(--slate); text-transform: uppercase;
-  letter-spacing: 0.08em; margin-bottom: 6px;
-}
-.result-hero-val {
-  font-size: 2.4rem; font-weight: 800; color: var(--blue-primary);
-  font-family: 'JetBrains Mono', monospace; line-height: 1;
-}
-.result-hero-unit {
-  font-size: 0.82rem; color: var(--muted); margin-top: 6px;
-}
-
-/* ═══════════ DATA ROW ═══════════ */
-.data-row {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 10px 0; border-bottom: 1px solid #f0f4ff;
-}
-.data-row:last-child { border-bottom: none; }
-.data-row-label { font-size: 0.82rem; color: var(--muted); }
-.data-row-val {
-  font-size: 0.85rem; font-weight: 700; color: var(--navy);
-  font-family: 'JetBrains Mono', monospace;
+@media (max-width: 768px) {
+    .mobile-nav-bar { display: block !important; }
+    /* Sembunyikan sidebar di mobile */
+    [data-testid="stSidebar"] { display: none !important; }
+    [data-testid="stSidebarCollapsedControl"] { display: none !important; }
+    .main .block-container {
+        padding-left: 0.75rem !important;
+        padding-right: 0.75rem !important;
+        padding-top: 0.5rem !important;
+        max-width: 100% !important;
+    }
 }
 </style>
 """, unsafe_allow_html=True)
 
-# ── Mobile: tampilkan tombol sidebar bawaan Streamlit dengan styling yang lebih baik ──
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# MOBILE NAV BAR (tampil di mobile, sidebar disembunyikan)
+# ═══════════════════════════════════════════════════════════════════════════════
+MENU_OPTIONS = [
+    "🏠  Dashboard",
+    "🧮  Kalkulator Engset",
+    "📐  Hitung Traffic A",
+    "📊  Analisis & Grafik",
+    "📄  Export Laporan"
+]
+
+if "mobile_page" not in st.session_state:
+    st.session_state.mobile_page = MENU_OPTIONS[0]
+
+# Render mobile nav bar (hanya tampil di mobile via CSS)
+opts_html = "".join(
+    f'<option value="{o}" {"selected" if o == st.session_state.mobile_page else ""}>{o}</option>'
+    for o in MENU_OPTIONS
+)
+st.markdown(f"""
+<div class="mobile-nav-bar">
+  <form method="get" id="mobile-nav-form">
+    <select onchange="this.form.submit()" name="mnav">{opts_html}</select>
+  </form>
+</div>
+""", unsafe_allow_html=True)
+
+# Baca query param untuk mobile nav
+qp = st.query_params
+if "mnav" in qp and qp["mnav"] in MENU_OPTIONS:
+    st.session_state.mobile_page = qp["mnav"]
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# CORE ENGSET
 # ═══════════════════════════════════════════════════════════════════════════════
 def log_factorial(n):
     if n <= 1: return 0.0
@@ -554,57 +328,49 @@ def find_min_N(S, A, target=0.01):
 # SIDEBAR
 # ═══════════════════════════════════════════════════════════════════════════════
 with st.sidebar:
-    # Logo / brand
     st.markdown("""
-    <div style="background:rgba(255,255,255,0.10);border-radius:18px;
-         padding:1.4rem 1.2rem 1.1rem;margin-bottom:1.4rem;text-align:center;">
-      <div style="font-size:2.2rem;margin-bottom:2px;">📡</div>
-      <div style="font-size:1.35rem;font-weight:800;color:#fff;letter-spacing:-0.01em;">EngsetPro</div>
-      <div style="font-size:0.65rem;color:rgba(255,255,255,0.5);letter-spacing:0.1em;
-           text-transform:uppercase;margin-top:2px;">Rekayasa Trafik v2.0</div>
+    <div style="background:rgba(255,255,255,0.12);border-radius:18px;padding:1.2rem 1.2rem 1rem;
+         margin-bottom:1.4rem;text-align:center;">
+      <div style="font-size:2rem;">📡</div>
+      <div style="font-size:1.3rem;font-weight:800;color:#fff;margin-top:4px;">EngsetPro</div>
+      <div style="font-size:0.72rem;color:rgba(255,255,255,0.6);letter-spacing:0.08em;margin-top:2px;">
+        REKAYASA TRAFIK v2.0</div>
     </div>
     """, unsafe_allow_html=True)
 
-    # ── MAIN MENU ──────────────────────────────────────────────
-    st.markdown('<div class="nav-group-label">Menu Utama</div>', unsafe_allow_html=True)
+    st.markdown('<div style="font-size:0.7rem;font-weight:700;color:rgba(255,255,255,0.45);'
+                'letter-spacing:0.12em;text-transform:uppercase;margin-bottom:8px;padding-left:4px;">Menu</div>',
+                unsafe_allow_html=True)
+
     page = st.radio("nav", [
         "🏠  Dashboard",
         "🧮  Kalkulator Engset",
+        "📐  Hitung Traffic A",
         "📊  Analisis & Grafik",
-        "📄  Export Laporan",
-    ], label_visibility="collapsed")
+        "📄  Export Laporan"
+    ], label_visibility="collapsed", key="sidebar_page")
+    st.session_state.mobile_page = page
 
-    # ── HITUNG TRAFFIC A (sub-menu) ────────────────────────────
-    st.markdown('<div class="nav-group-label">Hitung Traffic A</div>', unsafe_allow_html=True)
-    page_a = st.radio("nav_a", [
-        "📞  A — Call Rate & Hold Time",
-        "👥  A — Pengguna Aktif (BHT)",
-        "🔁  A — Data Rate / Throughput",
-    ], label_visibility="collapsed")
+    st.markdown("---")
+    st.markdown('<div style="font-size:0.7rem;font-weight:700;color:rgba(255,255,255,0.45);'
+                'letter-spacing:0.12em;text-transform:uppercase;margin-bottom:12px;padding-left:4px;">'
+                'Parameter Sistem</div>', unsafe_allow_html=True)
 
-    # Override page if one of the A-sub-pages is "selected but default page active"
-    if page not in ["🏠  Dashboard","🧮  Kalkulator Engset","📊  Analisis & Grafik","📄  Export Laporan"]:
-        pass  # page_a drives
+    S = st.slider("S — Jumlah Source", 2, 200, 20, 1)
+    N = st.slider("N — Jumlah Kanal",  1, 100,  5, 1)
+    A = st.slider("A — Traffic Offered (Erl)", 0.1, float(max(1, S-1)), min(8.0, float(S-2)), 0.1)
 
-    st.markdown('<div style="height:1px;background:rgba(255,255,255,0.12);margin:10px 0;border-radius:1px;"></div>', unsafe_allow_html=True)
-    # ── PARAMETER ─────────────────────────────────────────────
-    st.markdown('<div class="nav-group-label">Parameter Sistem</div>', unsafe_allow_html=True)
-
-    S = st.slider("S  Jumlah Source", 2, 200, 20, 1)
-    N = st.slider("N  Jumlah Kanal",  1, 100,  5, 1)
-    A = st.slider("A  Traffic Offered (Erl)", 0.1, float(max(1, S-1)), min(8.0, float(S-2)), 0.1)
-
-    st.markdown('<div style="height:1px;background:rgba(255,255,255,0.12);margin:10px 0;border-radius:1px;"></div>', unsafe_allow_html=True)
+    st.markdown("---")
     st.markdown(f"""
     <div style="background:rgba(255,255,255,0.08);border-radius:14px;padding:1rem;">
-      <div style="font-size:0.65rem;color:rgba(255,255,255,0.45);text-transform:uppercase;
-           letter-spacing:0.1em;margin-bottom:8px;">Sesi Saat Ini</div>
-      <div style="font-size:0.82rem;color:rgba(255,255,255,0.85);line-height:2.1;">
+      <div style="font-size:0.7rem;color:rgba(255,255,255,0.5);text-transform:uppercase;
+           letter-spacing:0.08em;margin-bottom:8px;">Sesi Saat Ini</div>
+      <div style="font-size:0.82rem;color:rgba(255,255,255,0.85);line-height:2;">
         S = <strong>{S}</strong> pengguna<br>
         N = <strong>{N}</strong> kanal<br>
         A = <strong>{A:.1f}</strong> Erlang
       </div>
-      <div style="font-size:0.68rem;color:rgba(255,255,255,0.38);margin-top:8px;">
+      <div style="font-size:0.7rem;color:rgba(255,255,255,0.4);margin-top:8px;">
         {datetime.now().strftime('%d %b %Y · %H:%M')}</div>
     </div>
     """, unsafe_allow_html=True)
@@ -626,153 +392,85 @@ BLUE  = '#1a56ff'
 TEAL  = '#00c8b4'
 AMBER = '#f59e0b'
 RED   = '#ef4444'
-GREEN = '#22c55e'
 BG    = '#f8faff'
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
-# HELPER — Page header
-# ═══════════════════════════════════════════════════════════════════════════════
+# ══════════════════════════════════════════════════════════════════════════════
+# PAGE HEADER helper
+# ══════════════════════════════════════════════════════════════════════════════
 def page_header(tag, title, sub):
     st.markdown(f"""
-    <div class="page-header">
-      <div class="page-header-tag">{tag}</div>
-      <h1 class="page-header-title">{title}</h1>
-      <p class="page-header-sub">{sub}</p>
+    <div style="margin-bottom:1.5rem;">
+      <div style="font-size:0.75rem;color:#1a56ff;font-weight:700;text-transform:uppercase;
+           letter-spacing:0.1em;margin-bottom:4px;">{tag}</div>
+      <h1 style="font-size:1.8rem;font-weight:800;color:#0d1b3e;margin:0;">{title}</h1>
+      <p style="color:#8899bb;margin:4px 0 0;font-size:0.9rem;">{sub}</p>
     </div>
     """, unsafe_allow_html=True)
-
-
-# ═══════════════════════════════════════════════════════════════════════════════
-# HELPER — Donut chart (matplotlib)
-# ═══════════════════════════════════════════════════════════════════════════════
-def donut_chart(val_pct, label_center, label_bottom, color=BLUE, bg='#e8efff'):
-    fig, ax = plt.subplots(figsize=(3.8, 3.8))
-    fig.patch.set_facecolor('#ffffff')
-    ax.set_facecolor('#ffffff')
-    sizes = [val_pct, max(0, 100 - val_pct)]
-    clrs  = [color, bg]
-    ax.pie(sizes, colors=clrs, startangle=90,
-           wedgeprops=dict(width=0.44, edgecolor='white', linewidth=3),
-           counterclock=False)
-    ax.text(0, 0.08, label_center,
-            ha='center', va='center', fontsize=18, fontweight='bold',
-            color='#0d1b3e', fontfamily='monospace')
-    ax.text(0, -0.24, label_bottom,
-            ha='center', va='center', fontsize=9, color='#8899bb')
-    ax.axis('equal')
-    plt.tight_layout(pad=0.3)
-    return fig
-
-
-# ═══════════════════════════════════════════════════════════════════════════════
-# DETERMINE ACTIVE PAGE
-# ═══════════════════════════════════════════════════════════════════════════════
-# Traffic A pages override when clicked
-A_PAGES = [
-    "📞  A — Call Rate & Hold Time",
-    "👥  A — Pengguna Aktif (BHT)",
-    "🔁  A — Data Rate / Throughput",
-]
-
-# Use session_state to track last-clicked group
-if "last_nav" not in st.session_state:
-    st.session_state["last_nav"] = "main"
-
-# Detect which radio was most recently changed using previous values
-prev_page   = st.session_state.get("prev_page",   page)
-prev_page_a = st.session_state.get("prev_page_a", page_a)
-
-if page != prev_page:
-    st.session_state["last_nav"] = "main"
-elif page_a != prev_page_a:
-    st.session_state["last_nav"] = "a"
-
-st.session_state["prev_page"]   = page
-st.session_state["prev_page_a"] = page_a
-
-active_page = page if st.session_state["last_nav"] == "main" else page_a
 
 
 # ══════════════════════════════════════════════════════════════════════════════
 # ██ DASHBOARD
 # ══════════════════════════════════════════════════════════════════════════════
+active_page = st.session_state.get("mobile_page", "🏠  Dashboard")
 if active_page == "🏠  Dashboard":
 
-    pbar_w  = min(100, (P or 0) * 500)
-    bar_col = GREEN if (P or 1) < 0.01 else AMBER if (P or 1) < 0.05 else RED
+    col_main, col_side = st.columns([2, 1], gap="large")
 
-    # ── Hero card (full width) ────────────────────────────────────────────────
-    st.markdown(f"""
-    <div class="hero-card">
-      <div class="hero-badge">📡 EngsetPro · Finite Source Model</div>
-      <h1 style="font-size:1.65rem;font-weight:800;color:#fff;margin:0 0 0.3rem;
-           line-height:1.15;">Dashboard Analisis Engset</h1>
-      <p style="font-size:0.85rem;opacity:0.75;margin:0 0 1.4rem;">
-        Probabilitas blocking real-time · Model Engset Finite Source</p>
-      <div style="display:flex;gap:10px;flex-wrap:wrap;">
-        <div class="hero-stat-pill">
-          <div style="font-size:0.62rem;opacity:0.7;text-transform:uppercase;
-               letter-spacing:0.08em;margin-bottom:1px;">Source</div>
-          <div style="font-size:1.3rem;font-weight:800;
-               font-family:'JetBrains Mono',monospace;">S = {S}</div>
-        </div>
-        <div class="hero-stat-pill">
-          <div style="font-size:0.62rem;opacity:0.7;text-transform:uppercase;
-               letter-spacing:0.08em;margin-bottom:1px;">Kanal</div>
-          <div style="font-size:1.3rem;font-weight:800;
-               font-family:'JetBrains Mono',monospace;">N = {N}</div>
-        </div>
-        <div class="hero-stat-pill">
-          <div style="font-size:0.62rem;opacity:0.7;text-transform:uppercase;
-               letter-spacing:0.08em;margin-bottom:1px;">Traffic</div>
-          <div style="font-size:1.3rem;font-weight:800;
-               font-family:'JetBrains Mono',monospace;">A = {A:.1f}</div>
-        </div>
-      </div>
-    </div>
-    """, unsafe_allow_html=True)
-
-    # ── Metric chips + GoS row (full width, responsive) ───────────────────────
-    if P is not None:
+    with col_main:
         st.markdown(f"""
-        <div class="dash-top-row">
-          <div class="chip">
-            <div class="chip-icon">📡</div>
-            <div class="chip-val">{P:.4f}</div>
-            <div class="chip-lbl">P Blocking</div>
-          </div>
-          <div class="chip">
-            <div class="chip-icon">✅</div>
-            <div class="chip-val">{carried:.3f}</div>
-            <div class="chip-lbl">Carried (Erl)</div>
-          </div>
-          <div class="chip">
-            <div class="chip-icon">❌</div>
-            <div class="chip-val">{lost:.3f}</div>
-            <div class="chip-lbl">Lost (Erl)</div>
-          </div>
-          <div class="chip chip-gos">
-            <div class="chip-icon">🏆</div>
-            <span class="gos {gos_cls}" style="font-size:0.85rem;padding:4px 14px;margin:4px 0;">{gos_text}</span>
-            <div class="progress-wrap" style="margin:6px 0 2px;">
-              <div class="progress-fill" style="width:{pbar_w:.1f}%;background:{bar_col};"></div>
+        <div class="hero-card">
+          <div style="font-size:0.78rem;font-weight:600;letter-spacing:0.1em;
+               text-transform:uppercase;opacity:0.7;margin-bottom:0.3rem;">Selamat Datang</div>
+          <h1 style="font-size:1.7rem;font-weight:800;color:#fff;margin:0 0 0.2rem;line-height:1.15;">
+            EngsetPro Dashboard</h1>
+          <p style="font-size:0.88rem;opacity:0.7;margin:0;">
+            Analisis probabilitas blocking real-time — Model Engset Finite Source</p>
+          <div style="margin-top:1.4rem;display:flex;gap:1rem;flex-wrap:wrap;">
+            <div style="background:rgba(255,255,255,0.15);border-radius:12px;padding:10px 18px;">
+              <div style="font-size:0.68rem;opacity:0.7;text-transform:uppercase;letter-spacing:0.08em;">Source</div>
+              <div style="font-size:1.4rem;font-weight:800;font-family:'JetBrains Mono',monospace;">S = {S}</div>
             </div>
-            <div class="chip-lbl">Grade of Service · P={P:.4f}</div>
+            <div style="background:rgba(255,255,255,0.15);border-radius:12px;padding:10px 18px;">
+              <div style="font-size:0.68rem;opacity:0.7;text-transform:uppercase;letter-spacing:0.08em;">Kanal</div>
+              <div style="font-size:1.4rem;font-weight:800;font-family:'JetBrains Mono',monospace;">N = {N}</div>
+            </div>
+            <div style="background:rgba(255,255,255,0.15);border-radius:12px;padding:10px 18px;">
+              <div style="font-size:0.68rem;opacity:0.7;text-transform:uppercase;letter-spacing:0.08em;">Traffic</div>
+              <div style="font-size:1.4rem;font-weight:800;font-family:'JetBrains Mono',monospace;">A = {A:.1f}</div>
+            </div>
           </div>
         </div>
         """, unsafe_allow_html=True)
 
-    # ── Main content: Ringkasan kiri + Donut+Rekomendasi kanan ───────────────
-    col_main, col_side = st.columns([2.2, 1], gap="large")
+        if P is not None:
+            st.markdown(f"""
+            <div class="chip-grid">
+              <div class="chip">
+                <div class="chip-icon">📡</div>
+                <div class="chip-val">{P:.4f}</div>
+                <div class="chip-lbl">P Blocking</div>
+              </div>
+              <div class="chip">
+                <div class="chip-icon">✅</div>
+                <div class="chip-val">{carried:.3f}</div>
+                <div class="chip-lbl">Carried (Erl)</div>
+              </div>
+              <div class="chip">
+                <div class="chip-icon">❌</div>
+                <div class="chip-val">{lost:.3f}</div>
+                <div class="chip-lbl">Lost (Erl)</div>
+              </div>
+            </div>
+            """, unsafe_allow_html=True)
 
-    with col_main:
-        st.markdown('<p class="sec-title">📋 Ringkasan Sistem</p>', unsafe_allow_html=True)
+        st.markdown('<p class="sec-title">Ringkasan Sistem</p>', unsafe_allow_html=True)
+
         items = [
-            ("📶", "plan-icon-blue",  "Probabilitas Blocking", f"{P*100:.3f}%" if P else "—",  f"Grade: {gos_text}"),
-            ("🔄", "plan-icon-teal",  "Traffic Carried",       f"{carried:.4f} Erl",            f"dari {A:.1f} Erl ditawarkan"),
-            ("📉", "plan-icon-amber", "Kanal Min GoS ≤ 1%",   f"N = {min_n_1}",               "untuk kualitas baik"),
-            ("⚡", "plan-icon-red",   "Utilisasi Kanal",       f"{util_pct:.1f}%",             f"rata-rata per {N} kanal"),
+            ("📶","plan-icon-blue", "Probabilitas Blocking",    f"{P*100:.3f}%" if P else "—",  f"Grade: {gos_text}"),
+            ("🔄","plan-icon-green","Traffic Carried",           f"{carried:.4f} Erl",            f"dari {A:.1f} Erl ditawarkan"),
+            ("📉","plan-icon-amber","Kanal Minimum GoS ≤ 1%",   f"N = {min_n_1}",                "untuk kualitas baik"),
+            ("⚡","plan-icon-red",  "Utilisasi Kanal",           f"{util_pct:.1f}%",              f"rata-rata per {N} kanal"),
         ]
         for icon, icon_cls, name, val, desc in items:
             st.markdown(f"""
@@ -787,26 +485,47 @@ if active_page == "🏠  Dashboard":
             """, unsafe_allow_html=True)
 
     with col_side:
-        # Donut lebih kecil agar tidak terlalu besar
-        fig_d = donut_chart(
-            util_pct,
-            f"{util_pct:.1f}%" if P else "—",
-            "utilisasi kanal",
-            color=BLUE,
-        )
-        st.pyplot(fig_d, use_container_width=True)
-        plt.close(fig_d)
+        # Donut
+        fig, ax = plt.subplots(figsize=(3.5, 3.5))
+        fig.patch.set_facecolor('#ffffff'); ax.set_facecolor('#ffffff')
+        sizes   = [util_pct, 100-util_pct] if P is not None else [50,50]
+        clrs    = [BLUE,'#e8efff']         if P is not None else ['#e8efff','#f0f4ff']
+        ax.pie(sizes, colors=clrs, startangle=90,
+               wedgeprops=dict(width=0.42,edgecolor='white',linewidth=3), counterclock=False)
+        ax.text(0, 0.08, f"{util_pct:.1f}%" if P else "—",
+                ha='center',va='center',fontsize=18,fontweight='bold',
+                color='#0d1b3e',fontfamily='monospace')
+        ax.text(0,-0.22,"utilisasi",ha='center',va='center',fontsize=9,color='#8899bb')
+        ax.axis('equal')
+        plt.tight_layout(pad=0.5)
+        st.pyplot(fig, use_container_width=True)
+        plt.close(fig)
 
-        # Rekomendasi kanal
+        pbar_w = min(100, (P or 0) * 500)
+        bar_col = '#22c55e' if (P or 1) < 0.01 else '#f59e0b' if (P or 1) < 0.05 else '#ef4444'
         st.markdown(f"""
-        <div class="card" style="padding:1rem 1.1rem;">
-          <div style="font-size:0.82rem;font-weight:700;color:var(--navy);margin-bottom:10px;">
+        <div class="card" style="text-align:center;padding:1.2rem;">
+          <div style="font-size:0.72rem;color:#8899bb;text-transform:uppercase;
+               letter-spacing:0.08em;margin-bottom:8px;">Grade of Service</div>
+          <span class="gos {gos_cls}" style="font-size:1rem;padding:8px 22px;">{gos_text}</span>
+          <div style="margin-top:12px;">
+            <div class="progress-wrap">
+              <div class="progress-fill" style="width:{pbar_w:.1f}%;background:{bar_col};"></div>
+            </div>
+          </div>
+          <div style="font-size:0.78rem;color:#8899bb;margin-top:6px;">
+            P = {f"{P:.6f}" if P is not None else "—"}
+          </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+        st.markdown(f"""
+        <div class="card">
+          <div style="font-size:0.82rem;font-weight:700;color:#0d1b3e;margin-bottom:10px;">
             🎯 Rekomendasi Kanal</div>
-          <div style="font-size:0.82rem;color:var(--slate);line-height:2.2;">
-            GoS ≤ 1%
-            <strong style="color:var(--blue-primary);float:right;">N = {min_n_1}</strong><br>
-            GoS ≤ 0.1%
-            <strong style="color:var(--blue-primary);float:right;">N = {min_n_001}</strong>
+          <div style="font-size:0.82rem;color:#3a5098;line-height:2.1;">
+            GoS ≤ 1%&nbsp;&nbsp;→ <strong style="color:#1a56ff;">N = {min_n_1}</strong><br>
+            GoS ≤ 0.1% → <strong style="color:#1a56ff;">N = {min_n_001}</strong>
           </div>
         </div>
         """, unsafe_allow_html=True)
@@ -820,31 +539,18 @@ if active_page == "🏠  Dashboard":
 # ██ KALKULATOR ENGSET
 # ══════════════════════════════════════════════════════════════════════════════
 elif active_page == "🧮  Kalkulator Engset":
-    page_header("Rekayasa Trafik", "Kalkulator Engset",
+    page_header("Rekayasa Trafik","Kalkulator Engset",
                 "Hitung probabilitas blocking dengan model finite source")
 
     st.markdown("""
     <div class="formula-wrap">
-      <span class="formula-tag">Rumus Engset — Finite Source (ITU-T)</span>
+      <span class="formula-tag">Rumus Engset — dari Dosen</span>
       <div class="formula-body">
-        <div class="formula-fraction-wrap">
-          <div class="formula-eq-label">P(S, N, A) =</div>
-          <div class="formula-fraction">
-            <div class="formula-num">C(S&minus;1, N) &middot; &rho;<sup>N</sup></div>
-            <div class="formula-divider"></div>
-            <div class="formula-den">
-              <span class="formula-sigma">N<br>&Sigma;<br><small>i=0</small></span>
-              C(S&minus;1, i) &middot; &rho;<sup>i</sup>
-            </div>
-          </div>
-          <div class="formula-rho-def">
-            di mana &nbsp;&nbsp;&rho; = <span class="formula-rho-frac">
-              <span class="formula-rho-num">A</span>
-              <span class="formula-rho-bar"></span>
-              <span class="formula-rho-den">S &minus; A</span>
-            </span>
-          </div>
-        </div>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;C(S-1, N) · (A/(S-A))^N<br>
+P = ─────────────────────────────────────<br>
+&nbsp;&nbsp;&nbsp;&nbsp;N<br>
+&nbsp;&nbsp;&nbsp;Σ  C(S-1, i) · (A/(S-A))^i<br>
+&nbsp;&nbsp;i=0
       </div>
       <div class="formula-legend">
         <div class="fl-item"><span class="fl-sym">P</span> Probabilitas blocking</div>
@@ -852,7 +558,7 @@ elif active_page == "🧮  Kalkulator Engset":
         <div class="fl-item"><span class="fl-sym">N</span> Jumlah server / kanal</div>
         <div class="fl-item"><span class="fl-sym">A</span> Traffic offered (Erlang)</div>
         <div class="fl-item"><span class="fl-sym">C(n,k)</span> Kombinasi binomial</div>
-        <div class="fl-item"><span class="fl-sym">&rho;</span> Intensitas per sumber</div>
+        <div class="fl-item"><span class="fl-sym">Σ</span> Sigma penjumlahan i=0 s/d N</div>
       </div>
     </div>
     """, unsafe_allow_html=True)
@@ -866,33 +572,28 @@ elif active_page == "🧮  Kalkulator Engset":
         with col1:
             st.markdown('<p class="sec-title">📊 Hasil Perhitungan</p>', unsafe_allow_html=True)
             rows = [
-                ("📡", "plan-icon-blue",  "Probabilitas Blocking (P)", f"{P:.8f}",        "probabilitas"),
-                ("📈", "plan-icon-blue",  "Blocking Persen",           f"{P*100:.4f}%",   "persentase"),
-                ("🏆", "plan-icon-green", "Grade of Service",          gos_text,           "penilaian kualitas"),
-                ("✅", "plan-icon-teal",  "Traffic Carried",           f"{carried:.4f} Erl","terlayani"),
-                ("❌", "plan-icon-red",   "Traffic Lost",              f"{lost:.4f} Erl",  "terblokir"),
-                ("⚡", "plan-icon-amber", "Utilisasi Kanal",           f"{util_pct:.2f}%", "per kanal"),
-                ("📶", "plan-icon-blue",  "Traffic Intensity",         f"{A/N:.4f} Erl/ch","per kanal"),
+                ("📡","Probabilitas Blocking (P)", f"{P:.8f}",       "probabilitas"),
+                ("📈","Blocking Persen",            f"{P*100:.4f}%",  "persentase"),
+                ("🏆","Grade of Service",           gos_text,         "penilaian kualitas"),
+                ("✅","Traffic Carried",            f"{carried:.4f} Erl","terlayani"),
+                ("❌","Traffic Lost",               f"{lost:.4f} Erl","terblokir"),
+                ("⚡","Utilisasi Kanal",            f"{util_pct:.2f}%","per kanal"),
+                ("📶","Traffic Intensity",          f"{A/N:.4f} Erl/ch","per kanal"),
             ]
-            for icon, icon_cls, label, val, unit in rows:
+            for icon, label, val, unit in rows:
                 st.markdown(f"""
-                <div class="plan-card" style="padding:0.85rem 1.1rem;">
-                  <div class="plan-icon-wrap {icon_cls}"
+                <div class="plan-card" style="padding:0.9rem 1.1rem;">
+                  <div class="plan-icon-wrap plan-icon-blue"
                        style="width:38px;height:38px;border-radius:10px;font-size:1.1rem;">{icon}</div>
                   <div class="plan-info">
-                    <p class="plan-name" style="font-size:0.84rem;">{label}</p>
+                    <p class="plan-name" style="font-size:0.85rem;">{label}</p>
                     <p class="plan-desc">{unit}</p>
                   </div>
-                  <div class="plan-val" style="font-size:0.92rem;">{val}</div>
+                  <div class="plan-val" style="font-size:0.95rem;">{val}</div>
                 </div>
                 """, unsafe_allow_html=True)
 
         with col2:
-            # Donut utilisasi
-            fig_du = donut_chart(util_pct, f"{util_pct:.1f}%", "utilisasi", color=BLUE)
-            st.pyplot(fig_du, use_container_width=True)
-            plt.close(fig_du)
-
             st.markdown('<p class="sec-title">🎯 Rekomendasi N Minimum</p>', unsafe_allow_html=True)
             targets = [0.10, 0.05, 0.02, 0.01, 0.005, 0.001]
             rec_rows = ""
@@ -950,238 +651,179 @@ P = {P*100:.4f}%
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# ██ HITUNG A — CALL RATE & HOLD TIME
+# ██ HITUNG TRAFFIC A
 # ══════════════════════════════════════════════════════════════════════════════
-elif active_page == "📞  A — Call Rate & Hold Time":
-    page_header("Hitung Traffic A", "Call Rate & Hold Time",
-                "Hitung Erlang dari λ (call rate) dan h (hold time)")
+elif active_page == "📐  Hitung Traffic A":
+    page_header("Perhitungan Trafik","Hitung Traffic Offered (A)",
+                "Tentukan nilai A dari parameter jaringan yang diketahui")
 
-    st.markdown("""
-    <div class="formula-wrap">
-      <span class="formula-tag">Rumus Erlang — Metode 1: Call Rate</span>
-      <div class="formula-body">
-        <div class="formula-fraction-wrap">
-          <div style="font-size:1.1rem;font-weight:700;color:#0d2060;margin-bottom:0.5rem;">
-            A = &lambda; &times; h
-          </div>
-          <div style="font-size:0.82rem;color:#3a5098;line-height:2;">
-            &lambda; &nbsp;= call rate (panggilan per jam per pengguna)<br>
-            h &nbsp;&nbsp;= rata-rata durasi panggilan (dalam jam)
-          </div>
-        </div>
-      </div>
-    </div>
-    """, unsafe_allow_html=True)
+    tab1, tab2, tab3 = st.tabs([
+        "📞 Call Rate & Hold Time",
+        "👥 Pengguna Aktif (BHT)",
+        "🔁 Data Rate / Throughput"
+    ])
 
-    c1, c2 = st.columns(2, gap="large")
-    with c1:
-        st.markdown('<div class="card">', unsafe_allow_html=True)
-        st.markdown('<div style="font-size:0.85rem;font-weight:700;color:#0d1b3e;margin-bottom:1rem;">⚙️ Input Parameter</div>',
-                    unsafe_allow_html=True)
-        call_rate  = st.number_input("λ — Call Rate (panggilan/jam per pengguna)",
-                                     0.01, 1000.0, 3.0, 0.1, format="%.2f")
-        hold_time  = st.number_input("h — Hold Time rata-rata (menit)",
-                                     0.1, 120.0, 2.0, 0.1, format="%.1f")
-        n_users_t1 = st.number_input("Jumlah pengguna aktif (untuk A total)",
-                                     1, 10000, S)
-        st.markdown('</div>', unsafe_allow_html=True)
-
-    with c2:
-        lam_s = call_rate / 3600
-        h_s   = hold_time * 60
-        A_1   = lam_s * h_s
-        A_tot = A_1 * n_users_t1
-
-        st.markdown(f"""
-        <div class="card">
-          <div style="font-size:0.85rem;font-weight:700;color:#0d1b3e;margin-bottom:1rem;">📊 Hasil Konversi</div>
-          <div class="data-row">
-            <span class="data-row-label">Traffic per pengguna</span>
-            <span class="data-row-val" style="color:#1a56ff;">{A_1:.6f} Erl</span>
-          </div>
-          <div class="data-row">
-            <span class="data-row-label">λ → konversi /detik</span>
-            <span class="data-row-val">{lam_s:.6f} call/s</span>
-          </div>
-          <div class="data-row">
-            <span class="data-row-label">h → konversi detik</span>
-            <span class="data-row-val">{h_s:.0f} detik</span>
+    # ── Tab 1 ─────────────────────────────────────────────────────────────────
+    with tab1:
+        st.markdown("""
+        <div class="formula-wrap" style="margin-bottom:1.2rem;">
+          <span class="formula-tag">Rumus Erlang</span>
+          <div class="formula-body">
+A = λ × h<br>
+<br>
+λ = call rate (panggilan/jam per pengguna)<br>
+h = rata-rata durasi panggilan (menit)
           </div>
         </div>
         """, unsafe_allow_html=True)
 
-        st.markdown(f"""
-        <div class="result-hero">
-          <div class="result-hero-label">A Total ({n_users_t1} pengguna)</div>
-          <div class="result-hero-val">{A_tot:.4f}</div>
-          <div class="result-hero-unit">Erlang — masukkan ke sidebar sebagai nilai A</div>
-        </div>
-        """, unsafe_allow_html=True)
+        c1, c2 = st.columns(2, gap="large")
+        with c1:
+            st.markdown('<div class="card">', unsafe_allow_html=True)
+            call_rate  = st.number_input("λ — Call Rate (panggilan/jam per pengguna)",
+                                         0.01, 1000.0, 3.0, 0.1, format="%.2f")
+            hold_time  = st.number_input("h — Hold Time rata-rata (menit)",
+                                         0.1, 120.0, 2.0, 0.1, format="%.1f")
+            n_users_t1 = st.number_input("Jumlah pengguna aktif (opsional untuk A total)",
+                                         1, 10000, S)
+            st.markdown('</div>', unsafe_allow_html=True)
 
-        if 0 < A_tot < S and S > N:
-            P2 = engset(S, N, A_tot)
-            if P2:
-                g2, gc2 = gos_label(P2)
-                cls = "eng-ok" if P2 < 0.01 else "eng-warn"
-                st.markdown(f'<div class="{cls}"><strong>Hasil Engset</strong> dengan '
-                            f'A={A_tot:.4f}, S={S}, N={N}:<br>'
-                            f'P = {P2:.6f} · Blocking = {P2*100:.3f}% · GoS = {g2}</div>',
-                            unsafe_allow_html=True)
+        with c2:
+            lam_s  = call_rate / 3600
+            h_s    = hold_time * 60
+            A_1    = lam_s * h_s            # per satu pengguna
+            A_tot  = A_1 * n_users_t1       # total
 
-
-# ══════════════════════════════════════════════════════════════════════════════
-# ██ HITUNG A — PENGGUNA AKTIF (BHT)
-# ══════════════════════════════════════════════════════════════════════════════
-elif active_page == "👥  A — Pengguna Aktif (BHT)":
-    page_header("Hitung Traffic A", "Pengguna Aktif — Metode BHT",
-                "Hitung Erlang dari jumlah pengguna aktif di jam sibuk")
-
-    st.markdown("""
-    <div class="formula-wrap">
-      <span class="formula-tag">Rumus BHT — Metode 2: Pengguna Aktif</span>
-      <div class="formula-body">
-        <div class="formula-fraction-wrap">
-          <div style="font-size:1.1rem;font-weight:700;color:#0d2060;margin-bottom:0.5rem;">
-            A = U &times; BHT
-          </div>
-          <div style="font-size:0.82rem;color:#3a5098;line-height:2;">
-            U &nbsp;&nbsp;&nbsp;= jumlah pengguna aktif di jam sibuk<br>
-            BHT = Busy Hour Traffic per pengguna (Erlang)
-          </div>
-        </div>
-      </div>
-    </div>
-    """, unsafe_allow_html=True)
-
-    c1, c2 = st.columns(2, gap="large")
-    with c1:
-        st.markdown('<div class="card">', unsafe_allow_html=True)
-        st.markdown('<div style="font-size:0.85rem;font-weight:700;color:#0d1b3e;margin-bottom:1rem;">⚙️ Input Parameter</div>',
-                    unsafe_allow_html=True)
-        U_val = st.number_input("U — Pengguna aktif jam sibuk", 1, 10000, 50)
-        BHT   = st.number_input("BHT — Busy Hour Traffic per user (Erl)",
-                                 0.001, 1.0, 0.1, 0.001, format="%.3f")
-        st.markdown('</div>', unsafe_allow_html=True)
-
-    with c2:
-        A_t2 = U_val * BHT
-
-        st.markdown(f"""
-        <div class="card">
-          <div style="font-size:0.85rem;font-weight:700;color:#0d1b3e;margin-bottom:1rem;">📊 Detail Perhitungan</div>
-          <div class="data-row">
-            <span class="data-row-label">Pengguna aktif (U)</span>
-            <span class="data-row-val">{U_val} pengguna</span>
-          </div>
-          <div class="data-row">
-            <span class="data-row-label">BHT per pengguna</span>
-            <span class="data-row-val">{BHT:.3f} Erl</span>
-          </div>
-          <div class="data-row">
-            <span class="data-row-label">Rumus: A = U × BHT</span>
-            <span class="data-row-val">{U_val} × {BHT:.3f}</span>
-          </div>
-        </div>
-        """, unsafe_allow_html=True)
-
-        st.markdown(f"""
-        <div class="result-hero">
-          <div class="result-hero-label">A Total (BHT Method)</div>
-          <div class="result-hero-val">{A_t2:.4f}</div>
-          <div class="result-hero-unit">Erlang — masukkan ke sidebar sebagai nilai A</div>
-        </div>
-        """, unsafe_allow_html=True)
-
-        if 0 < A_t2 < S and S > N:
-            P3 = engset(S, N, A_t2)
-            if P3:
-                g3, gc3 = gos_label(P3)
-                cls = "eng-ok" if P3 < 0.01 else "eng-warn"
-                st.markdown(f'<div class="{cls}">P = {P3:.6f} · Blocking = {P3*100:.3f}% · GoS = {g3}</div>',
-                            unsafe_allow_html=True)
-
-
-# ══════════════════════════════════════════════════════════════════════════════
-# ██ HITUNG A — DATA RATE / THROUGHPUT
-# ══════════════════════════════════════════════════════════════════════════════
-elif active_page == "🔁  A — Data Rate / Throughput":
-    page_header("Hitung Traffic A", "Data Rate / Throughput",
-                "Hitung Erlang dari data rate total dan kapasitas per kanal")
-
-    st.markdown("""
-    <div class="formula-wrap">
-      <span class="formula-tag">Rumus Data Rate — Metode 3: Throughput</span>
-      <div class="formula-body">
-        <div class="formula-fraction-wrap">
-          <div style="display:flex;align-items:center;gap:1rem;">
-            <div style="font-size:1.1rem;font-weight:700;color:#0d2060;">A =</div>
-            <div class="formula-fraction" style="margin-left:0;">
-              <div class="formula-num">R<sub>total</sub> (Mbps)</div>
-              <div class="formula-divider"></div>
-              <div class="formula-den">R<sub>channel</sub> (Mbps)</div>
+            st.markdown(f"""
+            <div class="card">
+              <div style="font-size:0.82rem;font-weight:700;color:#0d1b3e;margin-bottom:1rem;">
+                📊 Hasil Perhitungan</div>
+              <div style="display:flex;justify-content:space-between;align-items:center;
+                   padding:9px 0;border-bottom:1px solid #f0f4ff;">
+                <span style="font-size:0.82rem;color:#8899bb;">Traffic per pengguna</span>
+                <span style="font-family:'JetBrains Mono';font-weight:700;color:#1a56ff;">
+                  {A_1:.6f} Erl</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;
+                   padding:9px 0;border-bottom:1px solid #f0f4ff;">
+                <span style="font-size:0.82rem;color:#8899bb;">λ (konversi ke /detik)</span>
+                <span style="font-family:'JetBrains Mono';font-weight:700;color:#0d1b3e;">
+                  {lam_s:.6f} call/s</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;
+                   padding:9px 0;border-bottom:1px solid #f0f4ff;">
+                <span style="font-size:0.82rem;color:#8899bb;">h (konversi ke detik)</span>
+                <span style="font-family:'JetBrains Mono';font-weight:700;color:#0d1b3e;">
+                  {h_s:.0f} detik</span>
+              </div>
+              <div style="margin-top:1rem;background:#eff6ff;border-radius:12px;
+                   padding:1rem;text-align:center;">
+                <div style="font-size:0.72rem;color:#3a5098;text-transform:uppercase;
+                     letter-spacing:0.08em;margin-bottom:4px;">A total ({n_users_t1} pengguna)</div>
+                <div style="font-size:2rem;font-weight:800;color:#1a56ff;
+                     font-family:'JetBrains Mono';">{A_tot:.4f} Erl</div>
+                <div style="font-size:0.78rem;color:#3a5098;margin-top:4px;">
+                  masukkan ke sidebar sebagai nilai A</div>
+              </div>
             </div>
-          </div>
-          <div style="font-size:0.82rem;color:#3a5098;line-height:2;margin-top:0.5rem;">
-            R<sub>total</sub> &nbsp;&nbsp;&nbsp;= data rate total sistem<br>
-            R<sub>channel</sub> = kapasitas per kanal
-          </div>
-        </div>
-      </div>
-    </div>
-    """, unsafe_allow_html=True)
+            """, unsafe_allow_html=True)
 
-    c1, c2 = st.columns(2, gap="large")
-    with c1:
-        st.markdown('<div class="card">', unsafe_allow_html=True)
-        st.markdown('<div style="font-size:0.85rem;font-weight:700;color:#0d1b3e;margin-bottom:1rem;">⚙️ Input Parameter</div>',
-                    unsafe_allow_html=True)
-        dr = st.number_input("Data Rate total (Mbps)", 0.1, 100000.0, 100.0, 1.0)
-        cc = st.number_input("Kapasitas per kanal (Mbps)", 0.1, 10000.0, 10.0, 0.1)
-        st.markdown('</div>', unsafe_allow_html=True)
+            if 0 < A_tot < S and S > N:
+                P2 = engset(S, N, A_tot)
+                if P2:
+                    g2, gc2 = gos_label(P2)
+                    cls = "eng-ok" if P2 < 0.01 else "eng-warn"
+                    st.markdown(f'<div class="{cls}"><strong>Hasil Engset</strong> dengan '
+                                f'A={A_tot:.4f}, S={S}, N={N}:<br>'
+                                f'P = {P2:.6f} · Blocking = {P2*100:.3f}% · GoS = {g2}</div>',
+                                unsafe_allow_html=True)
 
-    with c2:
-        A_t3 = dr / cc
-
-        st.markdown(f"""
-        <div class="card">
-          <div style="font-size:0.85rem;font-weight:700;color:#0d1b3e;margin-bottom:1rem;">📊 Detail Perhitungan</div>
-          <div class="data-row">
-            <span class="data-row-label">Data Rate Total</span>
-            <span class="data-row-val">{dr:.1f} Mbps</span>
-          </div>
-          <div class="data-row">
-            <span class="data-row-label">Kapasitas per Kanal</span>
-            <span class="data-row-val">{cc:.1f} Mbps</span>
-          </div>
-          <div class="data-row">
-            <span class="data-row-label">Rumus: A = R_total / R_ch</span>
-            <span class="data-row-val">{dr:.1f} / {cc:.1f}</span>
+    # ── Tab 2 ─────────────────────────────────────────────────────────────────
+    with tab2:
+        st.markdown("""
+        <div class="formula-wrap" style="margin-bottom:1.2rem;">
+          <span class="formula-tag">Rumus BHT</span>
+          <div class="formula-body">
+A = U × BHT<br>
+<br>
+U   = jumlah pengguna aktif di jam sibuk<br>
+BHT = Busy Hour Traffic per pengguna (Erlang)
           </div>
         </div>
         """, unsafe_allow_html=True)
 
-        st.markdown(f"""
-        <div class="result-hero">
-          <div class="result-hero-label">A Total (Data Rate Method)</div>
-          <div class="result-hero-val">{A_t3:.4f}</div>
-          <div class="result-hero-unit">Erlang — masukkan ke sidebar sebagai nilai A</div>
+        c1, c2 = st.columns(2, gap="large")
+        with c1:
+            st.markdown('<div class="card">', unsafe_allow_html=True)
+            U_val  = st.number_input("U — Pengguna aktif jam sibuk", 1, 10000, 50)
+            BHT    = st.number_input("BHT — Busy Hour Traffic per user (Erl)",
+                                     0.001, 1.0, 0.1, 0.001, format="%.3f")
+            st.markdown('</div>', unsafe_allow_html=True)
+
+        with c2:
+            A_t2 = U_val * BHT
+            st.markdown(f"""
+            <div class="card" style="text-align:center;padding:1.6rem;">
+              <div style="font-size:0.78rem;color:#8899bb;margin-bottom:4px;">
+                A = {U_val} × {BHT:.3f}</div>
+              <div style="font-size:2.4rem;font-weight:800;color:#1a56ff;
+                   font-family:'JetBrains Mono';">{A_t2:.4f}</div>
+              <div style="font-size:0.82rem;color:#8899bb;margin-top:4px;">Erlang</div>
+            </div>
+            """, unsafe_allow_html=True)
+
+            if 0 < A_t2 < S and S > N:
+                P3 = engset(S, N, A_t2)
+                if P3:
+                    g3, gc3 = gos_label(P3)
+                    cls = "eng-ok" if P3 < 0.01 else "eng-warn"
+                    st.markdown(f'<div class="{cls}">P = {P3:.6f} · Blocking = {P3*100:.3f}% · GoS = {g3}</div>',
+                                unsafe_allow_html=True)
+
+    # ── Tab 3 ─────────────────────────────────────────────────────────────────
+    with tab3:
+        st.markdown("""
+        <div class="formula-wrap" style="margin-bottom:1.2rem;">
+          <span class="formula-tag">Rumus Data Rate</span>
+          <div class="formula-body">
+A = Data Rate (Mbps) / Kapasitas per Kanal (Mbps)
+          </div>
         </div>
         """, unsafe_allow_html=True)
 
-        if 0 < A_t3 < S and S > N:
-            P4 = engset(S, N, A_t3)
-            if P4:
-                g4, gc4 = gos_label(P4)
-                cls = "eng-ok" if P4 < 0.01 else "eng-warn"
-                st.markdown(f'<div class="{cls}">P = {P4:.6f} · Blocking = {P4*100:.3f}% · GoS = {g4}</div>',
-                            unsafe_allow_html=True)
+        c1, c2 = st.columns(2, gap="large")
+        with c1:
+            st.markdown('<div class="card">', unsafe_allow_html=True)
+            dr = st.number_input("Data Rate total (Mbps)", 0.1, 100000.0, 100.0, 1.0)
+            cc = st.number_input("Kapasitas per kanal (Mbps)", 0.1, 10000.0, 10.0, 0.1)
+            st.markdown('</div>', unsafe_allow_html=True)
+
+        with c2:
+            A_t3 = dr / cc
+            st.markdown(f"""
+            <div class="card" style="text-align:center;padding:1.6rem;">
+              <div style="font-size:0.78rem;color:#8899bb;margin-bottom:4px;">
+                A = {dr:.1f} / {cc:.1f}</div>
+              <div style="font-size:2.4rem;font-weight:800;color:#1a56ff;
+                   font-family:'JetBrains Mono';">{A_t3:.4f}</div>
+              <div style="font-size:0.82rem;color:#8899bb;margin-top:4px;">Erlang</div>
+            </div>
+            """, unsafe_allow_html=True)
+
+            if 0 < A_t3 < S and S > N:
+                P4 = engset(S, N, A_t3)
+                if P4:
+                    g4, gc4 = gos_label(P4)
+                    cls = "eng-ok" if P4 < 0.01 else "eng-warn"
+                    st.markdown(f'<div class="{cls}">P = {P4:.6f} · Blocking = {P4*100:.3f}% · GoS = {g4}</div>',
+                                unsafe_allow_html=True)
 
 
 # ══════════════════════════════════════════════════════════════════════════════
 # ██ ANALISIS & GRAFIK
 # ══════════════════════════════════════════════════════════════════════════════
 elif active_page == "📊  Analisis & Grafik":
-    page_header("Visualisasi", "Analisis & Grafik",
+    page_header("Visualisasi","Analisis & Grafik",
                 "Visualisasi perilaku sistem terhadap variasi parameter")
 
     if not valid:
@@ -1190,7 +832,7 @@ elif active_page == "📊  Analisis & Grafik":
     else:
         cg1, cg2 = st.columns(2, gap="large")
 
-        # ── Grafik 1: Blocking vs N ──────────────────────────────────────────
+        # Grafik 1
         with cg1:
             st.markdown('<div class="card">', unsafe_allow_html=True)
             st.markdown("##### 📈 Blocking vs Jumlah Kanal (N)")
@@ -1198,9 +840,9 @@ elif active_page == "📊  Analisis & Grafik":
             ns_   = list(range(1, max_n+1))
             ps_   = [(engset(S,n,A) or 0)*100 for n in ns_]
 
-            fig1, ax1 = plt.subplots(figsize=(5.5, 3.8))
+            fig1, ax1 = plt.subplots(figsize=(5.5,3.8))
             fig1.patch.set_facecolor(BG); ax1.set_facecolor(BG)
-            ax1.fill_between(ns_, ps_, alpha=0.13, color=BLUE)
+            ax1.fill_between(ns_, ps_, alpha=0.12, color=BLUE)
             ax1.plot(ns_, ps_, color=BLUE, linewidth=2.5, zorder=3)
             ax1.scatter([N], [P*100], color=RED, s=90, zorder=5,
                         label=f'N={N}, P={P*100:.3f}%')
@@ -1220,17 +862,17 @@ elif active_page == "📊  Analisis & Grafik":
             plt.close(fig1)
             st.markdown('</div>', unsafe_allow_html=True)
 
-        # ── Grafik 2: Blocking vs A ──────────────────────────────────────────
+        # Grafik 2
         with cg2:
             st.markdown('<div class="card">', unsafe_allow_html=True)
             st.markdown("##### 📉 Blocking vs Traffic Offered (A)")
-            a_max_ = min(float(S-1), 30.0)
-            av_    = np.linspace(0.1, a_max_, 300)
-            pv_    = [(engset(S,N,float(a)) or 0)*100 for a in av_]
+            a_max_  = min(float(S-1), 30.0)
+            av_     = np.linspace(0.1, a_max_, 300)
+            pv_     = [(engset(S,N,float(a)) or 0)*100 for a in av_]
 
-            fig2, ax2 = plt.subplots(figsize=(5.5, 3.8))
+            fig2, ax2 = plt.subplots(figsize=(5.5,3.8))
             fig2.patch.set_facecolor(BG); ax2.set_facecolor(BG)
-            ax2.fill_between(av_, pv_, alpha=0.13, color=TEAL)
+            ax2.fill_between(av_, pv_, alpha=0.12, color=TEAL)
             ax2.plot(av_, pv_, color=TEAL, linewidth=2.5, zorder=3)
             ax2.scatter([A], [P*100], color=RED, s=90, zorder=5,
                         label=f'A={A:.1f}, P={P*100:.3f}%')
@@ -1248,7 +890,7 @@ elif active_page == "📊  Analisis & Grafik":
             plt.close(fig2)
             st.markdown('</div>', unsafe_allow_html=True)
 
-        # ── Grafik 3: Multi-kurva ────────────────────────────────────────────
+        # Grafik 3 multi-kurva
         st.markdown('<div class="card">', unsafe_allow_html=True)
         st.markdown("##### 🌐 Multi-kurva: Blocking vs N untuk Berbagai Nilai A")
         palette = [BLUE, TEAL, AMBER, RED, '#a855f7', '#ec4899']
@@ -1278,7 +920,7 @@ elif active_page == "📊  Analisis & Grafik":
         plt.close(fig3)
         st.markdown('</div>', unsafe_allow_html=True)
 
-        # ── Tabel detail ─────────────────────────────────────────────────────
+        # Tabel
         st.markdown('<div class="card">', unsafe_allow_html=True)
         st.markdown("##### 📋 Tabel Detail Blocking vs N")
         rows_html = ""
@@ -1287,8 +929,8 @@ elif active_page == "📊  Analisis & Grafik":
             if p_i is None: continue
             c_i = A*(1-p_i); l_i = A*p_i; u_i = (c_i/n_i)*100
             g_t, g_c = gos_label(p_i)
-            active_cls = 'class="active"' if n_i == N else ""
-            rows_html += (f'<tr {active_cls}>'
+            active = 'class="active"' if n_i == N else ""
+            rows_html += (f'<tr {active}>'
                           f'<td>{"→ " if n_i==N else ""}{n_i}</td>'
                           f'<td>{p_i:.6f}</td><td>{p_i*100:.3f}%</td>'
                           f'<td>{c_i:.4f}</td><td>{l_i:.4f}</td>'
@@ -1313,7 +955,7 @@ elif active_page == "📊  Analisis & Grafik":
 # ██ EXPORT LAPORAN
 # ══════════════════════════════════════════════════════════════════════════════
 elif active_page == "📄  Export Laporan":
-    page_header("Export", "Export Laporan PDF",
+    page_header("Export","Export Laporan PDF",
                 "Generate laporan profesional hasil analisis Engset")
 
     if not valid:
@@ -1331,22 +973,24 @@ elif active_page == "📄  Export Laporan":
                         'margin-bottom:1rem;">📄 Preview Isi Laporan</div>',
                         unsafe_allow_html=True)
             items_prev = [
-                ("📌", "Judul",           "EngsetPro — Laporan Perhitungan Engset"),
-                ("📅", "Tanggal",         datetime.now().strftime('%d %B %Y, %H:%M')),
-                ("🔢", "Parameter",       f"S={S}, N={N}, A={A:.1f} Erl"),
-                ("📡", "P Blocking",      f"{P:.8f}"),
-                ("📊", "Blocking %",      f"{P*100:.4f}%"),
-                ("🏆", "GoS",             gos_text),
-                ("✅", "Traffic Carried", f"{carried:.4f} Erlang"),
-                ("❌", "Traffic Lost",    f"{lost:.4f} Erlang"),
-                ("📈", "Grafik",          "Blocking vs N + Blocking vs A"),
-                ("📋", "Tabel",           "Detail N dari 1 sampai N+10"),
+                ("📌","Judul",           "EngsetPro — Laporan Perhitungan Engset"),
+                ("📅","Tanggal",         datetime.now().strftime('%d %B %Y, %H:%M')),
+                ("🔢","Parameter",       f"S={S}, N={N}, A={A:.1f} Erl"),
+                ("📡","P Blocking",      f"{P:.8f}"),
+                ("📊","Blocking %",      f"{P*100:.4f}%"),
+                ("🏆","GoS",             gos_text),
+                ("✅","Traffic Carried", f"{carried:.4f} Erlang"),
+                ("❌","Traffic Lost",    f"{lost:.4f} Erlang"),
+                ("📈","Grafik",          "Blocking vs N + Blocking vs A"),
+                ("📋","Tabel",           "Detail N dari 1 sampai N+10"),
             ]
             for icon, label, val in items_prev:
                 st.markdown(f"""
-                <div class="data-row">
-                  <span class="data-row-label">{icon} {label}</span>
-                  <span class="data-row-val" style="text-align:right;max-width:55%;">{val}</span>
+                <div style="display:flex;justify-content:space-between;align-items:center;
+                     padding:8px 0;border-bottom:1px solid #f0f4ff;">
+                  <span style="font-size:0.82rem;color:#8899bb;">{icon} {label}</span>
+                  <span style="font-size:0.82rem;font-weight:600;color:#0d1b3e;
+                       font-family:'JetBrains Mono',monospace;text-align:right;max-width:55%;">{val}</span>
                 </div>
                 """, unsafe_allow_html=True)
             st.markdown('</div>', unsafe_allow_html=True)
@@ -1503,11 +1147,9 @@ elif active_page == "📄  Export Laporan":
                 st.markdown('<div class="eng-ok">✅ PDF siap! Klik tombol di atas untuk mengunduh.</div>',
                             unsafe_allow_html=True)
 
-
-# ── Footer ────────────────────────────────────────────────────────────────────
+# ── Footer ───────────────────────────────────────────────────────────────────
 st.markdown("""
-<div style="text-align:center;color:#aab5cc;font-size:0.75rem;
-     padding:2.5rem 0 1rem;letter-spacing:0.04em;">
+<div style="text-align:center;color:#aab5cc;font-size:0.78rem;padding:2rem 0 1rem;">
   EngsetPro v2.0 &nbsp;·&nbsp; Kalkulator Rekayasa Trafik Engset &nbsp;·&nbsp;
   Metode: Log-space Arithmetic
 </div>
