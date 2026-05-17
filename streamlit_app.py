@@ -212,37 +212,48 @@ html, body, [class*="css"] { font-family: 'Plus Jakarta Sans', sans-serif !impor
     box-shadow:0 2px 8px rgba(26,86,255,0.12);
 }
 
-/* ── Mobile nav bar ── */
-.mobile-nav-bar {
+/* ── Mobile nav selectbox: sembunyikan di desktop ── */
+div[data-testid="stSelectbox"]:has(> label:contains("Menu")) {
     display: none;
-    position: sticky; top: 0; z-index: 9999;
-    background: linear-gradient(135deg,#1a56ff,#0e3acc);
-    padding: 0.6rem 1rem;
-    margin-bottom: 1rem;
-    border-radius: 0 0 16px 16px;
-    box-shadow: 0 4px 20px rgba(26,86,255,0.3);
 }
-.mobile-nav-bar select {
-    width: 100%;
-    background: rgba(255,255,255,0.15) !important;
-    color: #fff !important;
-    border: 1px solid rgba(255,255,255,0.3) !important;
-    border-radius: 10px;
-    padding: 10px 14px;
-    font-size: 1rem;
-    font-weight: 600;
-    outline: none;
-    cursor: pointer;
-}
-.mobile-nav-bar select option {
-    background: #1a56ff;
-    color: #fff;
-}
+
 @media (max-width: 768px) {
-    .mobile-nav-bar { display: block !important; }
     /* Sembunyikan sidebar di mobile */
     [data-testid="stSidebar"] { display: none !important; }
     [data-testid="stSidebarCollapsedControl"] { display: none !important; }
+
+    /* Tampilkan selectbox nav di mobile */
+    div[data-testid="stSelectbox"] {
+        display: block !important;
+        background: linear-gradient(135deg,#1a56ff,#0e3acc) !important;
+        border-radius: 16px !important;
+        padding: 0.5rem 0.75rem !important;
+        margin-bottom: 1rem !important;
+        box-shadow: 0 4px 20px rgba(26,86,255,0.3) !important;
+        position: sticky !important;
+        top: 0 !important;
+        z-index: 9999 !important;
+    }
+    div[data-testid="stSelectbox"] label {
+        color: rgba(255,255,255,0.8) !important;
+        font-size: 0.72rem !important;
+        font-weight: 700 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.08em !important;
+    }
+    div[data-testid="stSelectbox"] > div > div {
+        background: rgba(255,255,255,0.15) !important;
+        border: 1px solid rgba(255,255,255,0.3) !important;
+        border-radius: 12px !important;
+        color: #fff !important;
+    }
+    div[data-testid="stSelectbox"] > div > div > div {
+        color: #fff !important;
+        font-weight: 600 !important;
+        font-size: 1rem !important;
+    }
+    div[data-testid="stSelectbox"] svg { fill: #fff !important; }
+
     .main .block-container {
         padding-left: 0.75rem !important;
         padding-right: 0.75rem !important;
@@ -250,12 +261,19 @@ html, body, [class*="css"] { font-family: 'Plus Jakarta Sans', sans-serif !impor
         max-width: 100% !important;
     }
 }
+
+/* Desktop: sembunyikan selectbox nav */
+@media (min-width: 769px) {
+    div[data-testid="stSelectbox"]:first-of-type {
+        display: none !important;
+    }
+}
 </style>
 """, unsafe_allow_html=True)
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# MOBILE NAV BAR (tampil di mobile, sidebar disembunyikan)
+# MOBILE NAV (st.selectbox native — selalu berfungsi)
 # ═══════════════════════════════════════════════════════════════════════════════
 MENU_OPTIONS = [
     "🏠  Dashboard",
@@ -265,26 +283,13 @@ MENU_OPTIONS = [
     "📄  Export Laporan"
 ]
 
-if "mobile_page" not in st.session_state:
-    st.session_state.mobile_page = MENU_OPTIONS[0]
-
-# Render mobile nav bar (hanya tampil di mobile via CSS)
-opts_html = "".join(
-    f'<option value="{o}" {"selected" if o == st.session_state.mobile_page else ""}>{o}</option>'
-    for o in MENU_OPTIONS
+# Selectbox ini disembunyikan di desktop via CSS, tampil di mobile
+mobile_page = st.selectbox(
+    "📋 Menu",
+    MENU_OPTIONS,
+    key="mobile_nav",
+    label_visibility="visible"
 )
-st.markdown(f"""
-<div class="mobile-nav-bar">
-  <form method="get" id="mobile-nav-form">
-    <select onchange="this.form.submit()" name="mnav">{opts_html}</select>
-  </form>
-</div>
-""", unsafe_allow_html=True)
-
-# Baca query param untuk mobile nav
-qp = st.query_params
-if "mnav" in qp and qp["mnav"] in MENU_OPTIONS:
-    st.session_state.mobile_page = qp["mnav"]
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -349,7 +354,8 @@ with st.sidebar:
         "📊  Analisis & Grafik",
         "📄  Export Laporan"
     ], label_visibility="collapsed", key="sidebar_page")
-    st.session_state.mobile_page = page
+    # Sync sidebar pilihan ke mobile_nav juga
+    st.session_state.mobile_nav = page
 
     st.markdown("---")
     st.markdown('<div style="font-size:0.7rem;font-weight:700;color:rgba(255,255,255,0.45);'
@@ -412,7 +418,7 @@ def page_header(tag, title, sub):
 # ══════════════════════════════════════════════════════════════════════════════
 # ██ DASHBOARD
 # ══════════════════════════════════════════════════════════════════════════════
-active_page = st.session_state.get("mobile_page", "🏠  Dashboard")
+active_page = st.session_state.get("mobile_nav", "🏠  Dashboard")
 if active_page == "🏠  Dashboard":
 
     col_main, col_side = st.columns([2, 1], gap="large")
