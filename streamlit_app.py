@@ -341,13 +341,20 @@ html, body, [class*="css"] {
 /* ═══════════ MOBILE RESPONSIVE ═══════════ */
 #mobile-menu-btn {
   display: none;
-  position: fixed; top: 10px; left: 10px; z-index: 99999;
+  position: fixed; top: 8px; left: 8px; z-index: 2147483647;
   background: linear-gradient(135deg, #1a56ff, #0e3acc);
-  color: white; border: none; border-radius: 10px;
-  width: 42px; height: 42px;
+  color: white; border: none; border-radius: 12px;
+  width: 48px; height: 48px;
   align-items: center; justify-content: center;
-  font-size: 1.25rem; cursor: pointer;
-  box-shadow: 0 4px 14px rgba(26,86,255,0.45);
+  font-size: 1.4rem; cursor: pointer;
+  box-shadow: 0 4px 18px rgba(26,86,255,0.55);
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  outline: none;
+}
+#mobile-menu-btn:active {
+  transform: scale(0.93);
+  box-shadow: 0 2px 10px rgba(26,86,255,0.4);
 }
 @media (max-width: 768px) {
   #mobile-menu-btn { display: flex !important; }
@@ -501,34 +508,73 @@ st.markdown("""
 <button id="mobile-menu-btn" title="Buka/Tutup Menu">&#9776;</button>
 <script>
 (function() {
-  // Tunggu DOM siap lalu attach event ke tombol hamburger kita
+  function findSidebarToggle() {
+    // Coba semua kemungkinan selector tombol sidebar Streamlit (berbagai versi)
+    var selectors = [
+      'button[data-testid="stSidebarNavToggleButton"]',
+      'button[data-testid="collapsedControl"]',
+      'button[data-testid="stBaseButton-headerNoPadding"]',
+      '[data-testid="stSidebarCollapsedControl"] button',
+      '[data-testid="stSidebarCollapsedControl"]',
+      'section[data-testid="stSidebar"] ~ div > button',
+      'section[data-testid="stSidebar"] + div button',
+      '.stMainBlockContainer ~ div button',
+      'button[aria-label="Close sidebar"]',
+      'button[aria-label="Open sidebar"]',
+      'button[title="Close sidebar"]',
+      'button[title="Open sidebar"]'
+    ];
+    for (var i = 0; i < selectors.length; i++) {
+      var el = document.querySelector(selectors[i]);
+      if (el) return el;
+    }
+    // Fallback: cari semua button di luar sidebar, pilih yang pertama
+    var allBtns = document.querySelectorAll('button');
+    for (var j = 0; j < allBtns.length; j++) {
+      var btn = allBtns[j];
+      var sid = document.querySelector('[data-testid="stSidebar"]');
+      if (sid && !sid.contains(btn)) {
+        var rect = btn.getBoundingClientRect();
+        // Tombol sidebar biasanya pojok kiri atas
+        if (rect.left < 80 && rect.top < 80) return btn;
+      }
+    }
+    return null;
+  }
+
+  function toggleSidebarManual() {
+    var sb = document.querySelector('[data-testid="stSidebar"]');
+    if (!sb) return;
+    var isHidden = sb.getAttribute('data-collapsed') === 'true'
+                || sb.style.display === 'none'
+                || sb.style.transform.includes('-100%')
+                || sb.offsetWidth < 10;
+    if (isHidden) {
+      sb.style.transform = 'translateX(0)';
+      sb.style.display = '';
+      sb.setAttribute('data-collapsed', 'false');
+    } else {
+      sb.style.transform = 'translateX(-110%)';
+      sb.setAttribute('data-collapsed', 'true');
+    }
+  }
+
   function attachBtn() {
     var myBtn = document.getElementById('mobile-menu-btn');
-    if (!myBtn) { setTimeout(attachBtn, 300); return; }
-    myBtn.addEventListener('click', function() {
-      // Cari tombol collapse/expand sidebar bawaan Streamlit
-      var selectors = [
-        'button[data-testid="stSidebarNavToggleButton"]',
-        'button[data-testid="collapsedControl"]',
-        '[data-testid="stSidebar"] + div button',
-        'section[data-testid="stSidebar"] ~ div button',
-        '.st-emotion-cache-zq5wmm',
-        'button[kind="header"]'
-      ];
-      var found = null;
-      for (var i = 0; i < selectors.length; i++) {
-        found = document.querySelector(selectors[i]);
-        if (found) break;
-      }
-      if (found) {
-        found.click();
+    if (!myBtn) { setTimeout(attachBtn, 400); return; }
+
+    myBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      var toggle = findSidebarToggle();
+      if (toggle) {
+        toggle.click();
       } else {
-        // Fallback: toggle class pada sidebar langsung
-        var sb = document.querySelector('[data-testid="stSidebar"]');
-        if (sb) sb.style.transform = sb.style.transform ? '' : 'translateX(-100%)';
+        toggleSidebarManual();
       }
     });
   }
+
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', attachBtn);
   } else {
