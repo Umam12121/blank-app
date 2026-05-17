@@ -327,6 +327,17 @@ html, body, [class*="css"] {
 .fl-item { font-size: 0.78rem; color: var(--slate); display: flex; align-items: baseline; gap: 8px; }
 .fl-sym  { font-family: 'JetBrains Mono', monospace; font-weight: 700; color: var(--blue-primary); min-width: 22px; }
 
+/* ═══════════ DASHBOARD TOP ROW (chips + GoS) ═══════════ */
+.dash-top-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1.4fr;
+  gap: 10px; margin-bottom: 1rem;
+}
+.chip-gos { text-align: center; }
+@media (max-width: 768px) {
+  .dash-top-row { grid-template-columns: 1fr 1fr !important; }
+}
+
 /* ═══════════ MOBILE RESPONSIVE ═══════════ */
 #mobile-menu-btn {
   display: none;
@@ -487,20 +498,43 @@ html, body, [class*="css"] {
 
 # ── Mobile hamburger menu button ──────────────────────────────────────────────
 st.markdown("""
-<button id="mobile-menu-btn" onclick="clickSidebarToggle()" title="Buka Menu">&#9776;</button>
+<button id="mobile-menu-btn" title="Buka/Tutup Menu">&#9776;</button>
 <script>
-function clickSidebarToggle() {
-  // Klik tombol collapse/expand bawaan Streamlit agar sidebar tetap fungsional
-  var btn = document.querySelector('[data-testid="collapsedControl"]');
-  if (!btn) btn = document.querySelector('button[kind="header"]');
-  if (!btn) btn = document.querySelector('[data-testid="stSidebarNavToggleButton"]');
-  if (!btn) {
-    // Fallback: cari semua button di area header, klik yang pertama
-    var allBtns = document.querySelectorAll('section[data-testid="stSidebar"] ~ div button');
-    if (allBtns.length) btn = allBtns[0];
+(function() {
+  // Tunggu DOM siap lalu attach event ke tombol hamburger kita
+  function attachBtn() {
+    var myBtn = document.getElementById('mobile-menu-btn');
+    if (!myBtn) { setTimeout(attachBtn, 300); return; }
+    myBtn.addEventListener('click', function() {
+      // Cari tombol collapse/expand sidebar bawaan Streamlit
+      var selectors = [
+        'button[data-testid="stSidebarNavToggleButton"]',
+        'button[data-testid="collapsedControl"]',
+        '[data-testid="stSidebar"] + div button',
+        'section[data-testid="stSidebar"] ~ div button',
+        '.st-emotion-cache-zq5wmm',
+        'button[kind="header"]'
+      ];
+      var found = null;
+      for (var i = 0; i < selectors.length; i++) {
+        found = document.querySelector(selectors[i]);
+        if (found) break;
+      }
+      if (found) {
+        found.click();
+      } else {
+        // Fallback: toggle class pada sidebar langsung
+        var sb = document.querySelector('[data-testid="stSidebar"]');
+        if (sb) sb.style.transform = sb.style.transform ? '' : 'translateX(-100%)';
+      }
+    });
   }
-  if (btn) btn.click();
-}
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', attachBtn);
+  } else {
+    attachBtn();
+  }
+})();
 </script>
 """, unsafe_allow_html=True)
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -687,69 +721,80 @@ active_page = page if st.session_state["last_nav"] == "main" else page_a
 # ══════════════════════════════════════════════════════════════════════════════
 if active_page == "🏠  Dashboard":
 
-    col_main, col_side = st.columns([2.1, 1], gap="large")
+    pbar_w  = min(100, (P or 0) * 500)
+    bar_col = GREEN if (P or 1) < 0.01 else AMBER if (P or 1) < 0.05 else RED
 
-    with col_main:
-        # Hero card
+    # ── Hero card (full width) ────────────────────────────────────────────────
+    st.markdown(f"""
+    <div class="hero-card">
+      <div class="hero-badge">📡 EngsetPro · Finite Source Model</div>
+      <h1 style="font-size:1.65rem;font-weight:800;color:#fff;margin:0 0 0.3rem;
+           line-height:1.15;">Dashboard Analisis Engset</h1>
+      <p style="font-size:0.85rem;opacity:0.75;margin:0 0 1.4rem;">
+        Probabilitas blocking real-time · Model Engset Finite Source</p>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <div class="hero-stat-pill">
+          <div style="font-size:0.62rem;opacity:0.7;text-transform:uppercase;
+               letter-spacing:0.08em;margin-bottom:1px;">Source</div>
+          <div style="font-size:1.3rem;font-weight:800;
+               font-family:'JetBrains Mono',monospace;">S = {S}</div>
+        </div>
+        <div class="hero-stat-pill">
+          <div style="font-size:0.62rem;opacity:0.7;text-transform:uppercase;
+               letter-spacing:0.08em;margin-bottom:1px;">Kanal</div>
+          <div style="font-size:1.3rem;font-weight:800;
+               font-family:'JetBrains Mono',monospace;">N = {N}</div>
+        </div>
+        <div class="hero-stat-pill">
+          <div style="font-size:0.62rem;opacity:0.7;text-transform:uppercase;
+               letter-spacing:0.08em;margin-bottom:1px;">Traffic</div>
+          <div style="font-size:1.3rem;font-weight:800;
+               font-family:'JetBrains Mono',monospace;">A = {A:.1f}</div>
+        </div>
+      </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # ── Metric chips + GoS row (full width, responsive) ───────────────────────
+    if P is not None:
         st.markdown(f"""
-        <div class="hero-card">
-          <div class="hero-badge">📡 EngsetPro · Finite Source Model</div>
-          <h1 style="font-size:1.65rem;font-weight:800;color:#fff;margin:0 0 0.3rem;
-               line-height:1.15;">Dashboard Analisis<br>Engset</h1>
-          <p style="font-size:0.85rem;opacity:0.75;margin:0 0 1.4rem;">
-            Probabilitas blocking real-time · Model Engset Finite Source</p>
-          <div style="display:flex;gap:10px;flex-wrap:wrap;">
-            <div class="hero-stat-pill">
-              <div style="font-size:0.62rem;opacity:0.7;text-transform:uppercase;
-                   letter-spacing:0.08em;margin-bottom:1px;">Source</div>
-              <div style="font-size:1.3rem;font-weight:800;
-                   font-family:'JetBrains Mono',monospace;">S = {S}</div>
+        <div class="dash-top-row">
+          <div class="chip">
+            <div class="chip-icon">📡</div>
+            <div class="chip-val">{P:.4f}</div>
+            <div class="chip-lbl">P Blocking</div>
+          </div>
+          <div class="chip">
+            <div class="chip-icon">✅</div>
+            <div class="chip-val">{carried:.3f}</div>
+            <div class="chip-lbl">Carried (Erl)</div>
+          </div>
+          <div class="chip">
+            <div class="chip-icon">❌</div>
+            <div class="chip-val">{lost:.3f}</div>
+            <div class="chip-lbl">Lost (Erl)</div>
+          </div>
+          <div class="chip chip-gos">
+            <div class="chip-icon">🏆</div>
+            <span class="gos {gos_cls}" style="font-size:0.85rem;padding:4px 14px;margin:4px 0;">{gos_text}</span>
+            <div class="progress-wrap" style="margin:6px 0 2px;">
+              <div class="progress-fill" style="width:{pbar_w:.1f}%;background:{bar_col};"></div>
             </div>
-            <div class="hero-stat-pill">
-              <div style="font-size:0.62rem;opacity:0.7;text-transform:uppercase;
-                   letter-spacing:0.08em;margin-bottom:1px;">Kanal</div>
-              <div style="font-size:1.3rem;font-weight:800;
-                   font-family:'JetBrains Mono',monospace;">N = {N}</div>
-            </div>
-            <div class="hero-stat-pill">
-              <div style="font-size:0.62rem;opacity:0.7;text-transform:uppercase;
-                   letter-spacing:0.08em;margin-bottom:1px;">Traffic</div>
-              <div style="font-size:1.3rem;font-weight:800;
-                   font-family:'JetBrains Mono',monospace;">A = {A:.1f}</div>
-            </div>
+            <div class="chip-lbl">Grade of Service · P={P:.4f}</div>
           </div>
         </div>
         """, unsafe_allow_html=True)
 
-        if P is not None:
-            # Metric chips
-            st.markdown(f"""
-            <div class="chip-grid">
-              <div class="chip">
-                <div class="chip-icon">📡</div>
-                <div class="chip-val">{P:.4f}</div>
-                <div class="chip-lbl">P Blocking</div>
-              </div>
-              <div class="chip">
-                <div class="chip-icon">✅</div>
-                <div class="chip-val">{carried:.3f}</div>
-                <div class="chip-lbl">Carried (Erl)</div>
-              </div>
-              <div class="chip">
-                <div class="chip-icon">❌</div>
-                <div class="chip-val">{lost:.3f}</div>
-                <div class="chip-lbl">Lost (Erl)</div>
-              </div>
-            </div>
-            """, unsafe_allow_html=True)
+    # ── Main content: Ringkasan kiri + Donut+Rekomendasi kanan ───────────────
+    col_main, col_side = st.columns([2.2, 1], gap="large")
 
+    with col_main:
         st.markdown('<p class="sec-title">📋 Ringkasan Sistem</p>', unsafe_allow_html=True)
-
         items = [
             ("📶", "plan-icon-blue",  "Probabilitas Blocking", f"{P*100:.3f}%" if P else "—",  f"Grade: {gos_text}"),
-            ("🔄", "plan-icon-teal",  "Traffic Carried",       f"{carried:.4f} Erl",             f"dari {A:.1f} Erl ditawarkan"),
-            ("📉", "plan-icon-amber", "Kanal Min GoS ≤ 1%",   f"N = {min_n_1}",                "untuk kualitas baik"),
-            ("⚡", "plan-icon-red",   "Utilisasi Kanal",       f"{util_pct:.1f}%",              f"rata-rata per {N} kanal"),
+            ("🔄", "plan-icon-teal",  "Traffic Carried",       f"{carried:.4f} Erl",            f"dari {A:.1f} Erl ditawarkan"),
+            ("📉", "plan-icon-amber", "Kanal Min GoS ≤ 1%",   f"N = {min_n_1}",               "untuk kualitas baik"),
+            ("⚡", "plan-icon-red",   "Utilisasi Kanal",       f"{util_pct:.1f}%",             f"rata-rata per {N} kanal"),
         ]
         for icon, icon_cls, name, val, desc in items:
             st.markdown(f"""
@@ -764,7 +809,7 @@ if active_page == "🏠  Dashboard":
             """, unsafe_allow_html=True)
 
     with col_side:
-        # Utilisasi donut
+        # Donut lebih kecil agar tidak terlalu besar
         fig_d = donut_chart(
             util_pct,
             f"{util_pct:.1f}%" if P else "—",
@@ -774,35 +819,16 @@ if active_page == "🏠  Dashboard":
         st.pyplot(fig_d, use_container_width=True)
         plt.close(fig_d)
 
-        # GoS badge card
-        pbar_w  = min(100, (P or 0) * 500)
-        bar_col = GREEN if (P or 1) < 0.01 else AMBER if (P or 1) < 0.05 else RED
-        st.markdown(f"""
-        <div class="card" style="text-align:center;padding:1.3rem;">
-          <div style="font-size:0.68rem;color:var(--muted);text-transform:uppercase;
-               letter-spacing:0.08em;margin-bottom:8px;">Grade of Service</div>
-          <span class="gos {gos_cls}" style="font-size:0.95rem;padding:7px 22px;">{gos_text}</span>
-          <div style="margin-top:12px;">
-            <div class="progress-wrap">
-              <div class="progress-fill" style="width:{pbar_w:.1f}%;background:{bar_col};"></div>
-            </div>
-          </div>
-          <div style="font-size:0.75rem;color:var(--muted);margin-top:6px;">
-            P = {f"{P:.6f}" if P is not None else "—"}
-          </div>
-        </div>
-        """, unsafe_allow_html=True)
-
         # Rekomendasi kanal
         st.markdown(f"""
-        <div class="card">
-          <div style="font-size:0.85rem;font-weight:700;color:var(--navy);margin-bottom:10px;">
+        <div class="card" style="padding:1rem 1.1rem;">
+          <div style="font-size:0.82rem;font-weight:700;color:var(--navy);margin-bottom:10px;">
             🎯 Rekomendasi Kanal</div>
-          <div style="font-size:0.82rem;color:var(--slate);line-height:2.3;">
-            GoS ≤ 1%&nbsp;&nbsp;&nbsp;→
-            <strong style="color:var(--blue-primary);">N = {min_n_1}</strong><br>
-            GoS ≤ 0.1% →
-            <strong style="color:var(--blue-primary);">N = {min_n_001}</strong>
+          <div style="font-size:0.82rem;color:var(--slate);line-height:2.2;">
+            GoS ≤ 1%
+            <strong style="color:var(--blue-primary);float:right;">N = {min_n_1}</strong><br>
+            GoS ≤ 0.1%
+            <strong style="color:var(--blue-primary);float:right;">N = {min_n_001}</strong>
           </div>
         </div>
         """, unsafe_allow_html=True)
