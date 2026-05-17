@@ -368,8 +368,8 @@ with st.sidebar:
                 'letter-spacing:0.12em;text-transform:uppercase;margin-bottom:12px;padding-left:4px;">'
                 'Parameter Sistem</div>', unsafe_allow_html=True)
 
-    S = st.slider("S — Jumlah Source", 2, 200, 20, 1, key="S_val")
-    N = st.slider("N — Jumlah Kanal",  1, 100,  5, 1, key="N_val")
+    S = st.slider("S — Jumlah Source", 2, 200, st.session_state.get("S_mob",20), 1, key="S_val")
+    N = st.slider("N — Jumlah Kanal",  1, 100, st.session_state.get("N_mob",5), 1, key="N_val")
     A = st.slider("A — Traffic Offered (Erl)", 0.1, float(max(1, S-1)), min(8.0, float(S-2)), 0.1, key="A_val")
 
     st.markdown("---")
@@ -401,10 +401,11 @@ with _mob_cols[1]:
 with _mob_cols[2]:
     A_mob = st.number_input("A — Erlang", min_value=0.1, max_value=float(max(1, S_mob-1)), value=min(8.0, float(S_mob-2)), step=0.1, format="%.1f", key="A_mob")
 
-# Sync: desktop slider override mobile input jika keduanya ada
-S = st.session_state.get("S_val", S_mob)
-N = st.session_state.get("N_val", N_mob)
-A = st.session_state.get("A_val", A_mob)
+# Gunakan nilai dari number_input mobile langsung
+# (sidebar slider di desktop akan ikut via key sync di atas)
+S = S_mob
+N = N_mob
+A = A_mob
 # ═══════════════════════════════════════════════════════════════════════════════
 # COMPUTE
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -574,14 +575,25 @@ elif active_page == "🧮  Kalkulator Engset":
 
     st.markdown("""
     <div class="formula-wrap">
-      <span class="formula-tag">Rumus Engset — dari Dosen</span>
-      <div class="formula-body">
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;C(S-1, N) · (A/(S-A))^N<br>
-P = ─────────────────────────────────────<br>
-&nbsp;&nbsp;&nbsp;&nbsp;N<br>
-&nbsp;&nbsp;&nbsp;Σ  C(S-1, i) · (A/(S-A))^i<br>
-&nbsp;&nbsp;i=0
-      </div>
+      <span class="formula-tag">Rumus Engset — Finite Source Model</span>
+      <svg width="100%" viewBox="0 0 640 240" style="display:block;margin:0.5rem 0;">
+        <text x="50" y="50" font-family="serif" font-size="16" font-weight="bold" fill="#0d2060">P =</text>
+        <text x="160" y="35" text-anchor="middle" font-family="serif" font-size="15" fill="#0d2060">&#x239B;S&#x2212;1&#x239E;   &#x239B;    A    &#x239E;&#x1D4F;</text>
+        <text x="160" y="52" text-anchor="middle" font-family="serif" font-size="15" fill="#0d2060">&#x239C;     &#x239F; &#xD7; &#x239C; &#x2015;&#x2015;&#x2015;&#x2015; &#x239F;</text>
+        <text x="160" y="69" text-anchor="middle" font-family="serif" font-size="15" fill="#0d2060">&#x239D; N &#x23A0;   &#x239D; S&#x2212;A &#x23A0;</text>
+        <line x1="100" y1="80" x2="560" y2="80" stroke="#1a56ff" stroke-width="1.5"/>
+        <text x="100" y="100" font-family="serif" font-size="13" fill="#0d2060">N</text>
+        <text x="95"  y="120" font-family="serif" font-size="22" fill="#1a56ff">&#x2211;</text>
+        <text x="100" y="140" font-family="serif" font-size="12" fill="#0d2060">i=0</text>
+        <text x="300" y="102" text-anchor="middle" font-family="serif" font-size="15" fill="#0d2060">&#x239B;S&#x2212;1&#x239E;   &#x239B;    A    &#x239E;&#x2071;</text>
+        <text x="300" y="119" text-anchor="middle" font-family="serif" font-size="15" fill="#0d2060">&#x239C;     &#x239F; &#xD7; &#x239C; &#x2015;&#x2015;&#x2015;&#x2015; &#x239F;</text>
+        <text x="300" y="136" text-anchor="middle" font-family="serif" font-size="15" fill="#0d2060">&#x239D;  i  &#x23A0;   &#x239D; S&#x2212;A &#x23A0;</text>
+        <line x1="60" y1="165" x2="580" y2="165" stroke="#c7d7ff" stroke-width="0.8"/>
+        <text x="65"  y="182" font-family="sans-serif" font-size="12" fill="#3a5098"><tspan font-weight="bold">P</tspan> = Probabilitas blocking</text>
+        <text x="65"  y="198" font-family="sans-serif" font-size="12" fill="#3a5098"><tspan font-weight="bold">S</tspan> = Jumlah source / pengguna</text>
+        <text x="340" y="182" font-family="sans-serif" font-size="12" fill="#3a5098"><tspan font-weight="bold">N</tspan> = Jumlah kanal / server</text>
+        <text x="340" y="198" font-family="sans-serif" font-size="12" fill="#3a5098"><tspan font-weight="bold">A</tspan> = Traffic offered (Erlang)</text>
+      </svg>
       <div class="formula-legend">
         <div class="fl-item"><span class="fl-sym">P</span> Probabilitas blocking</div>
         <div class="fl-item"><span class="fl-sym">S</span> Jumlah source / pengguna</div>
