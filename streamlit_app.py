@@ -504,85 +504,75 @@ html, body, [class*="css"] {
 """, unsafe_allow_html=True)
 
 # ── Mobile hamburger menu button ──────────────────────────────────────────────
-st.markdown("""
-<button id="mobile-menu-btn" title="Buka/Tutup Menu">&#9776;</button>
+import streamlit.components.v1 as components
+components.html("""
+<style>
+  #hbg-btn {
+    display: none;
+    position: fixed; top: 8px; left: 8px; z-index: 2147483647;
+    background: linear-gradient(135deg, #1a56ff, #0e3acc);
+    color: white; border: none; border-radius: 12px;
+    width: 48px; height: 48px;
+    align-items: center; justify-content: center;
+    font-size: 1.4rem; cursor: pointer;
+    box-shadow: 0 4px 18px rgba(26,86,255,0.55);
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    outline: none;
+    font-family: sans-serif;
+  }
+  #hbg-btn:active { transform: scale(0.93); }
+  @media (max-width: 768px) { #hbg-btn { display: flex !important; } }
+</style>
+<button id="hbg-btn" title="Buka/Tutup Menu">&#9776;</button>
 <script>
 (function() {
-  function findSidebarToggle() {
-    // Coba semua kemungkinan selector tombol sidebar Streamlit (berbagai versi)
-    var selectors = [
+  var btn = document.getElementById('hbg-btn');
+
+  function getToggleBtn() {
+    var doc = window.parent.document;
+    var tries = [
       'button[data-testid="stSidebarNavToggleButton"]',
       'button[data-testid="collapsedControl"]',
-      'button[data-testid="stBaseButton-headerNoPadding"]',
       '[data-testid="stSidebarCollapsedControl"] button',
-      '[data-testid="stSidebarCollapsedControl"]',
-      'section[data-testid="stSidebar"] ~ div > button',
-      'section[data-testid="stSidebar"] + div button',
-      '.stMainBlockContainer ~ div button',
-      'button[aria-label="Close sidebar"]',
+      'button[data-testid="stBaseButton-headerNoPadding"]',
       'button[aria-label="Open sidebar"]',
-      'button[title="Close sidebar"]',
-      'button[title="Open sidebar"]'
+      'button[aria-label="Close sidebar"]',
     ];
-    for (var i = 0; i < selectors.length; i++) {
-      var el = document.querySelector(selectors[i]);
+    for (var i = 0; i < tries.length; i++) {
+      var el = doc.querySelector(tries[i]);
       if (el) return el;
     }
-    // Fallback: cari semua button di luar sidebar, pilih yang pertama
-    var allBtns = document.querySelectorAll('button');
+    var sidebar = doc.querySelector('[data-testid="stSidebar"]');
+    var allBtns = doc.querySelectorAll('button');
     for (var j = 0; j < allBtns.length; j++) {
-      var btn = allBtns[j];
-      var sid = document.querySelector('[data-testid="stSidebar"]');
-      if (sid && !sid.contains(btn)) {
-        var rect = btn.getBoundingClientRect();
-        // Tombol sidebar biasanya pojok kiri atas
-        if (rect.left < 80 && rect.top < 80) return btn;
-      }
+      var b = allBtns[j];
+      if (sidebar && sidebar.contains(b)) continue;
+      var r = b.getBoundingClientRect();
+      if (r.left < 100 && r.top < 100 && r.width > 0) return b;
     }
     return null;
   }
 
-  function toggleSidebarManual() {
-    var sb = document.querySelector('[data-testid="stSidebar"]');
+  function toggleManual() {
+    var sb = window.parent.document.querySelector('[data-testid="stSidebar"]');
     if (!sb) return;
-    var isHidden = sb.getAttribute('data-collapsed') === 'true'
-                || sb.style.display === 'none'
-                || sb.style.transform.includes('-100%')
-                || sb.offsetWidth < 10;
-    if (isHidden) {
-      sb.style.transform = 'translateX(0)';
-      sb.style.display = '';
-      sb.setAttribute('data-collapsed', 'false');
+    var collapsed = sb.offsetWidth < 50 || sb.style.transform.indexOf('-') !== -1;
+    if (collapsed) {
+      sb.style.cssText += '; transform: translateX(0) !important; visibility: visible !important;';
     } else {
-      sb.style.transform = 'translateX(-110%)';
-      sb.setAttribute('data-collapsed', 'true');
+      sb.style.cssText += '; transform: translateX(-110%) !important;';
     }
   }
 
-  function attachBtn() {
-    var myBtn = document.getElementById('mobile-menu-btn');
-    if (!myBtn) { setTimeout(attachBtn, 400); return; }
-
-    myBtn.addEventListener('click', function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      var toggle = findSidebarToggle();
-      if (toggle) {
-        toggle.click();
-      } else {
-        toggleSidebarManual();
-      }
-    });
-  }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', attachBtn);
-  } else {
-    attachBtn();
-  }
+  btn.addEventListener('click', function(e) {
+    e.preventDefault();
+    var toggle = getToggleBtn();
+    if (toggle) { toggle.click(); } else { toggleManual(); }
+  });
 })();
 </script>
-""", unsafe_allow_html=True)
+""", height=0)
 # ═══════════════════════════════════════════════════════════════════════════════
 def log_factorial(n):
     if n <= 1: return 0.0
