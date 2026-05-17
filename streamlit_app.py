@@ -262,11 +262,23 @@ div[data-testid="stSelectbox"]:has(> label:contains("Menu")) {
     }
 }
 
-/* Desktop: sembunyikan selectbox nav */
+/* Desktop: sembunyikan selectbox nav dan mobile params */
 @media (min-width: 769px) {
     div[data-testid="stSelectbox"]:first-of-type {
         display: none !important;
     }
+    #mobile-params-label { display: none !important; }
+    /* Sembunyikan 3 number_input pertama (S_mob, N_mob, A_mob) di desktop */
+    div[data-testid="stNumberInput"]:nth-of-type(1),
+    div[data-testid="stNumberInput"]:nth-of-type(2),
+    div[data-testid="stNumberInput"]:nth-of-type(3) {
+        display: none !important;
+    }
+}
+
+/* Mobile: sembunyikan label mobile-params di atas selectbox */
+@media (max-width: 768px) {
+    #mobile-params-label { display: block !important; }
 }
 </style>
 """, unsafe_allow_html=True)
@@ -325,7 +337,7 @@ def find_min_N(S, A, target=0.01):
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# SIDEBAR
+# SIDEBAR (desktop only)
 # ═══════════════════════════════════════════════════════════════════════════════
 with st.sidebar:
     st.markdown("""
@@ -343,25 +355,22 @@ with st.sidebar:
                 unsafe_allow_html=True)
 
     page = st.radio(
-        "nav",
-        MENU_OPTIONS,
+        "nav", MENU_OPTIONS,
         index=MENU_OPTIONS.index(st.session_state.get("mobile_nav", MENU_OPTIONS[0])),
         label_visibility="collapsed"
     )
-    # Update mobile_nav agar halaman sync
     if page != st.session_state.get("mobile_nav"):
         st.session_state["mobile_nav"] = page
         st.rerun()
-
 
     st.markdown("---")
     st.markdown('<div style="font-size:0.7rem;font-weight:700;color:rgba(255,255,255,0.45);'
                 'letter-spacing:0.12em;text-transform:uppercase;margin-bottom:12px;padding-left:4px;">'
                 'Parameter Sistem</div>', unsafe_allow_html=True)
 
-    S = st.slider("S — Jumlah Source", 2, 200, 20, 1)
-    N = st.slider("N — Jumlah Kanal",  1, 100,  5, 1)
-    A = st.slider("A — Traffic Offered (Erl)", 0.1, float(max(1, S-1)), min(8.0, float(S-2)), 0.1)
+    S = st.slider("S — Jumlah Source", 2, 200, 20, 1, key="S_val")
+    N = st.slider("N — Jumlah Kanal",  1, 100,  5, 1, key="N_val")
+    A = st.slider("A — Traffic Offered (Erl)", 0.1, float(max(1, S-1)), min(8.0, float(S-2)), 0.1, key="A_val")
 
     st.markdown("---")
     st.markdown(f"""
@@ -369,16 +378,33 @@ with st.sidebar:
       <div style="font-size:0.7rem;color:rgba(255,255,255,0.5);text-transform:uppercase;
            letter-spacing:0.08em;margin-bottom:8px;">Sesi Saat Ini</div>
       <div style="font-size:0.82rem;color:rgba(255,255,255,0.85);line-height:2;">
-        S = <strong>{S}</strong> pengguna<br>
-        N = <strong>{N}</strong> kanal<br>
+        S = <strong>{S}</strong> pengguna<br>N = <strong>{N}</strong> kanal<br>
         A = <strong>{A:.1f}</strong> Erlang
       </div>
-      <div style="font-size:0.7rem;color:rgba(255,255,255,0.4);margin-top:8px;">
-        {datetime.now().strftime('%d %b %Y · %H:%M')}</div>
     </div>
     """, unsafe_allow_html=True)
 
+# ── Mobile parameter input (tampil di mobile, sembunyi di desktop) ──
+st.markdown("""
+<div id="mobile-params-label" style="
+  font-size:0.72rem;font-weight:700;color:#1a56ff;
+  text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px;">
+  ⚙️ Parameter Sistem
+</div>
+""", unsafe_allow_html=True)
 
+_mob_cols = st.columns(3)
+with _mob_cols[0]:
+    S_mob = st.number_input("S — Source", min_value=2, max_value=200, value=st.session_state.get("S_val", 20), step=1, key="S_mob")
+with _mob_cols[1]:
+    N_mob = st.number_input("N — Kanal", min_value=1, max_value=100, value=st.session_state.get("N_val", 5), step=1, key="N_mob")
+with _mob_cols[2]:
+    A_mob = st.number_input("A — Erlang", min_value=0.1, max_value=float(max(1, S_mob-1)), value=min(8.0, float(S_mob-2)), step=0.1, format="%.1f", key="A_mob")
+
+# Sync: desktop slider override mobile input jika keduanya ada
+S = st.session_state.get("S_val", S_mob)
+N = st.session_state.get("N_val", N_mob)
+A = st.session_state.get("A_val", A_mob)
 # ═══════════════════════════════════════════════════════════════════════════════
 # COMPUTE
 # ═══════════════════════════════════════════════════════════════════════════════
