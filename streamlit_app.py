@@ -418,92 +418,98 @@ def find_min_N(S, A, target=0.01):
 # Semua kurung kurawal SVG dihindari, pakai style attribute langsung
 # ═══════════════════════════════════════════════════════════════════════════════
 ENGSET_SVG = (
-    '<svg viewBox="0 0 540 210" xmlns="http://www.w3.org/2000/svg" '
-    'style="max-width:520px;width:100%;display:block;margin:0 auto;">'
+    # Viewbox lebih tinggi agar semua elemen muat, layout dipusatkan
+    '<svg viewBox="0 0 560 220" xmlns="http://www.w3.org/2000/svg" '
+    'style="max-width:560px;width:100%;display:block;margin:0 auto;">'
 
-    # defs / styles
     '<defs><style>'
     '.es { font-family: Georgia, "Times New Roman", serif; }'
     '.ec { fill: #0288D1; }'
     '.ed { fill: #0a2540; }'
-    '.eg { fill: #546e7a; font-family: "Plus Jakarta Sans", sans-serif; font-size: 11px; }'
+    '.eg { fill: #546e7a; font-family: sans-serif; font-size: 11.5px; }'
     '</style></defs>'
 
-    # background
-    '<rect x="0" y="0" width="540" height="210" rx="16" ry="16" fill="transparent"/>'
+    # ─────────────────────────────────────────────
+    # Layout: semua elemen rumus dipusatkan di x=280
+    # P = (x=60-100), garis pecahan (x=110-430)
+    # Pembilang: tengah di x=270
+    # Penyebut:  tengah di x=270
+    # ─────────────────────────────────────────────
 
     # ── P = ──
-    '<text x="18" y="105" class="es ed" font-size="26" font-style="italic" font-weight="bold">P</text>'
-    '<text x="42" y="105" class="es ed" font-size="24">=</text>'
+    '<text x="68" y="104" class="es ed" font-size="28" font-style="italic" font-weight="bold">P</text>'
+    '<text x="96" y="104" class="es ed" font-size="26">=</text>'
 
-    # ── NUMERATOR ──
-    # C superscript S-1
-    '<text x="74" y="62" class="es ec" font-size="11" font-weight="bold">S&#8722;1</text>'
-    # Big C
-    '<text x="74" y="78" class="es ec" font-size="22" font-weight="bold">C</text>'
-    # subscript N
-    '<text x="94" y="87" class="es ed" font-size="12">N</text>'
+    # ══════ NUMERATOR (baris atas garis pecahan) ══════
+    # Semua elemen pembilang berpusat di x≈270, y sekitar 50-88
 
-    # times
-    '<text x="116" y="76" class="es" fill="#90a4ae" font-size="18">&#215;</text>'
+    # C^{S-1}_N  (x=130)
+    '<text x="133" y="58" class="es ec" font-size="12" font-weight="bold">S&#8722;1</text>'
+    '<text x="130" y="76" class="es ec" font-size="24" font-weight="bold">C</text>'
+    '<text x="153" y="86" class="es ed" font-size="13">N</text>'
 
-    # big left paren
-    '<text x="138" y="80" class="es ed" font-size="30">(</text>'
-    # A top
-    '<text x="160" y="63" class="es ed" font-size="17" text-anchor="middle">A</text>'
-    # fraction bar numerator
-    '<line x1="147" y1="68" x2="173" y2="68" stroke="#0a2540" stroke-width="1.4"/>'
-    # S-A bottom
-    '<text x="160" y="84" class="es ed" font-size="13" text-anchor="middle">S&#8722;A</text>'
-    # big right paren
-    '<text x="175" y="80" class="es ed" font-size="30">)</text>'
-    # exponent N
-    '<text x="195" y="54" class="es ec" font-size="14" font-style="italic" font-weight="bold">N</text>'
+    # ×
+    '<text x="176" y="75" class="es" fill="#90a4ae" font-size="20">&#215;</text>'
 
-    # ── FRACTION LINE ──
-    '<line x1="62" y1="96" x2="370" y2="96" stroke="#0288D1" stroke-width="2.2"/>'
+    # ( A / (S-A) )^N
+    # kurung buka
+    '<text x="200" y="79" class="es ed" font-size="32" font-weight="300">(</text>'
+    # A (numerator pecahan kecil)
+    '<text x="222" y="62" class="es ed" font-size="18" text-anchor="middle">A</text>'
+    # garis pecahan kecil
+    '<line x1="210" y1="67" x2="234" y2="67" stroke="#0a2540" stroke-width="1.5"/>'
+    # S-A (denominator pecahan kecil) — pakai &#8722; bukan -
+    '<text x="222" y="83" class="es ed" font-size="13" text-anchor="middle">S&#8722;A</text>'
+    # kurung tutup
+    '<text x="238" y="79" class="es ed" font-size="32" font-weight="300">)</text>'
+    # pangkat N
+    '<text x="262" y="52" class="es ec" font-size="15" font-style="italic" font-weight="bold">N</text>'
 
-    # ── DENOMINATOR ──
-    # Sigma limits: N on top, i=0 on bottom
-    '<text x="66" y="116" class="es ec" font-size="11" font-weight="bold">N</text>'
-    '<text x="58" y="135" class="es ec" font-size="32">&#931;</text>'
-    '<text x="58" y="155" class="es ec" font-size="11" font-weight="bold">i&#61;0</text>'
+    # ══════ GARIS PECAHAN UTAMA ══════
+    '<line x1="118" y1="97" x2="430" y2="97" stroke="#0288D1" stroke-width="2.5"/>'
 
-    # C S-1 i
-    '<text x="100" y="116" class="es ec" font-size="11" font-weight="bold">S&#8722;1</text>'
-    '<text x="100" y="133" class="es ec" font-size="22" font-weight="bold">C</text>'
-    '<text x="120" y="143" class="es ed" font-size="12" font-style="italic">i</text>'
+    # ══════ DENOMINATOR (baris bawah garis pecahan) ══════
 
-    # times
-    '<text x="136" y="133" class="es" fill="#90a4ae" font-size="18">&#215;</text>'
+    # Sigma: N di atas, i=0 di bawah
+    '<text x="124" y="118" class="es ec" font-size="12" font-weight="bold">N</text>'
+    '<text x="116" y="138" class="es ec" font-size="34">&#931;</text>'
+    '<text x="115" y="159" class="es ec" font-size="12" font-weight="bold">i&#61;0</text>'
 
-    # big left paren denom
-    '<text x="158" y="136" class="es ed" font-size="30">(</text>'
-    # A top denom
-    '<text x="180" y="118" class="es ed" font-size="17" text-anchor="middle">A</text>'
-    # fraction bar denom
-    '<line x1="167" y1="123" x2="193" y2="123" stroke="#0a2540" stroke-width="1.4"/>'
-    # S-A denom
-    '<text x="180" y="139" class="es ed" font-size="13" text-anchor="middle">S&#8722;A</text>'
-    # big right paren denom
-    '<text x="195" y="136" class="es ed" font-size="30">)</text>'
-    # exponent i
-    '<text x="216" y="110" class="es ec" font-size="14" font-style="italic" font-weight="bold">i</text>'
+    # C^{S-1}_i  (x=168)
+    '<text x="168" y="118" class="es ec" font-size="12" font-weight="bold">S&#8722;1</text>'
+    '<text x="165" y="137" class="es ec" font-size="24" font-weight="bold">C</text>'
+    '<text x="188" y="148" class="es ed" font-size="13" font-style="italic">i</text>'
 
-    # ── DIVIDER LINE ──
-    '<line x1="20" y1="170" x2="520" y2="170" stroke="#b2ebf2" stroke-width="1.5"/>'
+    # ×
+    '<text x="210" y="137" class="es" fill="#90a4ae" font-size="20">&#215;</text>'
 
-    # ── LEGEND LEFT ──
-    '<text x="24" y="186" class="es ed" font-size="13" font-style="italic">P</text>'
-    '<text x="36" y="186" class="eg"> = Probabilitas Blocking</text>'
-    '<text x="24" y="202" class="es ed" font-size="13" font-style="italic">S</text>'
-    '<text x="36" y="202" class="eg"> = Jumlah Source / Pengguna</text>'
+    # ( A / (S-A) )^i
+    '<text x="234" y="141" class="es ed" font-size="32" font-weight="300">(</text>'
+    # A
+    '<text x="257" y="123" class="es ed" font-size="18" text-anchor="middle">A</text>'
+    # garis pecahan kecil
+    '<line x1="245" y1="128" x2="269" y2="128" stroke="#0a2540" stroke-width="1.5"/>'
+    # S-A
+    '<text x="257" y="144" class="es ed" font-size="13" text-anchor="middle">S&#8722;A</text>'
+    # kurung tutup
+    '<text x="273" y="141" class="es ed" font-size="32" font-weight="300">)</text>'
+    # pangkat i
+    '<text x="298" y="113" class="es ec" font-size="15" font-style="italic" font-weight="bold">i</text>'
 
-    # ── LEGEND RIGHT ──
-    '<text x="280" y="186" class="es ed" font-size="13" font-style="italic">N</text>'
-    '<text x="292" y="186" class="eg"> = Jumlah Kanal / Server</text>'
-    '<text x="280" y="202" class="es ed" font-size="13" font-style="italic">A</text>'
-    '<text x="292" y="202" class="eg"> = Traffic Offered (Erlang)</text>'
+    # ══════ GARIS PEMISAH LEGENDA ══════
+    '<line x1="20" y1="175" x2="540" y2="175" stroke="#b2ebf2" stroke-width="1.5"/>'
+
+    # ══════ LEGENDA ══════
+    # Kiri
+    '<text x="28" y="191" class="es ed" font-size="13" font-style="italic">P</text>'
+    '<text x="40" y="191" class="eg"> = Probabilitas Blocking</text>'
+    '<text x="28" y="208" class="es ed" font-size="13" font-style="italic">S</text>'
+    '<text x="40" y="208" class="eg"> = Jumlah Source / Pengguna</text>'
+    # Kanan
+    '<text x="290" y="191" class="es ed" font-size="13" font-style="italic">N</text>'
+    '<text x="302" y="191" class="eg"> = Jumlah Kanal / Server</text>'
+    '<text x="290" y="208" class="es ed" font-size="13" font-style="italic">A</text>'
+    '<text x="302" y="208" class="eg"> = Traffic Offered (Erlang)</text>'
 
     '</svg>'
 )
@@ -792,16 +798,19 @@ elif active_page == "🧮  Kalkulator Engset":
 
     col_s, col_n, col_a = st.columns(3, gap="large")
     with col_s:
-        inp_S = st.number_input("S — Jumlah Source (Pengguna)", min_value=2, max_value=200,
-                                 value=st.session_state["S_calc"], step=1)
+        st.markdown('<div style="font-size:0.82rem;font-weight:700;color:#0a2540;margin-bottom:4px;">S &nbsp;<span style="color:#0288D1;">Jumlah Source (Pengguna)</span></div>', unsafe_allow_html=True)
+        inp_S = st.number_input("S", min_value=2, max_value=200,
+                                 value=st.session_state["S_calc"], step=1, label_visibility="collapsed")
     with col_n:
-        inp_N = st.number_input("N — Jumlah Kanal (Server)", min_value=1, max_value=100,
-                                 value=st.session_state["N_calc"], step=1)
+        st.markdown('<div style="font-size:0.82rem;font-weight:700;color:#0a2540;margin-bottom:4px;">N &nbsp;<span style="color:#0288D1;">Jumlah Kanal (Server)</span></div>', unsafe_allow_html=True)
+        inp_N = st.number_input("N", min_value=1, max_value=100,
+                                 value=st.session_state["N_calc"], step=1, label_visibility="collapsed")
     with col_a:
-        inp_A = st.number_input("A — Traffic Offered (Erlang)", min_value=0.1,
+        st.markdown('<div style="font-size:0.82rem;font-weight:700;color:#0a2540;margin-bottom:4px;">A &nbsp;<span style="color:#0288D1;">Traffic Offered (Erlang)</span></div>', unsafe_allow_html=True)
+        inp_A = st.number_input("A", min_value=0.1,
                                  max_value=float(max(1, inp_S - 1)),
                                  value=min(st.session_state["A_calc"], float(inp_S - 2)),
-                                 step=0.1, format="%.1f")
+                                 step=0.1, format="%.1f", label_visibility="collapsed")
 
     st.markdown("<div style='height:0.5rem'></div>", unsafe_allow_html=True)
     if st.button("🚀  Jalankan Kalkulasi", use_container_width=True):
@@ -882,20 +891,20 @@ elif active_page == "🧮  Kalkulator Engset":
             with st.expander("🔢 Lihat Langkah Perhitungan"):
                 ratio = A / (S - A)
                 st.markdown(f"""
-**Langkah 1 — Hitung Rasio:**
+**Langkah 1 · Hitung Rasio:**
 ```
-A/(S-A) = {A:.2f} / ({S} - {A:.2f}) = {ratio:.6f}
+A / (S-A) = {A:.2f} / ({S} - {A:.2f}) = {ratio:.6f}
 ```
-**Langkah 2 — Hitung Pembilang:**
+**Langkah 2 · Hitung Pembilang:**
 ```
 C(S-1, N) x (A/(S-A))^N
 = C({S-1}, {N}) x {ratio:.6f}^{N}
 ```
-**Langkah 3 — Hitung Penyebut:**
+**Langkah 3 · Hitung Penyebut:**
 ```
 sum[i=0..{N}] C({S-1}, i) x {ratio:.6f}^i
 ```
-**Langkah 4 — Hasil Akhir:**
+**Langkah 4 · Hasil Akhir:**
 ```
 P = pembilang / penyebut
 P = {P:.8f}
@@ -1094,7 +1103,7 @@ elif active_page == "📊  Analisis Dan Grafik":
             ax1.text(max_n*0.97, 1.05, 'GoS 1%', ha='right', fontsize=8, color=AMBER)
             ax1.axhline(0.1, color=GREEN, linestyle='--', linewidth=1.2, alpha=0.8)
             ax1.text(max_n*0.97, 0.15, 'GoS 0.1%', ha='right', fontsize=8, color=GREEN)
-            ax1.set_xlabel('N — Jumlah Kanal', fontsize=9, color='#78909c')
+            ax1.set_xlabel('N (Jumlah Kanal)', fontsize=9, color='#78909c')
             ax1.set_ylabel('Blocking (%)', fontsize=9, color='#78909c')
             ax1.set_title(f'S={S}, A={A:.1f} Erl', fontsize=9, color='#90a4ae')
             ax1.legend(fontsize=8.5)
@@ -1121,7 +1130,7 @@ elif active_page == "📊  Analisis Dan Grafik":
                         label=f'A={A:.1f}, P={P*100:.3f}%')
             ax2.axhline(1.0, color=AMBER, linestyle='--', linewidth=1.2, alpha=0.8)
             ax2.text(a_max_*0.97, 1.05, 'GoS 1%', ha='right', fontsize=8, color=AMBER)
-            ax2.set_xlabel('A — Traffic Offered (Erlang)', fontsize=9, color='#78909c')
+            ax2.set_xlabel('A (Traffic Offered, Erlang)', fontsize=9, color='#78909c')
             ax2.set_ylabel('Blocking (%)', fontsize=9, color='#78909c')
             ax2.set_title(f'S={S}, N={N} Kanal', fontsize=9, color='#90a4ae')
             ax2.legend(fontsize=8.5)
@@ -1149,7 +1158,7 @@ elif active_page == "📊  Analisis Dan Grafik":
         ax3.axvline(N, color='#90a4ae', linestyle=':', linewidth=2,
                     label=f'N Aktif = {N}')
         ax3.axhline(1.0, color=AMBER, linestyle='--', linewidth=1, alpha=0.6)
-        ax3.set_xlabel('N — Jumlah Kanal', fontsize=9, color='#78909c')
+        ax3.set_xlabel('N (Jumlah Kanal)', fontsize=9, color='#78909c')
         ax3.set_ylabel('Blocking (%)', fontsize=9, color='#78909c')
         ax3.set_title(f'Perbandingan Blocking Vs N Untuk Berbagai A (S={S})',
                       fontsize=10, color='#0a2540', fontweight='bold')
