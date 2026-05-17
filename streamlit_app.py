@@ -418,8 +418,8 @@ def find_min_N(S, A, target=0.01):
 # Semua kurung kurawal SVG dihindari, pakai style attribute langsung
 # ═══════════════════════════════════════════════════════════════════════════════
 ENGSET_SVG = (
-    '<svg viewBox="0 0 520 200" xmlns="http://www.w3.org/2000/svg" '
-    'style="max-width:500px;width:100%;display:block;margin:0 auto;">'
+    '<svg viewBox="0 0 540 210" xmlns="http://www.w3.org/2000/svg" '
+    'style="max-width:520px;width:100%;display:block;margin:0 auto;">'
 
     # defs / styles
     '<defs><style>'
@@ -428,6 +428,9 @@ ENGSET_SVG = (
     '.ed { fill: #0a2540; }'
     '.eg { fill: #546e7a; font-family: "Plus Jakarta Sans", sans-serif; font-size: 11px; }'
     '</style></defs>'
+
+    # background
+    '<rect x="0" y="0" width="540" height="210" rx="16" ry="16" fill="transparent"/>'
 
     # ── P = ──
     '<text x="18" y="105" class="es ed" font-size="26" font-style="italic" font-weight="bold">P</text>'
@@ -442,65 +445,65 @@ ENGSET_SVG = (
     '<text x="94" y="87" class="es ed" font-size="12">N</text>'
 
     # times
-    '<text x="114" y="76" class="es" fill="#90a4ae" font-size="18">&#215;</text>'
+    '<text x="116" y="76" class="es" fill="#90a4ae" font-size="18">&#215;</text>'
 
     # big left paren
-    '<text x="134" y="78" class="es ed" font-size="28">(</text>'
+    '<text x="138" y="80" class="es ed" font-size="30">(</text>'
     # A top
-    '<text x="155" y="63" class="es ed" font-size="17" text-anchor="middle">A</text>'
+    '<text x="160" y="63" class="es ed" font-size="17" text-anchor="middle">A</text>'
     # fraction bar numerator
-    '<line x1="143" y1="68" x2="167" y2="68" stroke="#0a2540" stroke-width="1.4"/>'
+    '<line x1="147" y1="68" x2="173" y2="68" stroke="#0a2540" stroke-width="1.4"/>'
     # S-A bottom
-    '<text x="155" y="83" class="es ed" font-size="13" text-anchor="middle">S&#8722;A</text>'
+    '<text x="160" y="84" class="es ed" font-size="13" text-anchor="middle">S&#8722;A</text>'
     # big right paren
-    '<text x="170" y="78" class="es ed" font-size="28">)</text>'
+    '<text x="175" y="80" class="es ed" font-size="30">)</text>'
     # exponent N
-    '<text x="188" y="56" class="es ec" font-size="14" font-style="italic">N</text>'
+    '<text x="195" y="54" class="es ec" font-size="14" font-style="italic" font-weight="bold">N</text>'
 
     # ── FRACTION LINE ──
-    '<line x1="62" y1="96" x2="360" y2="96" stroke="#0288D1" stroke-width="2.2"/>'
+    '<line x1="62" y1="96" x2="370" y2="96" stroke="#0288D1" stroke-width="2.2"/>'
 
     # ── DENOMINATOR ──
-    # Sigma limits
-    '<text x="64" y="116" class="es ec" font-size="11" font-weight="bold">N</text>'
+    # Sigma limits: N on top, i=0 on bottom
+    '<text x="66" y="116" class="es ec" font-size="11" font-weight="bold">N</text>'
     '<text x="58" y="135" class="es ec" font-size="32">&#931;</text>'
-    '<text x="60" y="154" class="es ec" font-size="11" font-weight="bold">i=0</text>'
+    '<text x="58" y="155" class="es ec" font-size="11" font-weight="bold">i&#61;0</text>'
 
     # C S-1 i
     '<text x="100" y="116" class="es ec" font-size="11" font-weight="bold">S&#8722;1</text>'
-    '<text x="100" y="132" class="es ec" font-size="22" font-weight="bold">C</text>'
-    '<text x="120" y="141" class="es ed" font-size="12">i</text>'
+    '<text x="100" y="133" class="es ec" font-size="22" font-weight="bold">C</text>'
+    '<text x="120" y="143" class="es ed" font-size="12" font-style="italic">i</text>'
 
     # times
-    '<text x="136" y="132" class="es" fill="#90a4ae" font-size="18">&#215;</text>'
+    '<text x="136" y="133" class="es" fill="#90a4ae" font-size="18">&#215;</text>'
 
     # big left paren denom
-    '<text x="156" y="132" class="es ed" font-size="28">(</text>'
+    '<text x="158" y="136" class="es ed" font-size="30">(</text>'
     # A top denom
-    '<text x="177" y="117" class="es ed" font-size="17" text-anchor="middle">A</text>'
+    '<text x="180" y="118" class="es ed" font-size="17" text-anchor="middle">A</text>'
     # fraction bar denom
-    '<line x1="165" y1="122" x2="189" y2="122" stroke="#0a2540" stroke-width="1.4"/>'
+    '<line x1="167" y1="123" x2="193" y2="123" stroke="#0a2540" stroke-width="1.4"/>'
     # S-A denom
-    '<text x="177" y="138" class="es ed" font-size="13" text-anchor="middle">S&#8722;A</text>'
+    '<text x="180" y="139" class="es ed" font-size="13" text-anchor="middle">S&#8722;A</text>'
     # big right paren denom
-    '<text x="192" y="132" class="es ed" font-size="28">)</text>'
+    '<text x="195" y="136" class="es ed" font-size="30">)</text>'
     # exponent i
-    '<text x="210" y="110" class="es ec" font-size="14" font-style="italic">i</text>'
+    '<text x="216" y="110" class="es ec" font-size="14" font-style="italic" font-weight="bold">i</text>'
 
     # ── DIVIDER LINE ──
-    '<line x1="20" y1="168" x2="500" y2="168" stroke="#b2ebf2" stroke-width="1.5"/>'
+    '<line x1="20" y1="170" x2="520" y2="170" stroke="#b2ebf2" stroke-width="1.5"/>'
 
     # ── LEGEND LEFT ──
-    '<text x="24" y="184" class="es ed" font-size="13" font-style="italic">P</text>'
-    '<text x="36" y="184" class="eg"> = Probabilitas Blocking</text>'
-    '<text x="24" y="198" class="es ed" font-size="13" font-style="italic">S</text>'
-    '<text x="36" y="198" class="eg"> = Jumlah Source / Pengguna</text>'
+    '<text x="24" y="186" class="es ed" font-size="13" font-style="italic">P</text>'
+    '<text x="36" y="186" class="eg"> = Probabilitas Blocking</text>'
+    '<text x="24" y="202" class="es ed" font-size="13" font-style="italic">S</text>'
+    '<text x="36" y="202" class="eg"> = Jumlah Source / Pengguna</text>'
 
     # ── LEGEND RIGHT ──
-    '<text x="270" y="184" class="es ed" font-size="13" font-style="italic">N</text>'
-    '<text x="282" y="184" class="eg"> = Jumlah Kanal / Server</text>'
-    '<text x="270" y="198" class="es ed" font-size="13" font-style="italic">A</text>'
-    '<text x="282" y="198" class="eg"> = Traffic Offered (Erlang)</text>'
+    '<text x="280" y="186" class="es ed" font-size="13" font-style="italic">N</text>'
+    '<text x="292" y="186" class="eg"> = Jumlah Kanal / Server</text>'
+    '<text x="280" y="202" class="es ed" font-size="13" font-style="italic">A</text>'
+    '<text x="292" y="202" class="eg"> = Traffic Offered (Erlang)</text>'
 
     '</svg>'
 )
@@ -768,17 +771,15 @@ elif active_page == "🧮  Kalkulator Engset":
     page_header("Rekayasa Trafik", "Kalkulator Engset",
                 "Hitung probabilitas blocking dengan model finite source")
 
-    # Formula wrap header
+    # Formula wrap — SVG dan wrapper digabung dalam satu markdown call
     st.markdown(
         '<div class="formula-wrap">'
         '<span class="formula-tag">&#9889; Rumus Engset &#8212; Finite Source Model</span>'
-        '<div class="eq-container">',
+        '<div class="eq-container">'
+        + ENGSET_SVG +
+        '</div></div>',
         unsafe_allow_html=True
     )
-    # SVG rumus — dirender TERPISAH dari f-string agar kurung kurawal SVG tidak konflik
-    st.markdown(ENGSET_SVG, unsafe_allow_html=True)
-    # Tutup formula-wrap
-    st.markdown('</div></div>', unsafe_allow_html=True)
 
     st.markdown("<div style='height:0.5rem'></div>", unsafe_allow_html=True)
 
@@ -1332,17 +1333,54 @@ elif active_page == "📄  Export Laporan":
                     el.append(Paragraph(
                         "Model Engset digunakan untuk menghitung probabilitas blocking pada "
                         "sistem telekomunikasi dengan jumlah sumber (source) terbatas.", B))
+
+                    # Style untuk rumus box
+                    FormulaBox = ParagraphStyle('FormulaBox',
+                        fontSize=10, fontName='Courier',
+                        textColor=DARK, backColor=LIGHT_BG,
+                        leftIndent=20, rightIndent=20,
+                        spaceBefore=8, spaceAfter=8,
+                        leading=20, borderPadding=12)
+
+                    FormulaTitle = ParagraphStyle('FormulaTitle',
+                        fontSize=9, fontName='Helvetica-Bold',
+                        textColor=HDR_BG, backColor=LIGHT_BG,
+                        leftIndent=20, rightIndent=20,
+                        spaceBefore=8, spaceAfter=2,
+                        leading=14)
+
+                    el.append(Paragraph("Rumus Engset (Finite Source Model):", FormulaTitle))
+
+                    # Buat tabel untuk menampilkan rumus dengan rapi
+                    formula_data = [
+                        ["       C(S\u20121, N) \u00d7 (A/(S\u2212A))\u1d3a"],
+                        ["P  =  \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550"],
+                        ["        N"],
+                        ["       \u03a3  C(S\u20121, i) \u00d7 (A/(S\u2212A))\u2071"],
+                        ["      i=0"],
+                    ]
+                    ft = Table(formula_data, colWidths=[15*cm])
+                    ft.setStyle(TableStyle([
+                        ('BACKGROUND', (0,0), (-1,-1), LIGHT_BG),
+                        ('FONTNAME',   (0,0), (-1,-1), 'Courier'),
+                        ('FONTSIZE',   (0,0), (-1,-1), 10),
+                        ('TEXTCOLOR',  (0,0), (-1,-1), DARK),
+                        ('ALIGN',      (0,0), (-1,-1), 'LEFT'),
+                        ('LEFTPADDING',  (0,0), (-1,-1), 20),
+                        ('RIGHTPADDING', (0,0), (-1,-1), 20),
+                        ('TOPPADDING',   (0,0), (-1,-1), 3),
+                        ('BOTTOMPADDING',(0,0), (-1,-1), 3),
+                        ('TOPPADDING',   (0,0), (0,0), 10),
+                        ('BOTTOMPADDING',(0,-1), (0,-1), 10),
+                        ('BOX',        (0,0), (-1,-1), 0.5, BORDER),
+                        ('ROUNDEDCORNERS', [6]),
+                    ]))
+                    el.append(ft)
+                    el.append(Spacer(1, 4))
                     el.append(Paragraph(
-                        "&nbsp;&nbsp;&nbsp;&nbsp;"
-                        "C(S-1, N) x (A/(S-A))^N<br/>"
-                        "P = ─────────────────────────────────────<br/>"
-                        "&nbsp;&nbsp;&nbsp;&nbsp;N<br/>"
-                        "&nbsp;&nbsp;&nbsp;&#931; C(S-1, i) x (A/(S-A))^i<br/>"
-                        "&nbsp;&nbsp;&nbsp;i=0", M))
-                    el.append(Paragraph(
-                        "<b>P</b> = Probabilitas Blocking &nbsp;|&nbsp; "
-                        "<b>S</b> = Jumlah Source &nbsp;|&nbsp; "
-                        "<b>N</b> = Jumlah Kanal &nbsp;|&nbsp; "
+                        "<b>P</b> = Probabilitas Blocking &nbsp;&nbsp;|&nbsp;&nbsp; "
+                        "<b>S</b> = Jumlah Source / Pengguna &nbsp;&nbsp;|&nbsp;&nbsp; "
+                        "<b>N</b> = Jumlah Kanal &nbsp;&nbsp;|&nbsp;&nbsp; "
                         "<b>A</b> = Traffic Offered (Erlang)", B))
                     el.append(Spacer(1, 8))
 
