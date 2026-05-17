@@ -273,7 +273,7 @@ div[data-testid="stSelectbox"]:has(> label:contains("Menu")) {
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# MOBILE NAV (st.selectbox native — selalu berfungsi)
+# MENU OPTIONS
 # ═══════════════════════════════════════════════════════════════════════════════
 MENU_OPTIONS = [
     "🏠  Dashboard",
@@ -283,13 +283,8 @@ MENU_OPTIONS = [
     "📄  Export Laporan"
 ]
 
-# Selectbox ini disembunyikan di desktop via CSS, tampil di mobile
-mobile_page = st.selectbox(
-    "📋 Menu",
-    MENU_OPTIONS,
-    key="mobile_nav",
-    label_visibility="visible"
-)
+# Selectbox mobile — disembunyikan di desktop via CSS
+mobile_page = st.selectbox("📋 Menu", MENU_OPTIONS, key="mobile_nav")
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -347,15 +342,17 @@ with st.sidebar:
                 'letter-spacing:0.12em;text-transform:uppercase;margin-bottom:8px;padding-left:4px;">Menu</div>',
                 unsafe_allow_html=True)
 
-    page = st.radio("nav", [
-        "🏠  Dashboard",
-        "🧮  Kalkulator Engset",
-        "📐  Hitung Traffic A",
-        "📊  Analisis & Grafik",
-        "📄  Export Laporan"
-    ], label_visibility="collapsed", key="sidebar_page")
-    # Sync sidebar pilihan ke mobile_nav juga
-    st.session_state.mobile_nav = page
+    page = st.radio(
+        "nav",
+        MENU_OPTIONS,
+        index=MENU_OPTIONS.index(st.session_state.get("mobile_nav", MENU_OPTIONS[0])),
+        label_visibility="collapsed"
+    )
+    # Update mobile_nav agar halaman sync
+    if page != st.session_state.get("mobile_nav"):
+        st.session_state["mobile_nav"] = page
+        st.rerun()
+
 
     st.markdown("---")
     st.markdown('<div style="font-size:0.7rem;font-weight:700;color:rgba(255,255,255,0.45);'
@@ -418,7 +415,8 @@ def page_header(tag, title, sub):
 # ══════════════════════════════════════════════════════════════════════════════
 # ██ DASHBOARD
 # ══════════════════════════════════════════════════════════════════════════════
-active_page = st.session_state.get("mobile_nav", "🏠  Dashboard")
+# Satu source of truth: mobile_nav
+active_page = st.session_state.get("mobile_nav", MENU_OPTIONS[0])
 if active_page == "🏠  Dashboard":
 
     col_main, col_side = st.columns([2, 1], gap="large")
