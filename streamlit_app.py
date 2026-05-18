@@ -68,21 +68,31 @@ footer    { visibility: hidden; }
 [data-testid="stSidebar"] hr { border-color: rgba(255,255,255,0.12) !important; }
 [data-testid="stSidebar"] .stRadio > div { gap: 4px !important; }
 [data-testid="stSidebar"] .stRadio label {
-    background: rgba(255,255,255,0.1) !important;
+    background: rgba(255,255,255,0.08) !important;
     border-radius: 12px !important;
-    padding: 10px 14px !important;
+    padding: 11px 14px !important;
     cursor: pointer !important;
-    transition: all 0.15s ease !important;
-    border: 1px solid rgba(255,255,255,0.08) !important;
-    font-size: 0.86rem !important;
+    transition: all 0.18s ease !important;
+    border: 1px solid rgba(255,255,255,0.06) !important;
+    font-size: 0.875rem !important;
     font-weight: 500 !important;
-    color: rgba(255,255,255,0.75) !important;
+    color: rgba(255,255,255,0.72) !important;
     width: 100%;
     margin: 2px 0;
+    display: flex !important;
+    align-items: center !important;
 }
 [data-testid="stSidebar"] .stRadio label:hover {
-    background: rgba(255,255,255,0.18) !important;
+    background: rgba(255,255,255,0.16) !important;
     color: #fff !important;
+    border-color: rgba(255,255,255,0.14) !important;
+}
+[data-testid="stSidebar"] .stRadio [aria-checked="true"] + label,
+[data-testid="stSidebar"] .stRadio label:has(input:checked) {
+    background: rgba(255,255,255,0.22) !important;
+    color: #fff !important;
+    border-color: rgba(255,255,255,0.28) !important;
+    font-weight: 600 !important;
 }
 [data-testid="stSidebar"] .stRadio [data-baseweb="radio"] > div:first-child {
     display: none !important;
@@ -349,6 +359,25 @@ label {
 ::-webkit-scrollbar-track { background: #F0F4FF; }
 ::-webkit-scrollbar-thumb { background: #B8CAFF; border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: #1660E8; }
+
+/* ── DELETE BUTTON ── */
+[data-testid="stButton"] button[kind="secondary"] {
+    background: transparent !important;
+    color: #D0D8F0 !important;
+    border: 1px solid #E2E8FF !important;
+    border-radius: 10px !important;
+    padding: 0.5rem 0.7rem !important;
+    font-size: 0.8rem !important;
+    box-shadow: none !important;
+    font-weight: 500 !important;
+}
+[data-testid="stButton"] button[kind="secondary"]:hover {
+    background: #FEEDED !important;
+    color: #B02020 !important;
+    border-color: #F5C0C0 !important;
+    transform: none !important;
+    box-shadow: none !important;
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -364,12 +393,48 @@ MENU_OPTIONS = [
     "Export Laporan"
 ]
 
-MENU_ICONS_SIMPLE = {
-    "Dashboard":          "◉",
-    "Kalkulator Engset":  "⌬",
-    "Hitung Traffic A":   "◎",
-    "Analisis Dan Grafik":"▦",
-    "Export Laporan":     "⤓",
+# SVG icons untuk menu — profesional & konsisten
+MENU_ICONS_SVG = {
+    "Dashboard": (
+        '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" '
+        'fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'
+        '<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>'
+        '<rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>'
+        '</svg>'
+    ),
+    "Kalkulator Engset": (
+        '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" '
+        'fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'
+        '<rect x="4" y="2" width="16" height="20" rx="2"/>'
+        '<line x1="8" y1="6" x2="16" y2="6"/>'
+        '<line x1="8" y1="10" x2="10" y2="10"/><line x1="14" y1="10" x2="16" y2="10"/>'
+        '<line x1="8" y1="14" x2="10" y2="14"/><line x1="14" y1="14" x2="16" y2="14"/>'
+        '<line x1="8" y1="18" x2="10" y2="18"/><line x1="14" y1="18" x2="16" y2="18"/>'
+        '</svg>'
+    ),
+    "Hitung Traffic A": (
+        '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" '
+        'fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'
+        '<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>'
+        '</svg>'
+    ),
+    "Analisis Dan Grafik": (
+        '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" '
+        'fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'
+        '<line x1="18" y1="20" x2="18" y2="10"/>'
+        '<line x1="12" y1="20" x2="12" y2="4"/>'
+        '<line x1="6" y1="20" x2="6" y2="14"/>'
+        '<line x1="2" y1="20" x2="22" y2="20"/>'
+        '</svg>'
+    ),
+    "Export Laporan": (
+        '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" '
+        'fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'
+        '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>'
+        '<polyline points="7 10 12 15 17 10"/>'
+        '<line x1="12" y1="15" x2="12" y2="3"/>'
+        '</svg>'
+    ),
 }
 
 # Session state — HARUS sebelum sidebar
@@ -378,6 +443,7 @@ if "S_calc"          not in st.session_state: st.session_state["S_calc"]        
 if "N_calc"          not in st.session_state: st.session_state["N_calc"]          = 5
 if "A_calc"          not in st.session_state: st.session_state["A_calc"]          = 7.0
 if "kalkulasi_done"  not in st.session_state: st.session_state["kalkulasi_done"]  = False
+if "history"         not in st.session_state: st.session_state["history"]         = []
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -484,55 +550,111 @@ ENGSET_SVG = (
 # SIDEBAR
 # ═══════════════════════════════════════════════════════════════════════════════
 with st.sidebar:
+    # Brand header
     st.markdown(
-        '<div style="background:rgba(255,255,255,0.12);border-radius:18px;padding:1.3rem 1.1rem 1.1rem;'
-        'margin-bottom:1.4rem;text-align:center;border:1px solid rgba(255,255,255,0.15);">'
-        '<div style="font-size:1.7rem;margin-bottom:5px;opacity:0.9;">◈</div>'
+        '<div style="background:rgba(255,255,255,0.12);border-radius:18px;padding:1.4rem 1.2rem 1.2rem;'
+        'margin-bottom:1.6rem;text-align:center;border:1px solid rgba(255,255,255,0.18);">'
+        '<div style="margin-bottom:8px;">'
+        '<svg xmlns="http://www.w3.org/2000/svg" width="34" height="34" viewBox="0 0 24 24" '
+        'fill="none" stroke="rgba(255,255,255,0.90)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">'
+        '<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>'
+        '</svg>'
+        '</div>'
         '<div style="font-size:1.35rem;font-weight:800;color:#fff;letter-spacing:-0.01em;'
-        'font-family:Inter,sans-serif;">EngsetPro</div>'
-        '<div style="font-size:0.65rem;color:rgba(255,255,255,0.45);letter-spacing:0.12em;'
-        'margin-top:3px;text-transform:uppercase;font-weight:600;">Rekayasa Trafik v2.0</div>'
+        'font-family:Inter,sans-serif;line-height:1;">EngsetPro</div>'
+        '<div style="font-size:0.62rem;color:rgba(255,255,255,0.42);letter-spacing:0.14em;'
+        'margin-top:5px;text-transform:uppercase;font-weight:600;">Rekayasa Trafik v2.0</div>'
         '</div>',
         unsafe_allow_html=True
     )
 
-    menu_labels = [f"{MENU_ICONS_SIMPLE[m]}  {m}" for m in MENU_OPTIONS]
+    # Navigation label
+    st.markdown(
+        '<div style="font-size:0.62rem;font-weight:700;color:rgba(255,255,255,0.35);'
+        'text-transform:uppercase;letter-spacing:0.12em;margin-bottom:0.5rem;padding:0 4px;">Navigasi</div>',
+        unsafe_allow_html=True
+    )
+
+    # Menu items sebagai HTML buttons via radio trick
     current_idx = MENU_OPTIONS.index(st.session_state["active_page"])
 
+    # Buat label dengan SVG icon inline
+    menu_labels_display = []
+    for m in MENU_OPTIONS:
+        svg = MENU_ICONS_SVG[m]
+        menu_labels_display.append(f"{m}")  # radio label teks saja
+
     selected = st.radio(
-        "Navigasi",
-        menu_labels,
+        "nav",
+        MENU_OPTIONS,
         index=current_idx,
         label_visibility="collapsed",
+        format_func=lambda x: x,
     )
-    selected_page = MENU_OPTIONS[menu_labels.index(selected)]
-    if selected_page != st.session_state["active_page"]:
-        st.session_state["active_page"] = selected_page
+    if selected != st.session_state["active_page"]:
+        st.session_state["active_page"] = selected
         st.rerun()
+
+    # Inject CSS untuk icon di tiap radio label via JS workaround
+    icons_js = ""
+    for i, m in enumerate(MENU_OPTIONS):
+        svg_b64 = MENU_ICONS_SVG[m]
+        icons_js += f"""
+        labels[{i}].innerHTML = `<span style="display:flex;align-items:center;gap:10px;">
+            <span style="opacity:0.75;flex-shrink:0;">{svg_b64}</span>
+            <span style="font-size:0.875rem;font-weight:500;">{m}</span>
+        </span>`;
+        """
+
+    st.markdown(
+        f"""<script>
+        (function inject() {{
+            const radios = window.parent.document.querySelectorAll('[data-testid="stSidebar"] [data-testid="stRadio"] label');
+            if (radios.length < {len(MENU_OPTIONS)}) {{ setTimeout(inject, 80); return; }}
+            const labels = Array.from(radios);
+            {icons_js}
+        }})();
+        </script>""",
+        unsafe_allow_html=True,
+    )
 
     st.markdown("<hr>", unsafe_allow_html=True)
 
-    # Parameter Aktif
+    # Parameter Aktif — hanya muncul jika kalkulasi sudah dijalankan
     if st.session_state.get("kalkulasi_done", False):
         s_disp = st.session_state.get('S_calc', 20)
         n_disp = st.session_state.get('N_calc', 5)
         a_disp = st.session_state.get('A_calc', 7.0)
+        hist_count = len(st.session_state.get("history", []))
         st.markdown(
-            '<div style="background:rgba(255,255,255,0.08);border-radius:14px;padding:1rem;'
+            '<div style="background:rgba(255,255,255,0.09);border-radius:14px;padding:0.9rem 1rem;'
             'border:1px solid rgba(255,255,255,0.1);">'
-            '<div style="font-size:0.63rem;color:rgba(255,255,255,0.4);text-transform:uppercase;'
-            'letter-spacing:0.1em;margin-bottom:8px;font-weight:700;">Parameter Aktif</div>'
-            '<div style="font-size:0.84rem;color:rgba(255,255,255,0.85);line-height:2.1;">'
-            f'S = <strong style="color:#A8CCFF;">{s_disp}</strong> pengguna<br>'
-            f'N = <strong style="color:#A8CCFF;">{n_disp}</strong> kanal<br>'
-            f'A = <strong style="color:#A8CCFF;">{a_disp:.1f}</strong> Erlang'
-            '</div></div>',
+            '<div style="font-size:0.6rem;color:rgba(255,255,255,0.38);text-transform:uppercase;'
+            'letter-spacing:0.1em;margin-bottom:9px;font-weight:700;display:flex;align-items:center;gap:6px;">'
+            '<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" '
+            'fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2.2">'
+            '<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>'
+            '</svg> Parameter Aktif</div>'
+            '<div style="font-size:0.82rem;color:rgba(255,255,255,0.82);line-height:2.2;font-family:\'JetBrains Mono\',monospace;">'
+            f'S = <strong style="color:#A8CCFF;">{s_disp}</strong>&nbsp;&nbsp;pengguna<br>'
+            f'N = <strong style="color:#A8CCFF;">{n_disp}</strong>&nbsp;&nbsp;kanal<br>'
+            f'A = <strong style="color:#A8CCFF;">{a_disp:.1f}</strong>&nbsp;&nbsp;Erlang'
+            '</div>'
+            f'<div style="margin-top:9px;padding-top:9px;border-top:1px solid rgba(255,255,255,0.1);'
+            f'font-size:0.7rem;color:rgba(255,255,255,0.42);">'
+            f'<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" '
+            f'fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="2.2">'
+            f'<polyline points="9 11 12 14 22 4"/>'
+            f'<path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>'
+            f'</svg> {hist_count} histori tersimpan'
+            '</div>'
+            '</div>',
             unsafe_allow_html=True
         )
 
     st.markdown(
         '<div style="margin-top:2rem;padding-top:1rem;text-align:center;'
-        'font-size:0.68rem;color:rgba(255,255,255,0.18);line-height:1.8;">'
+        'font-size:0.66rem;color:rgba(255,255,255,0.16);line-height:2;">'
         'EngsetPro v2.0<br>Metode Log-space Arithmetic</div>',
         unsafe_allow_html=True
     )
@@ -790,11 +912,35 @@ elif active_page == MENU_OPTIONS[1]:
                                  step=0.1, format="%.1f")
 
     st.markdown("<div style='height:0.5rem'></div>", unsafe_allow_html=True)
-    if st.button("Jalankan Kalkulasi", use_container_width=True):
+    if st.button("▶  Jalankan Kalkulasi", use_container_width=True):
         st.session_state["S_calc"] = inp_S
         st.session_state["N_calc"] = inp_N
         st.session_state["A_calc"] = inp_A
         st.session_state["kalkulasi_done"] = True
+        # Hitung dan simpan ke history
+        _S, _N, _A = inp_S, inp_N, inp_A
+        _valid = _S > _N and 0 < _A < _S
+        if _valid:
+            _P = engset(_S, _N, _A)
+            if _P is not None:
+                _carried = _A * (1 - _P)
+                _lost    = _A * _P
+                _util    = (_carried / _N) * 100
+                _gos, _  = gos_label(_P)
+                _entry = {
+                    "timestamp": datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
+                    "S": _S, "N": _N, "A": _A,
+                    "P": _P,
+                    "P_pct": _P * 100,
+                    "carried": _carried,
+                    "lost": _lost,
+                    "util": _util,
+                    "gos": _gos,
+                }
+                # Cek duplikat (S, N, A sama)
+                existing = [(h["S"], h["N"], h["A"]) for h in st.session_state["history"]]
+                if (_S, _N, _A) not in existing:
+                    st.session_state["history"].append(_entry)
         st.rerun()
 
     st.markdown("<div style='height:0.7rem'></div>", unsafe_allow_html=True)
@@ -1232,300 +1378,284 @@ elif active_page == MENU_OPTIONS[3]:
         )
 
 
+
 # ══════════════════════════════════════════════════════════════════════════════
-# EXPORT LAPORAN
+# EXPORT LAPORAN — dengan riwayat hitungan & delete per item
 # ══════════════════════════════════════════════════════════════════════════════
 elif active_page == MENU_OPTIONS[4]:
-    page_header("Export", "Export Laporan PDF",
-                "Generate laporan hasil analisis Engset")
+    page_header("Export", "Export & Riwayat Kalkulasi",
+                "Kelola histori perhitungan dan unduh laporan PDF")
 
-    if not kalkulasi_done:
+    history = st.session_state.get("history", [])
+
+    if not history:
         st.markdown(
-            '<div class="card" style="text-align:center;padding:2.5rem 1.5rem;">'
-            '<div style="font-size:2rem;color:#C0CCFF;margin-bottom:0.8rem;">⤓</div>'
-            '<div style="font-size:1rem;font-weight:700;color:#0D1E50;margin-bottom:0.4rem;">Belum Ada Data</div>'
-            '<div style="font-size:0.85rem;color:#9BAAD0;">Jalankan kalkulasi di menu <strong>Kalkulator Engset</strong> terlebih dahulu.</div>'
+            '<div class="card" style="text-align:center;padding:3rem 1.5rem;">'
+            '<div style="margin-bottom:1rem;">'
+            '<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" '
+            'fill="none" stroke="#C0CCFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">'
+            '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>'
+            '<polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>'
+            '</svg></div>'
+            '<div style="font-size:1rem;font-weight:700;color:#0D1E50;margin-bottom:0.4rem;">Belum Ada Riwayat</div>'
+            '<div style="font-size:0.85rem;color:#9BAAD0;">Jalankan kalkulasi di menu <strong>Kalkulator Engset</strong><br>untuk menyimpan riwayat hitungan.</div>'
             '</div>',
             unsafe_allow_html=True
         )
-    elif not valid:
-        st.markdown('<div class="eng-warn">Parameter tidak valid. Periksa kembali nilai S, N, dan A.</div>',
-                    unsafe_allow_html=True)
-    elif not PDF_OK:
-        st.markdown('<div class="eng-warn">Instal ReportLab: <code>pip install reportlab</code></div>',
-                    unsafe_allow_html=True)
     else:
-        # ── Hero summary bar ──────────────────────────────────────────────────
-        st.markdown(
-            '<div style="background:linear-gradient(135deg,#1548E0 0%,#1770F0 60%,#0EAAE0 100%);'
-            'border-radius:20px;padding:1.6rem 2rem;margin-bottom:1.4rem;'
-            'display:flex;align-items:center;gap:2rem;flex-wrap:wrap;">'
-            '<div style="flex:1;min-width:180px;">'
-            '<div style="font-size:0.62rem;color:rgba(255,255,255,0.55);text-transform:uppercase;'
-            'letter-spacing:0.12em;font-weight:700;margin-bottom:3px;">Parameter</div>'
-            f'<div style="font-size:1.1rem;font-weight:800;color:#fff;font-family:\'JetBrains Mono\',monospace;">'
-            f'S={S} · N={N} · A={A:.1f} Erl</div>'
-            '</div>'
-            '<div style="flex:1;min-width:140px;">'
-            '<div style="font-size:0.62rem;color:rgba(255,255,255,0.55);text-transform:uppercase;'
-            'letter-spacing:0.12em;font-weight:700;margin-bottom:3px;">P Blocking</div>'
-            f'<div style="font-size:1.1rem;font-weight:800;color:#fff;font-family:\'JetBrains Mono\',monospace;">'
-            f'{P:.6f}</div>'
-            '</div>'
-            '<div style="flex:1;min-width:120px;">'
-            '<div style="font-size:0.62rem;color:rgba(255,255,255,0.55);text-transform:uppercase;'
-            'letter-spacing:0.12em;font-weight:700;margin-bottom:3px;">Blocking</div>'
-            f'<div style="font-size:1.1rem;font-weight:800;color:#fff;font-family:\'JetBrains Mono\',monospace;">'
-            f'{P*100:.3f}%</div>'
-            '</div>'
-            '<div style="flex:1;min-width:100px;">'
-            '<div style="font-size:0.62rem;color:rgba(255,255,255,0.55);text-transform:uppercase;'
-            'letter-spacing:0.12em;font-weight:700;margin-bottom:3px;">Grade of Service</div>'
-            f'<div style="font-size:1.1rem;font-weight:800;color:#fff;">{gos_text}</div>'
-            '</div>'
-            '</div>',
-            unsafe_allow_html=True
-        )
-
-        col_left, col_right = st.columns([3, 2], gap="large")
-
-        with col_left:
-            # ── Preview tabel ────────────────────────────────────────────────
+        # ── Header dengan jumlah history dan tombol hapus semua ──────────────
+        col_htitle, col_hdel = st.columns([3, 1])
+        with col_htitle:
             st.markdown(
-                '<div style="font-size:0.68rem;font-weight:700;color:#9BAAD0;'
-                'text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.8rem;">Isi Laporan PDF</div>',
+                f'<div style="font-size:0.68rem;font-weight:700;color:#9BAAD0;text-transform:uppercase;'
+                f'letter-spacing:0.1em;margin-bottom:0.3rem;">Riwayat Perhitungan</div>'
+                f'<div style="font-size:0.9rem;font-weight:600;color:#0D1E50;">'
+                f'{len(history)} sesi kalkulasi tersimpan</div>',
                 unsafe_allow_html=True
             )
-            sections = [
-                ("⌬", "#EBF0FE", "Parameter Input",    f"S={S} pengguna, N={N} kanal, A={A:.1f} Erlang"),
-                ("◎", "#E4F9EF", "Hasil Perhitungan",   f"P={P:.6f}  ·  Blocking={P*100:.3f}%  ·  GoS={gos_text}"),
-                ("▦", "#FEF6DF", "Grafik Analisis",     "Blocking Vs N dan Blocking Vs Traffic Offered A"),
-                ("⤓", "#FEEDED", "Tabel Detail",        f"Blocking tiap nilai N dari 1 sampai N+10"),
-            ]
-            for icon, bg, title, desc in sections:
+        with col_hdel:
+            if st.button("🗑 Hapus Semua", use_container_width=True):
+                st.session_state["history"] = []
+                st.session_state["kalkulasi_done"] = False
+                st.rerun()
+
+        st.markdown("<div style='height:0.6rem'></div>", unsafe_allow_html=True)
+
+        # ── Tabel riwayat dengan tombol hapus per item ────────────────────────
+        for i, h in enumerate(history):
+            gos_c_map = {"Sangat Baik": "gos-great", "Baik": "gos-good", "Cukup": "gos-ok", "Buruk": "gos-bad"}
+            g_cls = gos_c_map.get(h["gos"], "gos-ok")
+            col_h1, col_h2 = st.columns([10, 1])
+            with col_h1:
                 st.markdown(
-                    f'<div class="plan-card">'
-                    f'<div class="plan-icon-wrap" style="background:{bg};width:42px;height:42px;'
-                    f'border-radius:12px;font-size:1rem;color:#1660E8;">{icon}</div>'
-                    f'<div class="plan-info">'
-                    f'<p class="plan-name">{title}</p>'
-                    f'<p class="plan-desc">{desc}</p>'
-                    f'</div></div>',
+                    f'<div class="plan-card" style="padding:0.9rem 1.1rem;">'
+                    f'<div style="background:#EBF0FE;width:36px;height:36px;border-radius:10px;'
+                    f'display:flex;align-items:center;justify-content:center;flex-shrink:0;'
+                    f'font-family:\'JetBrains Mono\';font-weight:700;color:#1660E8;font-size:0.8rem;">#{i+1}</div>'
+                    f'<div style="flex:1;">'
+                    f'<div style="display:flex;gap:1.4rem;flex-wrap:wrap;align-items:baseline;">'
+                    f'<span style="font-size:0.85rem;font-weight:700;color:#0D1E50;font-family:\'JetBrains Mono\';">'
+                    f'S={h["S"]} · N={h["N"]} · A={h["A"]:.1f} Erl</span>'
+                    f'<span class="gos {g_cls}" style="font-size:0.7rem;">{h["gos"]}</span>'
+                    f'</div>'
+                    f'<div style="display:flex;gap:1.6rem;margin-top:4px;flex-wrap:wrap;">'
+                    f'<span style="font-size:0.75rem;color:#9BAAD0;">P = <strong style="color:#1660E8;font-family:\'JetBrains Mono\';">{h["P"]:.6f}</strong></span>'
+                    f'<span style="font-size:0.75rem;color:#9BAAD0;">Blocking = <strong style="color:#1660E8;">{h["P_pct"]:.3f}%</strong></span>'
+                    f'<span style="font-size:0.75rem;color:#9BAAD0;">Util = <strong style="color:#0D1E50;">{h["util"]:.1f}%</strong></span>'
+                    f'<span style="font-size:0.7rem;color:#C0CCFF;">{h["timestamp"]}</span>'
+                    f'</div></div></div>',
+                    unsafe_allow_html=True
+                )
+            with col_h2:
+                if st.button("✕", key=f"del_{i}", help=f"Hapus sesi #{i+1}"):
+                    st.session_state["history"].pop(i)
+                    if not st.session_state["history"]:
+                        st.session_state["kalkulasi_done"] = False
+                    st.rerun()
+
+        st.markdown("<div style='height:1.4rem'></div>", unsafe_allow_html=True)
+        st.markdown('<div style="height:1px;background:#EEF2FF;margin-bottom:1.4rem;"></div>', unsafe_allow_html=True)
+
+        # ── Export PDF History ────────────────────────────────────────────────
+        if not PDF_OK:
+            st.markdown('<div class="eng-warn">Instal ReportLab: <code>pip install reportlab</code></div>',
+                        unsafe_allow_html=True)
+        else:
+            col_exp_l, col_exp_r = st.columns([3, 2], gap="large")
+
+            with col_exp_l:
+                st.markdown(
+                    '<div style="font-size:0.68rem;font-weight:700;color:#9BAAD0;'
+                    'text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.8rem;">Isi Laporan PDF</div>',
+                    unsafe_allow_html=True
+                )
+                items_info = [
+                    ("#EBF0FE", "Ringkasan Header", "Informasi aplikasi dan tanggal export"),
+                    ("#E4F9EF", "Tabel Riwayat Lengkap", f"Seluruh {len(history)} sesi perhitungan"),
+                    ("#FEF6DF", "Grafik Perbandingan", "P Blocking dari setiap sesi"),
+                    ("#FEEDED", "Detail Tiap Sesi", "Parameter, hasil, GoS per sesi"),
+                ]
+                for bg, title_, desc_ in items_info:
+                    st.markdown(
+                        f'<div class="plan-card">'
+                        f'<div class="plan-icon-wrap" style="background:{bg};width:38px;height:38px;border-radius:10px;'
+                        f'font-size:0.9rem;color:#1660E8;">'
+                        f'<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" '
+                        f'fill="none" stroke="#1660E8" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>'
+                        f'</div>'
+                        f'<div class="plan-info"><p class="plan-name">{title_}</p><p class="plan-desc">{desc_}</p></div>'
+                        f'</div>',
+                        unsafe_allow_html=True
+                    )
+
+            with col_exp_r:
+                st.markdown(
+                    '<div class="card" style="padding:1.8rem;text-align:center;">'
+                    '<div style="width:64px;height:64px;border-radius:18px;'
+                    'background:linear-gradient(135deg,#1660E8,#0EAAE0);'
+                    'display:flex;align-items:center;justify-content:center;'
+                    'margin:0 auto 1rem;">'
+                    '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" '
+                    'fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'
+                    '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>'
+                    '<polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>'
+                    '</svg></div>'
+                    '<div style="font-size:1rem;font-weight:800;color:#0D1E50;margin-bottom:0.35rem;">Export PDF Riwayat</div>'
+                    f'<div style="font-size:0.8rem;color:#9BAAD0;line-height:1.7;margin-bottom:1.2rem;">'
+                    f'Laporan A4 lengkap berisi semua {len(history)} sesi kalkulasi, siap cetak.</div>'
+                    f'<div style="font-size:0.7rem;color:#B8C8E8;margin-bottom:1.2rem;">'
+                    f'{datetime.now().strftime("%d %b %Y, %H:%M")}</div>'
+                    '</div>',
                     unsafe_allow_html=True
                 )
 
-        with col_right:
-            st.markdown(
-                '<div class="card" style="padding:1.8rem;text-align:center;">'
-                '<div style="width:64px;height:64px;border-radius:18px;'
-                'background:linear-gradient(135deg,#1660E8,#0EAAE0);'
-                'display:flex;align-items:center;justify-content:center;'
-                'margin:0 auto 1rem;font-size:1.6rem;color:#fff;">⤓</div>'
-                '<div style="font-size:1rem;font-weight:800;color:#0D1E50;margin-bottom:0.35rem;">'
-                'Ekspor ke PDF</div>'
-                '<div style="font-size:0.8rem;color:#9BAAD0;line-height:1.7;margin-bottom:1.4rem;">'
-                'Laporan lengkap berformat A4 siap cetak, mencakup parameter, hasil, grafik, dan tabel.</div>'
-                f'<div style="font-size:0.7rem;color:#B8C8E8;margin-bottom:1.2rem;">'
-                f'Dibuat: {datetime.now().strftime("%d %b %Y, %H:%M")}</div>'
-                '</div>',
-                unsafe_allow_html=True
-            )
-            if st.button("⤓  Generate dan Download PDF", use_container_width=True):
-                with st.spinner("Membuat laporan PDF..."):
-                    def cb(fig):
-                        buf = io.BytesIO()
-                        fig.savefig(buf, format='png', dpi=150, bbox_inches='tight',
-                                    facecolor='white')
-                        buf.seek(0); return buf.read()
+                if st.button("⬇  Generate & Download PDF Riwayat", use_container_width=True):
+                    with st.spinner("Membuat laporan PDF riwayat..."):
+                        def cb_hist(fig_):
+                            buf_ = io.BytesIO()
+                            fig_.savefig(buf_, format='png', dpi=150, bbox_inches='tight', facecolor='white')
+                            buf_.seek(0); return buf_.read()
 
-                    # Chart 1 — Bar: Blocking Vs N
-                    max_n_ = min(S - 1, 30)
-                    ns__   = list(range(1, max_n_ + 1))
-                    ps__   = [(engset(S, n, A) or 0) * 100 for n in ns__]
-                    f1, a1 = plt.subplots(figsize=(7, 3.5))
-                    f1.patch.set_facecolor('white'); a1.set_facecolor('white')
-                    bar_c1 = [RED if n == N else BLUE for n in ns__]
-                    a1.bar(ns__, ps__, color=bar_c1, width=0.7, zorder=3,
-                           edgecolor='white', linewidth=0.5)
-                    a1.axhline(1.0, color=AMBER, linestyle='--', linewidth=1.2)
-                    a1.set_xlabel('N (Jumlah Kanal)', fontsize=9)
-                    a1.set_ylabel('Blocking (%)', fontsize=9)
-                    a1.set_title(f'Blocking Vs N  |  S={S}, A={A:.1f} Erl',
-                                 fontsize=10, fontweight='bold', color='#0D1E50')
-                    a1.grid(True, axis='y', linestyle='--', alpha=0.2)
-                    a1.spines[['top', 'right']].set_visible(False)
-                    plt.tight_layout(); c1_bytes = cb(f1); plt.close(f1)
+                        # ── Chart ringkasan: P Blocking per sesi ──────────────
+                        labels_ = [f"#{j+1}\nS={h['S']},N={h['N']},A={h['A']:.1f}" for j, h in enumerate(history)]
+                        pvals_  = [h["P"] * 100 for h in history]
+                        bar_cols_ = [RED if p > 5 else AMBER if p > 1 else BLUE for p in pvals_]
+                        fh, ah = plt.subplots(figsize=(max(6, len(history) * 1.2), 4))
+                        fh.patch.set_facecolor('white'); ah.set_facecolor('white')
+                        ah.bar(range(len(pvals_)), pvals_, color=bar_cols_, width=0.6,
+                               edgecolor='white', linewidth=0.5, zorder=3)
+                        ah.axhline(1.0, color=AMBER, linestyle='--', linewidth=1.2, label='GoS 1%')
+                        ah.set_xticks(range(len(labels_))); ah.set_xticklabels(labels_, fontsize=7)
+                        ah.set_ylabel('Blocking (%)', fontsize=9)
+                        ah.set_title('Perbandingan P Blocking per Sesi Kalkulasi',
+                                     fontsize=10, fontweight='bold', color='#0D1E50')
+                        ah.legend(fontsize=8, frameon=False)
+                        ah.grid(True, axis='y', linestyle='--', alpha=0.2)
+                        ah.spines[['top', 'right']].set_visible(False)
+                        plt.tight_layout()
+                        chart_bytes_ = cb_hist(fh); plt.close(fh)
 
-                    # Chart 2 — Bar: Blocking Vs A
-                    am_ = min(float(S - 1), 25.0)
-                    n_b2 = min(25, int(am_ / 0.5))
-                    av2_ = np.linspace(0.1, am_, n_b2)
-                    pv2_ = [(engset(S, N, float(a)) or 0) * 100 for a in av2_]
-                    f2, a2 = plt.subplots(figsize=(7, 3.5))
-                    f2.patch.set_facecolor('white'); a2.set_facecolor('white')
-                    bw2 = (am_ - 0.1) / n_b2 * 0.8
-                    bc2 = [RED if abs(a - A) == min(abs(x - A) for x in av2_) else TEAL for a in av2_]
-                    a2.bar(av2_, pv2_, width=bw2, color=bc2, zorder=3,
-                           edgecolor='white', linewidth=0.4)
-                    a2.axhline(1.0, color=AMBER, linestyle='--', linewidth=1.2)
-                    a2.set_xlabel('A (Erlang)', fontsize=9)
-                    a2.set_ylabel('Blocking (%)', fontsize=9)
-                    a2.set_title(f'Blocking Vs A  |  S={S}, N={N}',
-                                 fontsize=10, fontweight='bold', color='#0D1E50')
-                    a2.grid(True, axis='y', linestyle='--', alpha=0.2)
-                    a2.spines[['top', 'right']].set_visible(False)
-                    plt.tight_layout(); c2_bytes = cb(f2); plt.close(f2)
+                        # ── Build PDF ──────────────────────────────────────────
+                        buf_pdf = io.BytesIO()
+                        doc = SimpleDocTemplate(
+                            buf_pdf, pagesize=A4,
+                            leftMargin=2.4*cm, rightMargin=2.4*cm,
+                            topMargin=2.4*cm, bottomMargin=2.4*cm
+                        )
+                        C_DARK   = colors.HexColor('#0D1E50')
+                        C_MEDIUM = colors.HexColor('#4A5680')
+                        C_LIGHT  = colors.HexColor('#9BAAD0')
+                        C_BG     = colors.HexColor('#F0F4FF')
+                        C_BORDER = colors.HexColor('#C0CCFF')
+                        C_HDR    = colors.HexColor('#1660E8')
+                        C_ALT    = colors.HexColor('#EEF3FF')
+                        C_WHITE  = colors.white
 
-                    # ── Build PDF ──────────────────────────────────────────────
-                    buf_pdf = io.BytesIO()
-                    doc = SimpleDocTemplate(
-                        buf_pdf, pagesize=A4,
-                        leftMargin=2.4*cm, rightMargin=2.4*cm,
-                        topMargin=2.4*cm, bottomMargin=2.4*cm
+                        sTitle  = ParagraphStyle('sTitle', fontName='Helvetica-Bold', fontSize=20,
+                                                  textColor=C_DARK, spaceAfter=4, leading=26)
+                        sSub    = ParagraphStyle('sSub', fontName='Helvetica', fontSize=9,
+                                                  textColor=C_LIGHT, spaceAfter=14, leading=13)
+                        sH2     = ParagraphStyle('sH2', fontName='Helvetica-Bold', fontSize=12,
+                                                  textColor=C_DARK, spaceBefore=14, spaceAfter=6, leading=16)
+                        sH3     = ParagraphStyle('sH3', fontName='Helvetica-Bold', fontSize=10,
+                                                  textColor=C_DARK, spaceBefore=10, spaceAfter=5, leading=14)
+                        sBody   = ParagraphStyle('sBody', fontName='Helvetica', fontSize=9,
+                                                  textColor=C_MEDIUM, leading=14, spaceAfter=4)
+                        sFooter = ParagraphStyle('sFooter', fontName='Helvetica', fontSize=7.5,
+                                                  textColor=C_LIGHT, alignment=TA_CENTER)
+
+                        el = []
+                        el.append(Paragraph("EngsetPro", sTitle))
+                        el.append(Paragraph(
+                            f"Laporan Riwayat Kalkulasi &nbsp;&middot;&nbsp; "
+                            f"{datetime.now().strftime('%d %B %Y, %H:%M')} &nbsp;&middot;&nbsp; "
+                            f"{len(history)} sesi tersimpan", sSub
+                        ))
+                        el.append(HRFlowable(width="100%", thickness=1.5, color=C_HDR, spaceAfter=14))
+
+                        # 1. Tabel Ringkasan
+                        el.append(Paragraph("1. Ringkasan Seluruh Sesi", sH2))
+                        sum_data = [["#", "S", "N", "A (Erl)", "P Blocking", "Blocking%", "Carried", "GoS", "Waktu"]]
+                        for j, h in enumerate(history):
+                            sum_data.append([
+                                str(j+1), str(h["S"]), str(h["N"]), f"{h['A']:.1f}",
+                                f"{h['P']:.6f}", f"{h['P_pct']:.3f}%",
+                                f"{h['carried']:.4f}", h["gos"],
+                                h["timestamp"]
+                            ])
+                        tbl_sum = Table(sum_data, colWidths=[0.7*cm,1*cm,1*cm,1.3*cm,2.2*cm,1.6*cm,1.6*cm,1.4*cm,2.8*cm])
+                        tbl_sum.setStyle(TableStyle([
+                            ('BACKGROUND',    (0,0), (-1,0), C_HDR),
+                            ('TEXTCOLOR',     (0,0), (-1,0), C_WHITE),
+                            ('FONTNAME',      (0,0), (-1,0), 'Helvetica-Bold'),
+                            ('FONTNAME',      (0,1), (-1,-1), 'Helvetica'),
+                            ('FONTSIZE',      (0,0), (-1,-1), 7.5),
+                            ('ALIGN',         (0,0), (-1,-1), 'CENTER'),
+                            ('VALIGN',        (0,0), (-1,-1), 'MIDDLE'),
+                            ('ROWBACKGROUNDS',(0,1), (-1,-1), [C_WHITE, C_ALT]),
+                            ('GRID',          (0,0), (-1,-1), 0.4, C_BORDER),
+                            ('TOPPADDING',    (0,0), (-1,-1), 5),
+                            ('BOTTOMPADDING', (0,0), (-1,-1), 5),
+                            ('LEFTPADDING',   (0,0), (-1,-1), 5),
+                            ('RIGHTPADDING',  (0,0), (-1,-1), 5),
+                        ]))
+                        el.append(tbl_sum)
+                        el.append(Spacer(1, 14))
+
+                        # 2. Grafik perbandingan
+                        el.append(Paragraph("2. Grafik Perbandingan P Blocking", sH2))
+                        el.append(RLImage(io.BytesIO(chart_bytes_), width=14.6*cm, height=7*cm))
+                        el.append(Spacer(1, 14))
+
+                        # 3. Detail per sesi
+                        el.append(Paragraph("3. Detail Per Sesi", sH2))
+                        for j, h in enumerate(history):
+                            el.append(Paragraph(f"Sesi #{j+1} — {h['timestamp']}", sH3))
+                            det_data = [
+                                ["Parameter", "Nilai"], ["S (Pengguna)", str(h["S"])],
+                                ["N (Kanal)", str(h["N"])], ["A (Erlang)", f"{h['A']:.1f}"],
+                                ["P Blocking", f"{h['P']:.8f}"], ["Blocking (%)", f"{h['P_pct']:.4f}%"],
+                                ["Grade of Service", h["gos"]], ["Traffic Carried", f"{h['carried']:.4f} Erl"],
+                                ["Traffic Lost", f"{h['lost']:.4f} Erl"], ["Utilisasi Kanal", f"{h['util']:.2f}%"],
+                            ]
+                            td = Table(det_data, colWidths=[5*cm, 9.6*cm])
+                            td.setStyle(TableStyle([
+                                ('BACKGROUND',    (0,0), (-1,0), C_HDR),
+                                ('TEXTCOLOR',     (0,0), (-1,0), C_WHITE),
+                                ('FONTNAME',      (0,0), (-1,0), 'Helvetica-Bold'),
+                                ('FONTNAME',      (0,1), (-1,-1), 'Helvetica'),
+                                ('FONTSIZE',      (0,0), (-1,-1), 8.5),
+                                ('ALIGN',         (0,0), (0,-1), 'LEFT'),
+                                ('ALIGN',         (1,0), (1,-1), 'LEFT'),
+                                ('VALIGN',        (0,0), (-1,-1), 'MIDDLE'),
+                                ('ROWBACKGROUNDS',(0,1), (-1,-1), [C_WHITE, C_ALT]),
+                                ('GRID',          (0,0), (-1,-1), 0.4, C_BORDER),
+                                ('TOPPADDING',    (0,0), (-1,-1), 5),
+                                ('BOTTOMPADDING', (0,0), (-1,-1), 5),
+                                ('LEFTPADDING',   (0,0), (-1,-1), 8),
+                                ('RIGHTPADDING',  (0,0), (-1,-1), 8),
+                            ]))
+                            el.append(td)
+                            el.append(Spacer(1, 8))
+
+                        el.append(HRFlowable(width="100%", thickness=0.5, color=C_BORDER, spaceAfter=7))
+                        el.append(Paragraph(
+                            f"EngsetPro v2.0 &nbsp;&middot;&nbsp; {datetime.now().strftime('%d %B %Y')} "
+                            f"&nbsp;&middot;&nbsp; Rekayasa Trafik &nbsp;&middot;&nbsp; Model Engset Finite Source",
+                            sFooter
+                        ))
+                        doc.build(el)
+                        buf_pdf.seek(0)
+
+                    st.download_button(
+                        "⬇ Klik untuk Download PDF Riwayat",
+                        data=buf_pdf,
+                        file_name=f"engset_history_{datetime.now().strftime('%Y%m%d_%H%M')}.pdf",
+                        mime="application/pdf",
+                        use_container_width=True,
                     )
-
-                    # Warna konsisten
-                    C_DARK    = colors.HexColor('#0D1E50')
-                    C_MEDIUM  = colors.HexColor('#4A5680')
-                    C_LIGHT   = colors.HexColor('#9BAAD0')
-                    C_BG      = colors.HexColor('#F0F4FF')
-                    C_BORDER  = colors.HexColor('#C0CCFF')
-                    C_HDR     = colors.HexColor('#1660E8')
-                    C_ALT     = colors.HexColor('#EEF3FF')
-                    C_WHITE   = colors.white
-
-                    # Styles — konsisten Inter-like, font size seragam
-                    sTitle = ParagraphStyle(
-                        'sTitle', fontName='Helvetica-Bold', fontSize=20,
-                        textColor=C_DARK, spaceAfter=4, leading=26
-                    )
-                    sSub = ParagraphStyle(
-                        'sSub', fontName='Helvetica', fontSize=9,
-                        textColor=C_LIGHT, spaceAfter=14, leading=13
-                    )
-                    sH2 = ParagraphStyle(
-                        'sH2', fontName='Helvetica-Bold', fontSize=12,
-                        textColor=C_DARK, spaceBefore=14, spaceAfter=6, leading=16
-                    )
-                    sBody = ParagraphStyle(
-                        'sBody', fontName='Helvetica', fontSize=9,
-                        textColor=C_MEDIUM, leading=14, spaceAfter=4
-                    )
-                    sMono = ParagraphStyle(
-                        'sMono', fontName='Courier', fontSize=8.5,
-                        textColor=C_DARK, backColor=C_BG,
-                        leftIndent=10, rightIndent=10,
-                        spaceBefore=4, spaceAfter=4, leading=14,
-                        borderPadding=6
-                    )
-                    sFooter = ParagraphStyle(
-                        'sFooter', fontName='Helvetica', fontSize=7.5,
-                        textColor=C_LIGHT, alignment=TA_CENTER
-                    )
-
-                    el = []
-
-                    # Header
-                    el.append(Paragraph("EngsetPro", sTitle))
-                    el.append(Paragraph(
-                        f"Laporan Analisis Engset &nbsp;&middot;&nbsp; {datetime.now().strftime('%d %B %Y, %H:%M')}",
-                        sSub
-                    ))
-                    el.append(HRFlowable(width="100%", thickness=1.5, color=C_HDR, spaceAfter=14))
-
-                    # 1. Parameter Input
-                    el.append(Paragraph("1. Parameter Input", sH2))
-                    pd_data = [
-                        ["Parameter", "Simbol", "Nilai", "Satuan"],
-                        ["Jumlah Source",    "S", str(S),        "Pengguna"],
-                        ["Jumlah Kanal",     "N", str(N),        "Kanal"],
-                        ["Traffic Offered",  "A", f"{A:.1f}",    "Erlang"],
-                    ]
-                    pt = Table(pd_data, colWidths=[5.5*cm, 2.5*cm, 3*cm, 3.5*cm])
-                    pt.setStyle(TableStyle([
-                        ('BACKGROUND',    (0,0), (-1,0), C_HDR),
-                        ('TEXTCOLOR',     (0,0), (-1,0), C_WHITE),
-                        ('FONTNAME',      (0,0), (-1,0), 'Helvetica-Bold'),
-                        ('FONTNAME',      (0,1), (-1,-1), 'Helvetica'),
-                        ('FONTSIZE',      (0,0), (-1,-1), 9),
-                        ('ALIGN',         (0,0), (-1,-1), 'CENTER'),
-                        ('VALIGN',        (0,0), (-1,-1), 'MIDDLE'),
-                        ('ROWBACKGROUNDS',(0,1), (-1,-1), [C_WHITE, C_ALT]),
-                        ('GRID',          (0,0), (-1,-1), 0.5, C_BORDER),
-                        ('TOPPADDING',    (0,0), (-1,-1), 7),
-                        ('BOTTOMPADDING', (0,0), (-1,-1), 7),
-                        ('LEFTPADDING',   (0,0), (-1,-1), 10),
-                        ('RIGHTPADDING',  (0,0), (-1,-1), 10),
-                        ('ROUNDEDCORNERS', [4]),
-                    ]))
-                    el.append(pt)
-                    el.append(Spacer(1, 10))
-
-                    # 2. Hasil Perhitungan
-                    el.append(Paragraph("2. Hasil Perhitungan", sH2))
-                    rd_data = [
-                        ["Metrik", "Nilai", "Keterangan"],
-                        ["Probabilitas Blocking (P)", f"{P:.8f}",        "Nilai probabilitas blocking"],
-                        ["Blocking (%)",              f"{P*100:.4f}%",   "Persentase trafik terblokir"],
-                        ["Grade Of Service",          gos_text,          "Kualitas layanan sistem"],
-                        ["Traffic Carried",           f"{carried:.4f} Erl", "Trafik yang berhasil dilayani"],
-                        ["Traffic Lost",              f"{lost:.4f} Erl",    "Trafik yang terblokir"],
-                        ["Utilisasi Kanal",           f"{util_pct:.2f}%",   "Utilisasi rata-rata per kanal"],
-                    ]
-                    rt = Table(rd_data, colWidths=[5.5*cm, 3.5*cm, 5.5*cm])
-                    rt.setStyle(TableStyle([
-                        ('BACKGROUND',    (0,0), (-1,0), C_HDR),
-                        ('TEXTCOLOR',     (0,0), (-1,0), C_WHITE),
-                        ('FONTNAME',      (0,0), (-1,0), 'Helvetica-Bold'),
-                        ('FONTNAME',      (0,1), (-1,-1), 'Helvetica'),
-                        ('FONTSIZE',      (0,0), (-1,-1), 9),
-                        ('ALIGN',         (1,0), (1,-1), 'CENTER'),
-                        ('ALIGN',         (0,0), (0,-1), 'LEFT'),
-                        ('ALIGN',         (2,0), (2,-1), 'LEFT'),
-                        ('VALIGN',        (0,0), (-1,-1), 'MIDDLE'),
-                        ('ROWBACKGROUNDS',(0,1), (-1,-1), [C_WHITE, C_ALT]),
-                        ('GRID',          (0,0), (-1,-1), 0.5, C_BORDER),
-                        ('TOPPADDING',    (0,0), (-1,-1), 7),
-                        ('BOTTOMPADDING', (0,0), (-1,-1), 7),
-                        ('LEFTPADDING',   (0,0), (-1,-1), 10),
-                        ('RIGHTPADDING',  (0,0), (-1,-1), 10),
-                    ]))
-                    el.append(rt)
-                    el.append(Spacer(1, 14))
-
-                    # 3. Grafik
-                    el.append(Paragraph("3. Grafik Analisis", sH2))
-                    el.append(Paragraph(
-                        f"Grafik berikut menunjukkan pengaruh perubahan jumlah kanal (N) "
-                        f"dan traffic offered (A) terhadap probabilitas blocking (S={S}).",
-                        sBody
-                    ))
-                    el.append(Spacer(1, 6))
-                    el.append(RLImage(io.BytesIO(c1_bytes), width=14.6*cm, height=7*cm))
-                    el.append(Spacer(1, 8))
-                    el.append(RLImage(io.BytesIO(c2_bytes), width=14.6*cm, height=7*cm))
-                    el.append(Spacer(1, 14))
-
-                    # Footer
-                    el.append(HRFlowable(width="100%", thickness=0.5, color=C_BORDER, spaceAfter=7))
-                    el.append(Paragraph(
-                        f"EngsetPro v2.0 &nbsp;&middot;&nbsp; {datetime.now().strftime('%d %B %Y')} "
-                        f"&nbsp;&middot;&nbsp; Rekayasa Trafik &nbsp;&middot;&nbsp; Model Engset Finite Source",
-                        sFooter
-                    ))
-
-                    doc.build(el)
-                    buf_pdf.seek(0)
-
-                st.download_button(
-                    "Klik untuk Download PDF",
-                    data=buf_pdf,
-                    file_name=f"engset_S{S}_N{N}_A{A:.1f}.pdf",
-                    mime="application/pdf",
-                    use_container_width=True,
-                )
-                st.markdown('<div class="eng-ok">PDF siap! Klik tombol di atas untuk mengunduh.</div>',
-                            unsafe_allow_html=True)
+                    st.markdown('<div class="eng-ok">PDF riwayat siap! Klik tombol di atas untuk mengunduh.</div>',
+                                unsafe_allow_html=True)
 
 
 # ── Footer ─────────────────────────────────────────────────────────────────────
