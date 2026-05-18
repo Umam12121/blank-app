@@ -461,9 +461,9 @@ MENU_ICONS_SVG = {
 
 # Session state — HARUS sebelum sidebar
 if "active_page"     not in st.session_state: st.session_state["active_page"]     = MENU_OPTIONS[0]
-if "S_calc"          not in st.session_state: st.session_state["S_calc"]          = 10
-if "N_calc"          not in st.session_state: st.session_state["N_calc"]          = 3
-if "A_calc"          not in st.session_state: st.session_state["A_calc"]          = 2.0
+if "S_calc"          not in st.session_state: st.session_state["S_calc"]          = None   # None = belum diisi
+if "N_calc"          not in st.session_state: st.session_state["N_calc"]          = None
+if "A_calc"          not in st.session_state: st.session_state["A_calc"]          = None
 if "kalkulasi_done"  not in st.session_state: st.session_state["kalkulasi_done"]  = False
 if "history"         not in st.session_state: st.session_state["history"]         = []
 if "first_run"       not in st.session_state: st.session_state["first_run"]       = True
@@ -663,9 +663,9 @@ with st.sidebar:
 
     # Parameter Aktif — hanya muncul jika kalkulasi sudah dijalankan
     if st.session_state.get("kalkulasi_done", False):
-        s_disp = st.session_state.get('S_calc', 20)
-        n_disp = st.session_state.get('N_calc', 5)
-        a_disp = st.session_state.get('A_calc', 7.0)
+        s_disp = st.session_state.get('S_calc') or 0
+        n_disp = st.session_state.get('N_calc') or 0
+        a_disp = st.session_state.get('A_calc') or 0.0
         hist_count = len(st.session_state.get("history", []))
         st.markdown(
             '<div style="background:rgba(255,255,255,0.09);border-radius:14px;padding:0.9rem 1rem;'
@@ -679,7 +679,7 @@ with st.sidebar:
             '<div style="font-size:0.82rem;color:rgba(255,255,255,0.82);line-height:2.2;font-family:\'JetBrains Mono\',monospace;">'
             f'S = <strong style="color:#A8CCFF;">{s_disp}</strong>&nbsp;&nbsp;pengguna<br>'
             f'N = <strong style="color:#A8CCFF;">{n_disp}</strong>&nbsp;&nbsp;kanal<br>'
-            f'A = <strong style="color:#A8CCFF;">{a_disp:.1f}</strong>&nbsp;&nbsp;Erlang'
+            f'A = <strong style="color:#A8CCFF;">{float(a_disp):.1f}</strong>&nbsp;&nbsp;Erlang'
             '</div>'
             f'<div style="margin-top:9px;padding-top:9px;border-top:1px solid rgba(255,255,255,0.1);'
             f'font-size:0.7rem;color:rgba(255,255,255,0.42);">'
@@ -704,18 +704,20 @@ with st.sidebar:
 # ═══════════════════════════════════════════════════════════════════════════════
 # COMPUTE
 # ═══════════════════════════════════════════════════════════════════════════════
-S = st.session_state["S_calc"]
+S = st.session_state["S_calc"]  # bisa None jika belum diisi
 N = st.session_state["N_calc"]
 A = st.session_state["A_calc"]
 
-valid    = S > N and 0 < A < S
+# Hanya hitung jika semua parameter sudah diisi dan kalkulasi pernah dijalankan
+kalkulasi_done = st.session_state.get("kalkulasi_done", False)
+valid    = (S is not None and N is not None and A is not None) and S > N and 0 < A < S
 P        = engset(S, N, A) if valid else None
 carried  = A * (1 - P) if P is not None else 0.0
 lost     = A * P       if P is not None else 0.0
 util_pct = (carried / N) * 100 if (P is not None and N > 0) else 0.0
-gos_text, gos_cls = gos_label(P) if P is not None else ("N/A", "gos-ok")
-min_n_1   = find_min_N(S, A, 0.01)  if valid else "N/A"
-min_n_001 = find_min_N(S, A, 0.001) if valid else "N/A"
+gos_text, gos_cls = gos_label(P) if P is not None else ("–", "gos-ok")
+min_n_1   = find_min_N(S, A, 0.01)  if valid else "–"
+min_n_001 = find_min_N(S, A, 0.001) if valid else "–"
 
 BLUE  = '#1660E8'
 TEAL  = '#0EAAE0'
@@ -723,8 +725,6 @@ GREEN = '#0A7040'
 AMBER = '#F59E0B'
 RED   = '#EF4444'
 BG    = '#F0F4FF'
-
-kalkulasi_done = st.session_state.get("kalkulasi_done", False)
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -955,16 +955,31 @@ elif active_page == MENU_OPTIONS[1]:
 
     col_s, col_n, col_a = st.columns(3, gap="large")
     with col_s:
-        inp_S = st.number_input("S  Jumlah Source (Pengguna)", min_value=2, max_value=200,
-                                 value=st.session_state["S_calc"], step=1)
+        inp_S = st.number_input(
+            "S  Jumlah Source (Pengguna)",
+            min_value=2, max_value=200,
+            value=st.session_state["S_calc"],   # None = kosong
+            step=1,
+            placeholder="Masukkan jumlah pengguna..."
+        )
     with col_n:
-        inp_N = st.number_input("N  Jumlah Kanal (Server)", min_value=1, max_value=100,
-                                 value=st.session_state["N_calc"], step=1)
+        inp_N = st.number_input(
+            "N  Jumlah Kanal (Server)",
+            min_value=1, max_value=100,
+            value=st.session_state["N_calc"],   # None = kosong
+            step=1,
+            placeholder="Masukkan jumlah kanal..."
+        )
     with col_a:
-        inp_A = st.number_input("A  Traffic Offered (Erlang)", min_value=0.1,
-                                 max_value=float(max(1, inp_S - 1)),
-                                 value=min(st.session_state["A_calc"], float(inp_S - 2)),
-                                 step=0.1, format="%.1f")
+        _s_for_max = inp_S if inp_S is not None else 200
+        inp_A = st.number_input(
+            "A  Traffic Offered (Erlang)",
+            min_value=0.1,
+            max_value=float(max(1, _s_for_max - 1)),
+            value=st.session_state["A_calc"],   # None = kosong
+            step=0.1, format="%.1f",
+            placeholder="Masukkan nilai A..."
+        )
 
     st.markdown("<div style='height:0.5rem'></div>", unsafe_allow_html=True)
     st.markdown(
@@ -977,36 +992,42 @@ elif active_page == MENU_OPTIONS[1]:
         unsafe_allow_html=True
     )
     if st.button("▶  Jalankan Kalkulasi", use_container_width=True, type="primary"):
-        st.session_state["S_calc"] = inp_S
-        st.session_state["N_calc"] = inp_N
-        st.session_state["A_calc"] = inp_A
-        st.session_state["kalkulasi_done"] = True
-        st.session_state["first_run"] = False
-        # Hitung dan simpan ke history
-        _S, _N, _A = inp_S, inp_N, inp_A
-        _valid = _S > _N and 0 < _A < _S
-        if _valid:
-            _P = engset(_S, _N, _A)
-            if _P is not None:
-                _carried = _A * (1 - _P)
-                _lost    = _A * _P
-                _util    = (_carried / _N) * 100
-                _gos, _  = gos_label(_P)
-                _entry = {
-                    "timestamp": datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
-                    "S": _S, "N": _N, "A": _A,
-                    "P": _P,
-                    "P_pct": _P * 100,
-                    "carried": _carried,
-                    "lost": _lost,
-                    "util": _util,
-                    "gos": _gos,
-                }
-                # Cek duplikat (S, N, A sama)
-                existing = [(h["S"], h["N"], h["A"]) for h in st.session_state["history"]]
-                if (_S, _N, _A) not in existing:
-                    st.session_state["history"].append(_entry)
-        st.rerun()
+        if inp_S is None or inp_N is None or inp_A is None:
+            st.markdown(
+                '<div class="eng-warn">⚠ Harap isi semua parameter S, N, dan A terlebih dahulu.</div>',
+                unsafe_allow_html=True
+            )
+        else:
+            st.session_state["S_calc"] = inp_S
+            st.session_state["N_calc"] = inp_N
+            st.session_state["A_calc"] = inp_A
+            st.session_state["kalkulasi_done"] = True
+            st.session_state["first_run"] = False
+            # Hitung dan simpan ke history
+            _S, _N, _A = inp_S, inp_N, inp_A
+            _valid = _S > _N and 0 < _A < _S
+            if _valid:
+                _P = engset(_S, _N, _A)
+                if _P is not None:
+                    _carried = _A * (1 - _P)
+                    _lost    = _A * _P
+                    _util    = (_carried / _N) * 100
+                    _gos, _  = gos_label(_P)
+                    _entry = {
+                        "timestamp": datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
+                        "S": _S, "N": _N, "A": _A,
+                        "P": _P,
+                        "P_pct": _P * 100,
+                        "carried": _carried,
+                        "lost": _lost,
+                        "util": _util,
+                        "gos": _gos,
+                    }
+                    # Cek duplikat (S, N, A sama)
+                    existing = [(h["S"], h["N"], h["A"]) for h in st.session_state["history"]]
+                    if (_S, _N, _A) not in existing:
+                        st.session_state["history"].append(_entry)
+            st.rerun()
 
     st.markdown("<div style='height:0.7rem'></div>", unsafe_allow_html=True)
 
@@ -1141,8 +1162,9 @@ elif active_page == MENU_OPTIONS[2]:
                                          0.01, 1000.0, 3.0, 0.1, format="%.2f")
             hold_time  = st.number_input("Hold Time rata-rata (menit)",
                                          0.1, 120.0, 2.0, 0.1, format="%.1f")
+            _s_default = int(S) if S is not None else 50
             n_users_t1 = st.number_input("Jumlah pengguna aktif (opsional untuk A total)",
-                                         1, 10000, S)
+                                         1, 10000, _s_default)
 
         with c2:
             lam_s = call_rate / 3600
@@ -1181,7 +1203,7 @@ elif active_page == MENU_OPTIONS[2]:
                 unsafe_allow_html=True
             )
 
-            if 0 < A_tot < S and S > N:
+            if S is not None and N is not None and 0 < A_tot < S and S > N:
                 P2 = engset(S, N, A_tot)
                 if P2:
                     g2, gc2 = gos_label(P2)
@@ -1222,7 +1244,7 @@ elif active_page == MENU_OPTIONS[2]:
                 '</div>',
                 unsafe_allow_html=True
             )
-            if 0 < A_t2 < S and S > N:
+            if S is not None and N is not None and 0 < A_t2 < S and S > N:
                 P3 = engset(S, N, A_t2)
                 if P3:
                     g3, gc3 = gos_label(P3)
@@ -1258,7 +1280,7 @@ elif active_page == MENU_OPTIONS[2]:
                 '</div>',
                 unsafe_allow_html=True
             )
-            if 0 < A_t3 < S and S > N:
+            if S is not None and N is not None and 0 < A_t3 < S and S > N:
                 P4 = engset(S, N, A_t3)
                 if P4:
                     g4, gc4 = gos_label(P4)
