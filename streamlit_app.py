@@ -348,29 +348,6 @@ label {
     opacity: 1 !important;
 }
 
-/* ── SIDEBAR NAV BUTTONS ── */
-[data-testid="stSidebar"] .stButton > button {
-    background: rgba(255,255,255,0.1) !important;
-    color: rgba(255,255,255,0.78) !important;
-    border: 1px solid rgba(255,255,255,0.08) !important;
-    border-radius: 12px !important;
-    padding: 10px 14px !important;
-    font-size: 0.86rem !important;
-    font-weight: 500 !important;
-    text-align: left !important;
-    width: 100% !important;
-    margin: 2px 0 !important;
-    box-shadow: none !important;
-    transition: all 0.15s !important;
-    letter-spacing: 0 !important;
-}
-[data-testid="stSidebar"] .stButton > button:hover {
-    background: rgba(255,255,255,0.18) !important;
-    color: #fff !important;
-    transform: none !important;
-    box-shadow: none !important;
-}
-
 /* ── RESPONSIVE ── */
 @media (max-width: 768px) {
     .main .block-container {
@@ -379,9 +356,6 @@ label {
         padding-top: 1.6rem !important;
         max-width: 100% !important;
     }
-}
-@media (min-width: 769px) {
-    .main .block-container { padding-top: 1.6rem !important; max-width: 1180px !important; }
 }
 
 /* ── SCROLLBAR ── */
@@ -394,7 +368,7 @@ label {
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# MENU
+# MENU + SESSION STATE — semua inisialisasi SEBELUM sidebar dirender
 # ═══════════════════════════════════════════════════════════════════════════════
 MENU_OPTIONS = [
     "Dashboard",
@@ -404,11 +378,20 @@ MENU_OPTIONS = [
     "Export Laporan"
 ]
 
-MENU_DISPLAY = MENU_OPTIONS  # no emoji prefix — clean text only
+MENU_ICONS_SIMPLE = {
+    "Dashboard":          "⊞",
+    "Kalkulator Engset":  "≡",
+    "Hitung Traffic A":   "∿",
+    "Analisis Dan Grafik":"∥",
+    "Export Laporan":     "↓",
+}
 
-# Initialize nav state
-if "active_page" not in st.session_state:
-    st.session_state["active_page"] = MENU_OPTIONS[0]
+# Session state — HARUS sebelum sidebar
+if "active_page"     not in st.session_state: st.session_state["active_page"]     = MENU_OPTIONS[0]
+if "S_calc"          not in st.session_state: st.session_state["S_calc"]          = 20
+if "N_calc"          not in st.session_state: st.session_state["N_calc"]          = 5
+if "A_calc"          not in st.session_state: st.session_state["A_calc"]          = 7.0
+if "kalkulasi_done"  not in st.session_state: st.session_state["kalkulasi_done"]  = False
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -512,54 +495,39 @@ ENGSET_SVG = (
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# SIDEBAR (desktop)
+# SIDEBAR
 # ═══════════════════════════════════════════════════════════════════════════════
 with st.sidebar:
     st.markdown(
         '<div style="background:rgba(255,255,255,0.12);border-radius:18px;padding:1.3rem 1.1rem 1.1rem;'
         'margin-bottom:1.4rem;text-align:center;border:1px solid rgba(255,255,255,0.15);">'
         '<div style="font-size:1.7rem;margin-bottom:5px;opacity:0.9;">◈</div>'
-        '<div style="font-size:1.35rem;font-weight:800;color:#fff;letter-spacing:-0.01em;font-family:Inter,sans-serif;">EngsetPro</div>'
+        '<div style="font-size:1.35rem;font-weight:800;color:#fff;letter-spacing:-0.01em;'
+        'font-family:Inter,sans-serif;">EngsetPro</div>'
         '<div style="font-size:0.65rem;color:rgba(255,255,255,0.45);letter-spacing:0.12em;'
         'margin-top:3px;text-transform:uppercase;font-weight:600;">Rekayasa Trafik v2.0</div>'
         '</div>',
         unsafe_allow_html=True
     )
 
-    st.markdown(
-        '<div style="font-size:0.64rem;font-weight:700;color:rgba(255,255,255,0.35);'
-        'letter-spacing:0.14em;text-transform:uppercase;margin-bottom:8px;padding-left:4px;">Menu</div>',
-        unsafe_allow_html=True
+    menu_labels = [f"{MENU_ICONS_SIMPLE[m]}  {m}" for m in MENU_OPTIONS]
+    current_idx = MENU_OPTIONS.index(st.session_state["active_page"])
+
+    selected = st.radio(
+        "Navigasi",
+        menu_labels,
+        index=current_idx,
+        label_visibility="collapsed",
     )
-
-    MENU_ICONS_SIMPLE = {
-        "Dashboard": "⊞",
-        "Kalkulator Engset": "≡",
-        "Hitung Traffic A": "∿",
-        "Analisis Dan Grafik": "∥",
-        "Export Laporan": "↓",
-    }
-
-    for m in MENU_OPTIONS:
-        is_active = st.session_state["active_page"] == m
-        btn_style = (
-            "background:rgba(255,255,255,0.92);color:#1660E8;"
-            if is_active else
-            "background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.78);"
-        )
-        if st.button(
-            f"{MENU_ICONS_SIMPLE[m]}  {m}",
-            key=f"nav_{m}",
-            use_container_width=True,
-        ):
-            st.session_state["active_page"] = m
-            st.rerun()
+    selected_page = MENU_OPTIONS[menu_labels.index(selected)]
+    if selected_page != st.session_state["active_page"]:
+        st.session_state["active_page"] = selected_page
+        st.rerun()
 
     st.markdown("<hr>", unsafe_allow_html=True)
 
-    # Parameter Aktif — hanya tampil kalau sudah ada kalkulasi yang pernah dijalankan
-    kalkulasi_pernah = st.session_state.get("kalkulasi_done", False)
-    if kalkulasi_pernah:
+    # Parameter Aktif
+    if st.session_state.get("kalkulasi_done", False):
         s_disp = st.session_state.get('S_calc', 20)
         n_disp = st.session_state.get('N_calc', 5)
         a_disp = st.session_state.get('A_calc', 7.0)
@@ -583,14 +551,6 @@ with st.sidebar:
         unsafe_allow_html=True
     )
 
-
-# ═══════════════════════════════════════════════════════════════════════════════
-# SESSION STATE
-# ═══════════════════════════════════════════════════════════════════════════════
-if "S_calc" not in st.session_state: st.session_state["S_calc"] = 20
-if "N_calc" not in st.session_state: st.session_state["N_calc"] = 5
-if "A_calc" not in st.session_state: st.session_state["A_calc"] = 7.0
-if "kalkulasi_done" not in st.session_state: st.session_state["kalkulasi_done"] = False
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # COMPUTE
