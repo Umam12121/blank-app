@@ -799,7 +799,16 @@ elif active_page == MENU_OPTIONS[1]:
 
     st.markdown("<div style='height:0.7rem'></div>", unsafe_allow_html=True)
 
-    if not valid:
+    if not kalkulasi_done:
+        st.markdown(
+            '<div class="card" style="text-align:center;padding:2.5rem 1.5rem;">'
+            '<div style="font-size:2rem;color:#C0CCFF;margin-bottom:0.8rem;">⌬</div>'
+            '<div style="font-size:1rem;font-weight:700;color:#0D1E50;margin-bottom:0.4rem;">Belum Ada Hasil</div>'
+            '<div style="font-size:0.85rem;color:#9BAAD0;">Masukkan parameter S, N, dan A di atas,<br>lalu tekan <strong>Jalankan Kalkulasi</strong>.</div>'
+            '</div>',
+            unsafe_allow_html=True
+        )
+    elif not valid:
         st.markdown('<div class="eng-warn">Pastikan S lebih besar dari N dan A lebih kecil dari S.</div>',
                     unsafe_allow_html=True)
     else:
@@ -1057,7 +1066,16 @@ elif active_page == MENU_OPTIONS[3]:
     page_header("Visualisasi", "Analisis Dan Grafik",
                 "Visualisasi perilaku sistem terhadap variasi parameter")
 
-    if not valid:
+    if not kalkulasi_done:
+        st.markdown(
+            '<div class="card" style="text-align:center;padding:2.5rem 1.5rem;">'
+            '<div style="font-size:2rem;color:#C0CCFF;margin-bottom:0.8rem;">▦</div>'
+            '<div style="font-size:1rem;font-weight:700;color:#0D1E50;margin-bottom:0.4rem;">Belum Ada Data</div>'
+            '<div style="font-size:0.85rem;color:#9BAAD0;">Jalankan kalkulasi di menu <strong>Kalkulator Engset</strong> terlebih dahulu.</div>'
+            '</div>',
+            unsafe_allow_html=True
+        )
+    elif not valid:
         st.markdown('<div class="eng-warn">Periksa parameter di kalkulator terlebih dahulu.</div>',
                     unsafe_allow_html=True)
     else:
@@ -1221,8 +1239,17 @@ elif active_page == MENU_OPTIONS[4]:
     page_header("Export", "Export Laporan PDF",
                 "Generate laporan hasil analisis Engset")
 
-    if not valid:
-        st.markdown('<div class="eng-warn">Jalankan kalkulasi di menu Kalkulator Engset terlebih dahulu.</div>',
+    if not kalkulasi_done:
+        st.markdown(
+            '<div class="card" style="text-align:center;padding:2.5rem 1.5rem;">'
+            '<div style="font-size:2rem;color:#C0CCFF;margin-bottom:0.8rem;">⤓</div>'
+            '<div style="font-size:1rem;font-weight:700;color:#0D1E50;margin-bottom:0.4rem;">Belum Ada Data</div>'
+            '<div style="font-size:0.85rem;color:#9BAAD0;">Jalankan kalkulasi di menu <strong>Kalkulator Engset</strong> terlebih dahulu.</div>'
+            '</div>',
+            unsafe_allow_html=True
+        )
+    elif not valid:
+        st.markdown('<div class="eng-warn">Parameter tidak valid. Periksa kembali nilai S, N, dan A.</div>',
                     unsafe_allow_html=True)
     elif not PDF_OK:
         st.markdown('<div class="eng-warn">Instal ReportLab: <code>pip install reportlab</code></div>',
