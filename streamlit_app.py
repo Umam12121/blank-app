@@ -142,7 +142,7 @@ header    { visibility: hidden; }
     transition: transform 0.15s, box-shadow 0.15s;
 }
 .chip:hover { transform: translateY(-2px); box-shadow: 0 6px 22px rgba(22,96,232,0.13); }
-.chip-icon { font-size: 1.2rem; margin-bottom: 5px; }
+.chip-icon { font-size: 1.4rem; margin-bottom: 5px; color: #1660E8; font-weight: 300; line-height: 1; }
 .chip-val  { font-size: 1rem; font-weight: 700; color: #0D1E50; font-family: 'JetBrains Mono', monospace; }
 .chip-lbl  { font-size: 0.6rem; color: #9BAAD0; text-transform: uppercase; letter-spacing: 0.08em; margin-top: 3px; font-weight: 600; }
 
@@ -163,6 +163,7 @@ header    { visibility: hidden; }
     width: 38px; height: 38px; border-radius: 11px;
     display: flex; align-items: center; justify-content: center;
     font-size: 1.1rem; flex-shrink: 0;
+    color: #1660E8; font-weight: 400;
 }
 .plan-icon-blue   { background: #EBF0FE; }
 .plan-icon-green  { background: #E4F9EF; }
@@ -334,32 +335,39 @@ label {
     color: #9BAAD0; margin: 5px 0 0; font-size: 0.88rem; font-weight: 400;
 }
 
-/* ── MOBILE NAV ── */
+/* ── SIDEBAR NAV BUTTONS ── */
+[data-testid="stSidebar"] .stButton > button {
+    background: rgba(255,255,255,0.1) !important;
+    color: rgba(255,255,255,0.78) !important;
+    border: 1px solid rgba(255,255,255,0.08) !important;
+    border-radius: 12px !important;
+    padding: 10px 14px !important;
+    font-size: 0.86rem !important;
+    font-weight: 500 !important;
+    text-align: left !important;
+    width: 100% !important;
+    margin: 2px 0 !important;
+    box-shadow: none !important;
+    transition: all 0.15s !important;
+    letter-spacing: 0 !important;
+}
+[data-testid="stSidebar"] .stButton > button:hover {
+    background: rgba(255,255,255,0.18) !important;
+    color: #fff !important;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+/* ── RESPONSIVE ── */
 @media (max-width: 768px) {
-    [data-testid="stSidebar"] { display: none !important; }
-    [data-testid="stSidebarCollapsedControl"] { display: none !important; }
-    div[data-testid="stSelectbox"] {
-        display: block !important;
-        background: linear-gradient(135deg, #1548E0, #1770F0) !important;
-        border-radius: 0 0 18px 18px !important; padding: 0.5rem 0.8rem 0.7rem !important;
-        margin-bottom: 1rem !important; box-shadow: 0 6px 22px rgba(22,96,232,0.3) !important;
-        position: fixed !important; top: 0 !important; left: 0 !important; right: 0 !important;
-        z-index: 99999 !important; width: 100% !important;
+    .main .block-container {
+        padding-left: 0.75rem !important;
+        padding-right: 0.75rem !important;
+        padding-top: 1.6rem !important;
+        max-width: 100% !important;
     }
-    div[data-testid="stSelectbox"] label {
-        color: rgba(255,255,255,0.5) !important; font-size: 0.66rem !important;
-        font-weight: 700 !important; text-transform: uppercase !important; letter-spacing: 0.1em !important;
-    }
-    div[data-testid="stSelectbox"] > div > div {
-        background: rgba(255,255,255,0.12) !important; border: 1px solid rgba(255,255,255,0.2) !important;
-        border-radius: 10px !important; color: #fff !important;
-    }
-    div[data-testid="stSelectbox"] > div > div > div { color: #fff !important; font-weight: 600 !important; font-size: 0.95rem !important; }
-    div[data-testid="stSelectbox"] svg { fill: #fff !important; }
-    .main .block-container { padding-left: 0.75rem !important; padding-right: 0.75rem !important; padding-top: 5.2rem !important; max-width: 100% !important; }
 }
 @media (min-width: 769px) {
-    div[data-testid="stSelectbox"] { display: none !important; }
     .main .block-container { padding-top: 1.6rem !important; max-width: 1180px !important; }
 }
 
@@ -383,18 +391,11 @@ MENU_OPTIONS = [
     "Export Laporan"
 ]
 
-MENU_ICONS = {
-    "Dashboard": "🏠",
-    "Kalkulator Engset": "🧮",
-    "Hitung Traffic A": "📐",
-    "Analisis Dan Grafik": "📊",
-    "Export Laporan": "📄",
-}
+MENU_DISPLAY = MENU_OPTIONS  # no emoji prefix — clean text only
 
-MENU_DISPLAY = [f"{MENU_ICONS[m]}  {m}" for m in MENU_OPTIONS]
-
-# Mobile selectbox
-mobile_page = st.selectbox("Menu", MENU_DISPLAY, key="mobile_nav")
+# Initialize nav state
+if "active_page" not in st.session_state:
+    st.session_state["active_page"] = MENU_OPTIONS[0]
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -504,7 +505,7 @@ with st.sidebar:
     st.markdown(
         '<div style="background:rgba(255,255,255,0.12);border-radius:18px;padding:1.3rem 1.1rem 1.1rem;'
         'margin-bottom:1.4rem;text-align:center;border:1px solid rgba(255,255,255,0.15);">'
-        '<div style="font-size:2.2rem;margin-bottom:5px;">📡</div>'
+        '<div style="font-size:1.7rem;margin-bottom:5px;opacity:0.9;">◈</div>'
         '<div style="font-size:1.35rem;font-weight:800;color:#fff;letter-spacing:-0.01em;font-family:Inter,sans-serif;">EngsetPro</div>'
         '<div style="font-size:0.65rem;color:rgba(255,255,255,0.45);letter-spacing:0.12em;'
         'margin-top:3px;text-transform:uppercase;font-weight:600;">Rekayasa Trafik v2.0</div>'
@@ -518,14 +519,28 @@ with st.sidebar:
         unsafe_allow_html=True
     )
 
-    page = st.radio(
-        "nav", MENU_DISPLAY,
-        index=MENU_DISPLAY.index(st.session_state.get("mobile_nav", MENU_DISPLAY[0])),
-        label_visibility="collapsed"
-    )
-    if page != st.session_state.get("mobile_nav"):
-        st.session_state["mobile_nav"] = page
-        st.rerun()
+    MENU_ICONS_SIMPLE = {
+        "Dashboard": "⊞",
+        "Kalkulator Engset": "≡",
+        "Hitung Traffic A": "∿",
+        "Analisis Dan Grafik": "∥",
+        "Export Laporan": "↓",
+    }
+
+    for m in MENU_OPTIONS:
+        is_active = st.session_state["active_page"] == m
+        btn_style = (
+            "background:rgba(255,255,255,0.92);color:#1660E8;"
+            if is_active else
+            "background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.78);"
+        )
+        if st.button(
+            f"{MENU_ICONS_SIMPLE[m]}  {m}",
+            key=f"nav_{m}",
+            use_container_width=True,
+        ):
+            st.session_state["active_page"] = m
+            st.rerun()
 
     st.markdown("<hr>", unsafe_allow_html=True)
 
@@ -607,13 +622,13 @@ def page_header(tag, title, sub):
 # ══════════════════════════════════════════════════════════════════════════════
 # PAGE ROUTER
 # ══════════════════════════════════════════════════════════════════════════════
-active_page = st.session_state.get("mobile_nav", MENU_DISPLAY[0])
+active_page = st.session_state.get("active_page", MENU_OPTIONS[0])
 
 
 # ══════════════════════════════════════════════════════════════════════════════
 # DASHBOARD
 # ══════════════════════════════════════════════════════════════════════════════
-if active_page == MENU_DISPLAY[0]:
+if active_page == MENU_OPTIONS[0]:
     col_main, col_side = st.columns([2, 1], gap="large")
 
     with col_main:
@@ -668,17 +683,17 @@ if active_page == MENU_DISPLAY[0]:
             chips_html = (
                 '<div class="chip-grid">'
                 '<div class="chip">'
-                '<div class="chip-icon">📡</div>'
+                '<div class="chip-icon">◈</div>'
                 f'<div class="chip-val">{P:.4f}</div>'
                 '<div class="chip-lbl">P Blocking</div>'
                 '</div>'
                 '<div class="chip">'
-                '<div class="chip-icon">📶</div>'
+                '<div class="chip-icon">↑</div>'
                 f'<div class="chip-val">{carried:.3f}</div>'
                 '<div class="chip-lbl">Carried (Erl)</div>'
                 '</div>'
                 '<div class="chip">'
-                '<div class="chip-icon">📉</div>'
+                '<div class="chip-icon">↓</div>'
                 f'<div class="chip-val">{lost:.3f}</div>'
                 '<div class="chip-lbl">Lost (Erl)</div>'
                 '</div>'
@@ -689,10 +704,10 @@ if active_page == MENU_DISPLAY[0]:
             st.markdown('<p class="sec-title">Ringkasan Sistem</p>', unsafe_allow_html=True)
 
             items = [
-                ("📡", "plan-icon-blue",  "Probabilitas Blocking",  f"{P*100:.3f}%" if P else "N/A",  f"Grade: {gos_text}"),
-                ("📶", "plan-icon-green", "Traffic Carried",         f"{carried:.4f} Erl",            f"Dari {A:.1f} Erl ditawarkan"),
-                ("📐", "plan-icon-amber", "Kanal Minimum GoS 1%",   f"N = {min_n_1}",                "Untuk kualitas baik"),
-                ("⚡", "plan-icon-teal",  "Utilisasi Kanal",         f"{util_pct:.1f}%",              f"Rata-rata per {N} kanal"),
+                ("◈", "plan-icon-blue",  "Probabilitas Blocking",  f"{P*100:.3f}%" if P else "N/A",  f"Grade: {gos_text}"),
+                ("↑", "plan-icon-green", "Traffic Carried",         f"{carried:.4f} Erl",            f"Dari {A:.1f} Erl ditawarkan"),
+                ("≡", "plan-icon-amber", "Kanal Minimum GoS 1%",   f"N = {min_n_1}",                "Untuk kualitas baik"),
+                ("∿", "plan-icon-teal",  "Utilisasi Kanal",         f"{util_pct:.1f}%",              f"Rata-rata per {N} kanal"),
             ]
             for icon, icon_cls, name, val, desc in items:
                 st.markdown(
@@ -709,7 +724,7 @@ if active_page == MENU_DISPLAY[0]:
         else:
             st.markdown(
                 '<div class="card" style="text-align:center;padding:2rem;">'
-                '<div style="font-size:2.5rem;margin-bottom:0.8rem;">🧮</div>'
+                '<div style="font-size:2rem;margin-bottom:0.8rem;color:#C0CCFF;font-weight:300;">≡</div>'
                 '<div style="font-size:1rem;font-weight:700;color:#0D1E50;margin-bottom:0.4rem;">Belum Ada Data</div>'
                 '<div style="font-size:0.85rem;color:#9BAAD0;">Masuk ke menu <strong>Kalkulator Engset</strong> dan jalankan kalkulasi terlebih dahulu.</div>'
                 '</div>',
@@ -792,7 +807,7 @@ if active_page == MENU_DISPLAY[0]:
 # ══════════════════════════════════════════════════════════════════════════════
 # KALKULATOR ENGSET
 # ══════════════════════════════════════════════════════════════════════════════
-elif active_page == MENU_DISPLAY[1]:
+elif active_page == MENU_OPTIONS[1]:
     page_header("Rekayasa Trafik", "Kalkulator Engset",
                 "Hitung probabilitas blocking dengan model finite source")
 
@@ -846,13 +861,13 @@ elif active_page == MENU_DISPLAY[1]:
         with col1:
             st.markdown('<p class="sec-title">Hasil Perhitungan</p>', unsafe_allow_html=True)
             rows = [
-                ("📡", "Probabilitas Blocking (P)", f"{P:.8f}",       "Probabilitas"),
-                ("📈", "Blocking Persen",            f"{P*100:.4f}%",  "Persentase"),
-                ("🏆", "Grade Of Service",           gos_text,         "Penilaian kualitas"),
-                ("📶", "Traffic Carried",            f"{carried:.4f} Erl", "Terlayani"),
-                ("📉", "Traffic Lost",               f"{lost:.4f} Erl",    "Terblokir"),
-                ("⚡", "Utilisasi Kanal",            f"{util_pct:.2f}%",   "Per kanal"),
-                ("📊", "Traffic Intensity",          f"{A/N:.4f} Erl/ch",  "Per kanal"),
+                ("◈", "Probabilitas Blocking (P)", f"{P:.8f}",       "Probabilitas"),
+                ("∿", "Blocking Persen",            f"{P*100:.4f}%",  "Persentase"),
+                ("◉", "Grade Of Service",           gos_text,         "Penilaian kualitas"),
+                ("↑", "Traffic Carried",            f"{carried:.4f} Erl", "Terlayani"),
+                ("↓", "Traffic Lost",               f"{lost:.4f} Erl",    "Terblokir"),
+                ("≡", "Utilisasi Kanal",            f"{util_pct:.2f}%",   "Per kanal"),
+                ("∥", "Traffic Intensity",          f"{A/N:.4f} Erl/ch",  "Per kanal"),
             ]
             for icon, label, val, unit in rows:
                 st.markdown(
@@ -931,7 +946,7 @@ P = {P*100:.4f}%
 # ══════════════════════════════════════════════════════════════════════════════
 # HITUNG TRAFFIC A
 # ══════════════════════════════════════════════════════════════════════════════
-elif active_page == MENU_DISPLAY[2]:
+elif active_page == MENU_OPTIONS[2]:
     page_header("Perhitungan Trafik", "Hitung Traffic Offered (A)",
                 "Tentukan nilai A dari parameter jaringan yang diketahui")
 
@@ -1091,7 +1106,7 @@ elif active_page == MENU_DISPLAY[2]:
 # ══════════════════════════════════════════════════════════════════════════════
 # ANALISIS DAN GRAFIK
 # ══════════════════════════════════════════════════════════════════════════════
-elif active_page == MENU_DISPLAY[3]:
+elif active_page == MENU_OPTIONS[3]:
     page_header("Visualisasi", "Analisis Dan Grafik",
                 "Visualisasi perilaku sistem terhadap variasi parameter")
 
@@ -1255,7 +1270,7 @@ elif active_page == MENU_DISPLAY[3]:
 # ══════════════════════════════════════════════════════════════════════════════
 # EXPORT LAPORAN
 # ══════════════════════════════════════════════════════════════════════════════
-elif active_page == MENU_DISPLAY[4]:
+elif active_page == MENU_OPTIONS[4]:
     page_header("Export", "Export Laporan PDF",
                 "Generate laporan hasil analisis Engset")
 
@@ -1302,7 +1317,7 @@ elif active_page == MENU_DISPLAY[4]:
         with c_act:
             st.markdown(
                 '<div class="card" style="text-align:center;padding:2rem 1.2rem;">'
-                '<div style="font-size:2.8rem;margin-bottom:0.7rem;">📄</div>'
+                '<div style="font-size:2.2rem;margin-bottom:0.7rem;color:#1660E8;font-weight:200;">↓</div>'
                 '<div style="font-size:0.95rem;font-weight:700;color:#0D1E50;margin-bottom:0.4rem;">'
                 'Laporan PDF</div>'
                 '<div style="font-size:0.8rem;color:#9BAAD0;margin-bottom:1rem;line-height:1.7;">'
