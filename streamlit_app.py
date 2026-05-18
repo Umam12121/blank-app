@@ -365,11 +365,11 @@ MENU_OPTIONS = [
 ]
 
 MENU_ICONS_SIMPLE = {
-    "Dashboard":          "⊞",
-    "Kalkulator Engset":  "≡",
-    "Hitung Traffic A":   "∿",
-    "Analisis Dan Grafik":"∥",
-    "Export Laporan":     "↓",
+    "Dashboard":          "◉",
+    "Kalkulator Engset":  "⌬",
+    "Hitung Traffic A":   "◎",
+    "Analisis Dan Grafik":"▦",
+    "Export Laporan":     "⤓",
 }
 
 # Session state — HARUS sebelum sidebar
@@ -642,17 +642,17 @@ if active_page == MENU_OPTIONS[0]:
             chips_html = (
                 '<div class="chip-grid">'
                 '<div class="chip">'
-                '<div class="chip-icon">◈</div>'
+                '<div class="chip-icon">◉</div>'
                 f'<div class="chip-val">{P:.4f}</div>'
                 '<div class="chip-lbl">P Blocking</div>'
                 '</div>'
                 '<div class="chip">'
-                '<div class="chip-icon">↑</div>'
+                '<div class="chip-icon">⌬</div>'
                 f'<div class="chip-val">{carried:.3f}</div>'
                 '<div class="chip-lbl">Carried (Erl)</div>'
                 '</div>'
                 '<div class="chip">'
-                '<div class="chip-icon">↓</div>'
+                '<div class="chip-icon">◎</div>'
                 f'<div class="chip-val">{lost:.3f}</div>'
                 '<div class="chip-lbl">Lost (Erl)</div>'
                 '</div>'
@@ -663,10 +663,10 @@ if active_page == MENU_OPTIONS[0]:
             st.markdown('<p class="sec-title">Ringkasan Sistem</p>', unsafe_allow_html=True)
 
             items = [
-                ("◈", "plan-icon-blue",  "Probabilitas Blocking",  f"{P*100:.3f}%" if P else "N/A",  f"Grade: {gos_text}"),
-                ("↑", "plan-icon-green", "Traffic Carried",         f"{carried:.4f} Erl",            f"Dari {A:.1f} Erl ditawarkan"),
-                ("≡", "plan-icon-amber", "Kanal Minimum GoS 1%",   f"N = {min_n_1}",                "Untuk kualitas baik"),
-                ("∿", "plan-icon-teal",  "Utilisasi Kanal",         f"{util_pct:.1f}%",              f"Rata-rata per {N} kanal"),
+                ("◉", "plan-icon-blue",  "Probabilitas Blocking",  f"{P*100:.3f}%" if P else "N/A",  f"Grade: {gos_text}"),
+                ("⌬", "plan-icon-green", "Traffic Carried",         f"{carried:.4f} Erl",            f"Dari {A:.1f} Erl ditawarkan"),
+                ("▦", "plan-icon-amber", "Kanal Minimum GoS 1%",   f"N = {min_n_1}",                "Untuk kualitas baik"),
+                ("◎", "plan-icon-teal",  "Utilisasi Kanal",         f"{util_pct:.1f}%",              f"Rata-rata per {N} kanal"),
             ]
             for icon, icon_cls, name, val, desc in items:
                 st.markdown(
@@ -701,7 +701,7 @@ if active_page == MENU_OPTIONS[0]:
         else:
             sizes = [50, 50]
             clrs  = ['#DDE5FF', '#F0F4FF']
-            label_txt = "—"
+            label_txt = "0%"
         ax.pie(sizes, colors=clrs, startangle=90,
                wedgeprops=dict(width=0.42, edgecolor='white', linewidth=3.5),
                counterclock=False)
@@ -770,18 +770,6 @@ elif active_page == MENU_OPTIONS[1]:
     page_header("Rekayasa Trafik", "Kalkulator Engset",
                 "Hitung probabilitas blocking dengan model finite source")
 
-    # Formula wrap
-    st.markdown(
-        '<div class="formula-wrap">'
-        '<span class="formula-tag">Rumus Engset · Finite Source Model</span>'
-        '<div class="eq-container">'
-        + ENGSET_SVG +
-        '</div></div>',
-        unsafe_allow_html=True
-    )
-
-    st.markdown("<div style='height:0.4rem'></div>", unsafe_allow_html=True)
-
     st.markdown(
         '<div style="font-size:0.8rem;color:#4A5680;font-weight:600;margin-bottom:0.9rem;">'
         'Masukkan Parameter Sistem</div>',
@@ -790,13 +778,13 @@ elif active_page == MENU_OPTIONS[1]:
 
     col_s, col_n, col_a = st.columns(3, gap="large")
     with col_s:
-        inp_S = st.number_input("S — Jumlah Source (Pengguna)", min_value=2, max_value=200,
+        inp_S = st.number_input("S  Jumlah Source (Pengguna)", min_value=2, max_value=200,
                                  value=st.session_state["S_calc"], step=1)
     with col_n:
-        inp_N = st.number_input("N — Jumlah Kanal (Server)", min_value=1, max_value=100,
+        inp_N = st.number_input("N  Jumlah Kanal (Server)", min_value=1, max_value=100,
                                  value=st.session_state["N_calc"], step=1)
     with col_a:
-        inp_A = st.number_input("A — Traffic Offered (Erlang)", min_value=0.1,
+        inp_A = st.number_input("A  Traffic Offered (Erlang)", min_value=0.1,
                                  max_value=float(max(1, inp_S - 1)),
                                  value=min(st.session_state["A_calc"], float(inp_S - 2)),
                                  step=0.1, format="%.1f")
@@ -820,13 +808,13 @@ elif active_page == MENU_OPTIONS[1]:
         with col1:
             st.markdown('<p class="sec-title">Hasil Perhitungan</p>', unsafe_allow_html=True)
             rows = [
-                ("◈", "Probabilitas Blocking (P)", f"{P:.8f}",       "Probabilitas"),
-                ("∿", "Blocking Persen",            f"{P*100:.4f}%",  "Persentase"),
-                ("◉", "Grade Of Service",           gos_text,         "Penilaian kualitas"),
-                ("↑", "Traffic Carried",            f"{carried:.4f} Erl", "Terlayani"),
-                ("↓", "Traffic Lost",               f"{lost:.4f} Erl",    "Terblokir"),
-                ("≡", "Utilisasi Kanal",            f"{util_pct:.2f}%",   "Per kanal"),
-                ("∥", "Traffic Intensity",          f"{A/N:.4f} Erl/ch",  "Per kanal"),
+                ("◉", "Probabilitas Blocking (P)", f"{P:.8f}",       "Probabilitas"),
+                ("◎", "Blocking Persen",            f"{P*100:.4f}%",  "Persentase"),
+                ("▦", "Grade Of Service",           gos_text,         "Penilaian kualitas"),
+                ("⌬", "Traffic Carried",            f"{carried:.4f} Erl", "Terlayani"),
+                ("⤓", "Traffic Lost",               f"{lost:.4f} Erl",    "Terblokir"),
+                ("◈", "Utilisasi Kanal",            f"{util_pct:.2f}%",   "Per kanal"),
+                ("⊹", "Traffic Intensity",          f"{A/N:.4f} Erl/ch",  "Per kanal"),
             ]
             for icon, label, val, unit in rows:
                 st.markdown(
@@ -851,7 +839,7 @@ elif active_page == MENU_OPTIONS[1]:
                 ok = N >= (mn if mn else 9999)
                 rec_rows += (
                     f'<tr><td>{t*100:.1f}%</td>'
-                    f'<td>N = {mn if mn else "&#8211;"}</td>'
+                    f'<td>N = {mn if mn else "N/A"}</td>'
                     f'<td>{"&#10003;" if ok else "&#10007;"}</td></tr>'
                 )
             st.markdown(
@@ -929,7 +917,7 @@ elif active_page == MENU_OPTIONS[2]:
 
         c1, c2 = st.columns(2, gap="large")
         with c1:
-            call_rate  = st.number_input("Call Rate — panggilan/jam per pengguna",
+            call_rate  = st.number_input("Call Rate  panggilan/jam per pengguna",
                                          0.01, 1000.0, 3.0, 0.1, format="%.2f")
             hold_time  = st.number_input("Hold Time rata-rata (menit)",
                                          0.1, 120.0, 2.0, 0.1, format="%.1f")
@@ -999,8 +987,8 @@ elif active_page == MENU_OPTIONS[2]:
 
         c1, c2 = st.columns(2, gap="large")
         with c1:
-            U_val = st.number_input("U — Pengguna Aktif Jam Sibuk", 1, 10000, 50)
-            BHT   = st.number_input("BHT — Busy Hour Traffic Per User (Erl)",
+            U_val = st.number_input("U  Pengguna Aktif Jam Sibuk", 1, 10000, 50)
+            BHT   = st.number_input("BHT  Busy Hour Traffic Per User (Erl)",
                                     0.001, 1.0, 0.1, 0.001, format="%.3f")
         with c2:
             A_t2 = U_val * BHT
@@ -1240,52 +1228,82 @@ elif active_page == MENU_OPTIONS[4]:
         st.markdown('<div class="eng-warn">Instal ReportLab: <code>pip install reportlab</code></div>',
                     unsafe_allow_html=True)
     else:
-        c_prev, c_act = st.columns([1.5, 1], gap="large")
+        # ── Hero summary bar ──────────────────────────────────────────────────
+        st.markdown(
+            '<div style="background:linear-gradient(135deg,#1548E0 0%,#1770F0 60%,#0EAAE0 100%);'
+            'border-radius:20px;padding:1.6rem 2rem;margin-bottom:1.4rem;'
+            'display:flex;align-items:center;gap:2rem;flex-wrap:wrap;">'
+            '<div style="flex:1;min-width:180px;">'
+            '<div style="font-size:0.62rem;color:rgba(255,255,255,0.55);text-transform:uppercase;'
+            'letter-spacing:0.12em;font-weight:700;margin-bottom:3px;">Parameter</div>'
+            f'<div style="font-size:1.1rem;font-weight:800;color:#fff;font-family:\'JetBrains Mono\',monospace;">'
+            f'S={S} · N={N} · A={A:.1f} Erl</div>'
+            '</div>'
+            '<div style="flex:1;min-width:140px;">'
+            '<div style="font-size:0.62rem;color:rgba(255,255,255,0.55);text-transform:uppercase;'
+            'letter-spacing:0.12em;font-weight:700;margin-bottom:3px;">P Blocking</div>'
+            f'<div style="font-size:1.1rem;font-weight:800;color:#fff;font-family:\'JetBrains Mono\',monospace;">'
+            f'{P:.6f}</div>'
+            '</div>'
+            '<div style="flex:1;min-width:120px;">'
+            '<div style="font-size:0.62rem;color:rgba(255,255,255,0.55);text-transform:uppercase;'
+            'letter-spacing:0.12em;font-weight:700;margin-bottom:3px;">Blocking</div>'
+            f'<div style="font-size:1.1rem;font-weight:800;color:#fff;font-family:\'JetBrains Mono\',monospace;">'
+            f'{P*100:.3f}%</div>'
+            '</div>'
+            '<div style="flex:1;min-width:100px;">'
+            '<div style="font-size:0.62rem;color:rgba(255,255,255,0.55);text-transform:uppercase;'
+            'letter-spacing:0.12em;font-weight:700;margin-bottom:3px;">Grade of Service</div>'
+            f'<div style="font-size:1.1rem;font-weight:800;color:#fff;">{gos_text}</div>'
+            '</div>'
+            '</div>',
+            unsafe_allow_html=True
+        )
 
-        with c_prev:
+        col_left, col_right = st.columns([3, 2], gap="large")
+
+        with col_left:
+            # ── Preview tabel ────────────────────────────────────────────────
             st.markdown(
-                '<div style="font-size:0.86rem;font-weight:700;color:#0D1E50;margin-bottom:1.1rem;">'
-                'Preview Isi Laporan</div>',
+                '<div style="font-size:0.68rem;font-weight:700;color:#9BAAD0;'
+                'text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.8rem;">Isi Laporan PDF</div>',
                 unsafe_allow_html=True
             )
-            items_prev = [
-                ("Judul",           "EngsetPro · Laporan Perhitungan Engset"),
-                ("Tanggal",         datetime.now().strftime('%d %B %Y, %H:%M')),
-                ("Parameter",       f"S={S}, N={N}, A={A:.1f} Erl"),
-                ("P Blocking",      f"{P:.8f}"),
-                ("Blocking %",      f"{P*100:.4f}%"),
-                ("GoS",             gos_text),
-                ("Traffic Carried", f"{carried:.4f} Erlang"),
-                ("Traffic Lost",    f"{lost:.4f} Erlang"),
-                ("Grafik",          "Blocking Vs N + Blocking Vs A"),
-                ("Tabel",           "Detail N dari 1 sampai N+10"),
+            sections = [
+                ("⌬", "#EBF0FE", "Parameter Input",    f"S={S} pengguna, N={N} kanal, A={A:.1f} Erlang"),
+                ("◎", "#E4F9EF", "Hasil Perhitungan",   f"P={P:.6f}  ·  Blocking={P*100:.3f}%  ·  GoS={gos_text}"),
+                ("▦", "#FEF6DF", "Grafik Analisis",     "Blocking Vs N dan Blocking Vs Traffic Offered A"),
+                ("⤓", "#FEEDED", "Tabel Detail",        f"Blocking tiap nilai N dari 1 sampai N+10"),
             ]
-            st.markdown('<div class="card" style="padding:1.2rem 1.4rem;">', unsafe_allow_html=True)
-            for label, val in items_prev:
+            for icon, bg, title, desc in sections:
                 st.markdown(
-                    '<div style="display:flex;justify-content:space-between;align-items:center;'
-                    'padding:8px 0;border-bottom:1px solid #EEF2FF;">'
-                    f'<span style="font-size:0.8rem;color:#9BAAD0;font-weight:500;">{label}</span>'
-                    f'<span style="font-size:0.8rem;font-weight:600;color:#0D1E50;'
-                    f'font-family:\'JetBrains Mono\',monospace;text-align:right;max-width:55%;">{val}</span>'
-                    '</div>',
+                    f'<div class="plan-card">'
+                    f'<div class="plan-icon-wrap" style="background:{bg};width:42px;height:42px;'
+                    f'border-radius:12px;font-size:1rem;color:#1660E8;">{icon}</div>'
+                    f'<div class="plan-info">'
+                    f'<p class="plan-name">{title}</p>'
+                    f'<p class="plan-desc">{desc}</p>'
+                    f'</div></div>',
                     unsafe_allow_html=True
                 )
-            st.markdown('</div>', unsafe_allow_html=True)
 
-        with c_act:
+        with col_right:
             st.markdown(
-                '<div class="card" style="text-align:center;padding:2rem 1.2rem;">'
-                '<div style="font-size:2.2rem;margin-bottom:0.7rem;color:#1660E8;font-weight:200;">↓</div>'
-                '<div style="font-size:0.95rem;font-weight:700;color:#0D1E50;margin-bottom:0.4rem;">'
-                'Laporan PDF</div>'
-                '<div style="font-size:0.8rem;color:#9BAAD0;margin-bottom:1rem;line-height:1.7;">'
-                'Berisi parameter, hasil perhitungan,<br>grafik analisis, dan tabel detail.'
-                '</div></div>',
+                '<div class="card" style="padding:1.8rem;text-align:center;">'
+                '<div style="width:64px;height:64px;border-radius:18px;'
+                'background:linear-gradient(135deg,#1660E8,#0EAAE0);'
+                'display:flex;align-items:center;justify-content:center;'
+                'margin:0 auto 1rem;font-size:1.6rem;color:#fff;">⤓</div>'
+                '<div style="font-size:1rem;font-weight:800;color:#0D1E50;margin-bottom:0.35rem;">'
+                'Ekspor ke PDF</div>'
+                '<div style="font-size:0.8rem;color:#9BAAD0;line-height:1.7;margin-bottom:1.4rem;">'
+                'Laporan lengkap berformat A4 siap cetak, mencakup parameter, hasil, grafik, dan tabel.</div>'
+                f'<div style="font-size:0.7rem;color:#B8C8E8;margin-bottom:1.2rem;">'
+                f'Dibuat: {datetime.now().strftime("%d %b %Y, %H:%M")}</div>'
+                '</div>',
                 unsafe_allow_html=True
             )
-
-            if st.button("Generate dan Download PDF", use_container_width=True):
+            if st.button("⤓  Generate dan Download PDF", use_container_width=True):
                 with st.spinner("Membuat laporan PDF..."):
                     def cb(fig):
                         buf = io.BytesIO()
