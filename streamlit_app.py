@@ -957,70 +957,84 @@ elif active_page == MENU_OPTIONS[1]:
     with col_s:
         inp_S = st.number_input(
             "S  Jumlah Source (Pengguna)",
-            min_value=2, max_value=200,
-            value=st.session_state["S_calc"] if st.session_state["S_calc"] is not None else 2,
+            min_value=0, max_value=200,
+            value=st.session_state["S_calc"] if st.session_state["S_calc"] is not None else 0,
             step=1
         )
     with col_n:
         inp_N = st.number_input(
             "N  Jumlah Kanal (Server)",
-            min_value=1, max_value=100,
-            value=st.session_state["N_calc"] if st.session_state["N_calc"] is not None else 1,
+            min_value=0, max_value=100,
+            value=st.session_state["N_calc"] if st.session_state["N_calc"] is not None else 0,
             step=1
         )
     with col_a:
-        _s_for_max = inp_S if inp_S is not None else 200
-        _a_default = st.session_state["A_calc"] if st.session_state["A_calc"] is not None else 0.1
-        _a_default = min(float(_a_default), float(max(0.1, _s_for_max - 1)))
         inp_A = st.number_input(
             "A  Traffic Offered (Erlang)",
-            min_value=0.1,
-            max_value=float(max(1, _s_for_max - 1)),
-            value=_a_default,
+            min_value=0.0, max_value=9999.0,
+            value=float(st.session_state["A_calc"]) if st.session_state["A_calc"] is not None else 0.0,
             step=0.1, format="%.1f"
         )
 
     st.markdown("<div style='height:0.5rem'></div>", unsafe_allow_html=True)
-    st.markdown(
-        '<div style="background:linear-gradient(135deg,rgba(22,96,232,0.08),rgba(14,170,224,0.08));'
-        'border-radius:14px;padding:1rem 1.2rem;border:1.5px solid rgba(22,96,232,0.15);margin-bottom:0.5rem;">'
-        '<div style="font-size:0.75rem;color:#1660E8;font-weight:600;margin-bottom:0.5rem;'
-        'text-transform:uppercase;letter-spacing:0.08em;">▶ Siap Kalkulasi</div>'
-        '<div style="font-size:0.82rem;color:#4A5680;">Parameter sudah diisi? Tekan tombol di bawah untuk menghitung probabilitas blocking.</div>'
-        '</div>',
-        unsafe_allow_html=True
-    )
-    if st.button("▶  Jalankan Kalkulasi", use_container_width=True, type="primary"):
-        st.session_state["S_calc"] = inp_S
-        st.session_state["N_calc"] = inp_N
-        st.session_state["A_calc"] = inp_A
-        st.session_state["kalkulasi_done"] = True
-        st.session_state["first_run"] = False
-        # Hitung dan simpan ke history
-        _S, _N, _A = inp_S, inp_N, inp_A
-        _valid = _S > _N and 0 < _A < _S
-        if _valid:
-            _P = engset(_S, _N, _A)
-            if _P is not None:
-                _carried = _A * (1 - _P)
-                _lost    = _A * _P
-                _util    = (_carried / _N) * 100
-                _gos, _  = gos_label(_P)
-                _entry = {
-                    "timestamp": datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
-                    "S": _S, "N": _N, "A": _A,
-                    "P": _P,
-                    "P_pct": _P * 100,
-                    "carried": _carried,
-                    "lost": _lost,
-                    "util": _util,
-                    "gos": _gos,
-                }
-                # Cek duplikat (S, N, A sama)
-                existing = [(h["S"], h["N"], h["A"]) for h in st.session_state["history"]]
-                if (_S, _N, _A) not in existing:
-                    st.session_state["history"].append(_entry)
-        st.rerun()
+
+    # Tombol Reset
+    col_run, col_reset = st.columns([3, 1], gap="small")
+    with col_reset:
+        if st.button("🗑  Reset", use_container_width=True):
+            st.session_state["S_calc"]         = None
+            st.session_state["N_calc"]         = None
+            st.session_state["A_calc"]         = None
+            st.session_state["kalkulasi_done"] = False
+            st.session_state["first_run"]      = True
+            st.rerun()
+
+    with col_run:
+        jalankan = st.button("▶  Jalankan Kalkulasi", use_container_width=True, type="primary")
+
+    if jalankan:
+        # Validasi manual
+        if inp_S < 2:
+            st.markdown('<div class="eng-warn">⚠ S harus minimal 2 (jumlah pengguna).</div>', unsafe_allow_html=True)
+        elif inp_N < 1:
+            st.markdown('<div class="eng-warn">⚠ N harus minimal 1 (jumlah kanal).</div>', unsafe_allow_html=True)
+        elif inp_A <= 0:
+            st.markdown('<div class="eng-warn">⚠ A harus lebih dari 0 (traffic offered).</div>', unsafe_allow_html=True)
+        elif inp_S <= inp_N:
+            st.markdown('<div class="eng-warn">⚠ S harus lebih besar dari N.</div>', unsafe_allow_html=True)
+        elif inp_A >= inp_S:
+            st.markdown('<div class="eng-warn">⚠ A harus lebih kecil dari S.</div>', unsafe_allow_html=True)
+        else:
+            st.session_state["S_calc"] = inp_S
+            st.session_state["N_calc"] = inp_N
+            st.session_state["A_calc"] = inp_A
+            st.session_state["kalkulasi_done"] = True
+            st.session_state["first_run"] = False
+            # Hitung dan simpan ke history
+            _S, _N, _A = inp_S, inp_N, inp_A
+            _valid = _S > _N and 0 < _A < _S
+            if _valid:
+                _P = engset(_S, _N, _A)
+                if _P is not None:
+                    _carried = _A * (1 - _P)
+                    _lost    = _A * _P
+                    _util    = (_carried / _N) * 100
+                    _gos, _  = gos_label(_P)
+                    _entry = {
+                        "timestamp": datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
+                        "S": _S, "N": _N, "A": _A,
+                        "P": _P,
+                        "P_pct": _P * 100,
+                        "carried": _carried,
+                        "lost": _lost,
+                        "util": _util,
+                        "gos": _gos,
+                    }
+                    # Cek duplikat (S, N, A sama)
+                    existing = [(h["S"], h["N"], h["A"]) for h in st.session_state["history"]]
+                    if (_S, _N, _A) not in existing:
+                        st.session_state["history"].append(_entry)
+            st.rerun()
 
     st.markdown("<div style='height:0.7rem'></div>", unsafe_allow_html=True)
 
