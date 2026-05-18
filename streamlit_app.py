@@ -1166,18 +1166,17 @@ elif active_page == MENU_OPTIONS[2]:
         c1, c2 = st.columns(2, gap="large")
         with c1:
             call_rate  = st.number_input("Call Rate  panggilan/jam per pengguna",
-                                         0.01, 1000.0, 3.0, 0.1, format="%.2f")
+                                         min_value=0.0, max_value=1000.0, value=0.0, step=0.1, format="%.2f")
             hold_time  = st.number_input("Hold Time rata-rata (menit)",
-                                         0.1, 120.0, 2.0, 0.1, format="%.1f")
-            _s_default = int(S) if S is not None else 50
+                                         min_value=0.0, max_value=120.0, value=0.0, step=0.1, format="%.1f")
             n_users_t1 = st.number_input("Jumlah pengguna aktif (opsional untuk A total)",
-                                         1, 10000, _s_default)
+                                         min_value=0, max_value=10000, value=0, step=1)
 
         with c2:
-            lam_s = call_rate / 3600
+            lam_s = call_rate / 3600 if call_rate > 0 else 0
             h_s   = hold_time * 60
             A_1   = lam_s * h_s
-            A_tot = A_1 * n_users_t1
+            A_tot = A_1 * n_users_t1 if n_users_t1 > 0 else 0.0
 
             st.markdown(
                 '<div class="card">'
@@ -1236,9 +1235,9 @@ elif active_page == MENU_OPTIONS[2]:
 
         c1, c2 = st.columns(2, gap="large")
         with c1:
-            U_val = st.number_input("U  Pengguna Aktif Jam Sibuk", 1, 10000, 50)
+            U_val = st.number_input("U  Pengguna Aktif Jam Sibuk", min_value=0, max_value=10000, value=0, step=1)
             BHT   = st.number_input("BHT  Busy Hour Traffic Per User (Erl)",
-                                    0.001, 1.0, 0.1, 0.001, format="%.3f")
+                                    min_value=0.0, max_value=1.0, value=0.0, step=0.001, format="%.3f")
         with c2:
             A_t2 = U_val * BHT
             st.markdown(
@@ -1273,10 +1272,10 @@ elif active_page == MENU_OPTIONS[2]:
         )
         c1, c2 = st.columns(2, gap="large")
         with c1:
-            dr = st.number_input("Data Rate Total (Mbps)", 0.1, 100000.0, 100.0, 1.0)
-            cc = st.number_input("Kapasitas Per Kanal (Mbps)", 0.1, 10000.0, 10.0, 0.1)
+            dr = st.number_input("Data Rate Total (Mbps)", min_value=0.0, max_value=100000.0, value=0.0, step=1.0, format="%.1f")
+            cc = st.number_input("Kapasitas Per Kanal (Mbps)", min_value=0.0, max_value=10000.0, value=0.0, step=0.1, format="%.1f")
         with c2:
-            A_t3 = dr / cc
+            A_t3 = dr / cc if cc > 0 else 0.0
             st.markdown(
                 '<div class="card" style="text-align:center;padding:1.6rem;">'
                 f'<div style="font-size:0.78rem;color:#9BAAD0;margin-bottom:6px;'
