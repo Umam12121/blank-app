@@ -958,27 +958,26 @@ elif active_page == MENU_OPTIONS[1]:
         inp_S = st.number_input(
             "S  Jumlah Source (Pengguna)",
             min_value=2, max_value=200,
-            value=st.session_state["S_calc"],   # None = kosong
-            step=1,
-            placeholder="Masukkan jumlah pengguna..."
+            value=st.session_state["S_calc"] if st.session_state["S_calc"] is not None else 2,
+            step=1
         )
     with col_n:
         inp_N = st.number_input(
             "N  Jumlah Kanal (Server)",
             min_value=1, max_value=100,
-            value=st.session_state["N_calc"],   # None = kosong
-            step=1,
-            placeholder="Masukkan jumlah kanal..."
+            value=st.session_state["N_calc"] if st.session_state["N_calc"] is not None else 1,
+            step=1
         )
     with col_a:
         _s_for_max = inp_S if inp_S is not None else 200
+        _a_default = st.session_state["A_calc"] if st.session_state["A_calc"] is not None else 0.1
+        _a_default = min(float(_a_default), float(max(0.1, _s_for_max - 1)))
         inp_A = st.number_input(
             "A  Traffic Offered (Erlang)",
             min_value=0.1,
             max_value=float(max(1, _s_for_max - 1)),
-            value=st.session_state["A_calc"],   # None = kosong
-            step=0.1, format="%.1f",
-            placeholder="Masukkan nilai A..."
+            value=_a_default,
+            step=0.1, format="%.1f"
         )
 
     st.markdown("<div style='height:0.5rem'></div>", unsafe_allow_html=True)
@@ -992,42 +991,36 @@ elif active_page == MENU_OPTIONS[1]:
         unsafe_allow_html=True
     )
     if st.button("▶  Jalankan Kalkulasi", use_container_width=True, type="primary"):
-        if inp_S is None or inp_N is None or inp_A is None:
-            st.markdown(
-                '<div class="eng-warn">⚠ Harap isi semua parameter S, N, dan A terlebih dahulu.</div>',
-                unsafe_allow_html=True
-            )
-        else:
-            st.session_state["S_calc"] = inp_S
-            st.session_state["N_calc"] = inp_N
-            st.session_state["A_calc"] = inp_A
-            st.session_state["kalkulasi_done"] = True
-            st.session_state["first_run"] = False
-            # Hitung dan simpan ke history
-            _S, _N, _A = inp_S, inp_N, inp_A
-            _valid = _S > _N and 0 < _A < _S
-            if _valid:
-                _P = engset(_S, _N, _A)
-                if _P is not None:
-                    _carried = _A * (1 - _P)
-                    _lost    = _A * _P
-                    _util    = (_carried / _N) * 100
-                    _gos, _  = gos_label(_P)
-                    _entry = {
-                        "timestamp": datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
-                        "S": _S, "N": _N, "A": _A,
-                        "P": _P,
-                        "P_pct": _P * 100,
-                        "carried": _carried,
-                        "lost": _lost,
-                        "util": _util,
-                        "gos": _gos,
-                    }
-                    # Cek duplikat (S, N, A sama)
-                    existing = [(h["S"], h["N"], h["A"]) for h in st.session_state["history"]]
-                    if (_S, _N, _A) not in existing:
-                        st.session_state["history"].append(_entry)
-            st.rerun()
+        st.session_state["S_calc"] = inp_S
+        st.session_state["N_calc"] = inp_N
+        st.session_state["A_calc"] = inp_A
+        st.session_state["kalkulasi_done"] = True
+        st.session_state["first_run"] = False
+        # Hitung dan simpan ke history
+        _S, _N, _A = inp_S, inp_N, inp_A
+        _valid = _S > _N and 0 < _A < _S
+        if _valid:
+            _P = engset(_S, _N, _A)
+            if _P is not None:
+                _carried = _A * (1 - _P)
+                _lost    = _A * _P
+                _util    = (_carried / _N) * 100
+                _gos, _  = gos_label(_P)
+                _entry = {
+                    "timestamp": datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
+                    "S": _S, "N": _N, "A": _A,
+                    "P": _P,
+                    "P_pct": _P * 100,
+                    "carried": _carried,
+                    "lost": _lost,
+                    "util": _util,
+                    "gos": _gos,
+                }
+                # Cek duplikat (S, N, A sama)
+                existing = [(h["S"], h["N"], h["A"]) for h in st.session_state["history"]]
+                if (_S, _N, _A) not in existing:
+                    st.session_state["history"].append(_entry)
+        st.rerun()
 
     st.markdown("<div style='height:0.7rem'></div>", unsafe_allow_html=True)
 
