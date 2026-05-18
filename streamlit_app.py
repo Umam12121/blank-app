@@ -49,11 +49,16 @@ html, body, [class*="css"] {
 
 #MainMenu { visibility: hidden; }
 footer    { visibility: hidden; }
-header    { visibility: hidden; }
 .stDeployButton { display: none !important; }
 
+/* Sembunyikan branding Streamlit tapi JANGAN sembunyikan sidebar toggle button */
+[data-testid="stToolbar"] { display: none !important; }
+[data-testid="stDecoration"] { display: none !important; }
+[data-testid="stStatusWidget"] { display: none !important; }
+[data-testid="stHeader"] { background: transparent !important; height: 0 !important; min-height: 0 !important; }
+
 .main .block-container {
-    padding-top: 1.6rem !important;
+    padding-top: 2.5rem !important;
     padding-bottom: 2rem !important;
     max-width: 1180px !important;
 }
@@ -333,6 +338,14 @@ label {
 }
 .ph-sub {
     color: #9BAAD0; margin: 5px 0 0; font-size: 0.88rem; font-weight: 400;
+}
+
+/* Pastikan sidebar toggle button selalu terlihat */
+[data-testid="stSidebarCollapsedControl"],
+[data-testid="stSidebarCollapseButton"] {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
 }
 
 /* ── SIDEBAR NAV BUTTONS ── */
