@@ -51,12 +51,6 @@ html, body, [class*="css"] {
 footer    { visibility: hidden; }
 .stDeployButton { display: none !important; }
 
-/* Sembunyikan branding Streamlit tapi JANGAN sembunyikan sidebar toggle button */
-[data-testid="stToolbar"] { display: none !important; }
-[data-testid="stDecoration"] { display: none !important; }
-[data-testid="stStatusWidget"] { display: none !important; }
-[data-testid="stHeader"] { background: transparent !important; height: 0 !important; min-height: 0 !important; }
-
 .main .block-container {
     padding-top: 2.5rem !important;
     padding-bottom: 2rem !important;
@@ -338,14 +332,6 @@ label {
 }
 .ph-sub {
     color: #9BAAD0; margin: 5px 0 0; font-size: 0.88rem; font-weight: 400;
-}
-
-/* Pastikan sidebar toggle button selalu terlihat */
-[data-testid="stSidebarCollapsedControl"],
-[data-testid="stSidebarCollapseButton"] {
-    display: flex !important;
-    visibility: visible !important;
-    opacity: 1 !important;
 }
 
 /* ── RESPONSIVE ── */
