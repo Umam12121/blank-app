@@ -97,6 +97,13 @@ footer    { visibility: hidden; }
 [data-testid="stSidebar"] .stRadio [data-baseweb="radio"] > div:first-child {
     display: none !important;
 }
+/* Sembunyikan label text dari st.radio() di sidebar */
+[data-testid="stSidebar"] .stRadio > label {
+    display: none !important;
+}
+[data-testid="stSidebar"] [data-testid="stRadio"] > label {
+    display: none !important;
+}
 
 /* ── CARD ── */
 .card {
@@ -281,6 +288,21 @@ footer    { visibility: hidden; }
     box-shadow: 0 8px 26px rgba(22,96,232,0.38) !important;
     transform: translateY(-1px) !important;
 }
+/* Primary button — Jalankan Kalkulasi lebih mencolok */
+.stButton > button[kind="primary"] {
+    background: linear-gradient(135deg, #1248C8 0%, #1660E8 50%, #0EAAE0 100%) !important;
+    padding: 0.85rem 2rem !important;
+    font-size: 1rem !important;
+    font-weight: 700 !important;
+    box-shadow: 0 6px 24px rgba(22,96,232,0.40) !important;
+    border-radius: 14px !important;
+    letter-spacing: 0.02em !important;
+}
+.stButton > button[kind="primary"]:hover {
+    background: linear-gradient(135deg, #0E38A8 0%, #1248C8 50%, #0880C0 100%) !important;
+    box-shadow: 0 10px 32px rgba(22,96,232,0.50) !important;
+    transform: translateY(-2px) !important;
+}
 
 /* ── PROGRESS ── */
 .progress-wrap {
@@ -439,11 +461,12 @@ MENU_ICONS_SVG = {
 
 # Session state — HARUS sebelum sidebar
 if "active_page"     not in st.session_state: st.session_state["active_page"]     = MENU_OPTIONS[0]
-if "S_calc"          not in st.session_state: st.session_state["S_calc"]          = 20
-if "N_calc"          not in st.session_state: st.session_state["N_calc"]          = 5
-if "A_calc"          not in st.session_state: st.session_state["A_calc"]          = 7.0
+if "S_calc"          not in st.session_state: st.session_state["S_calc"]          = 10
+if "N_calc"          not in st.session_state: st.session_state["N_calc"]          = 3
+if "A_calc"          not in st.session_state: st.session_state["A_calc"]          = 2.0
 if "kalkulasi_done"  not in st.session_state: st.session_state["kalkulasi_done"]  = False
 if "history"         not in st.session_state: st.session_state["history"]         = []
+if "first_run"       not in st.session_state: st.session_state["first_run"]       = True
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -557,7 +580,10 @@ with st.sidebar:
         '<div style="margin-bottom:8px;">'
         '<svg xmlns="http://www.w3.org/2000/svg" width="34" height="34" viewBox="0 0 24 24" '
         'fill="none" stroke="rgba(255,255,255,0.90)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">'
-        '<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>'
+        '<path d="M1 6c0 0 4-4 11-4s11 4 11 4"/>'
+        '<path d="M5 10c0 0 2.5-2.5 7-2.5s7 2.5 7 2.5"/>'
+        '<path d="M9 14c0 0 1-1 3-1s3 1 3 1"/>'
+        '<line x1="12" y1="18" x2="12" y2="18" stroke-width="3" stroke-linecap="round"/>'
         '</svg>'
         '</div>'
         '<div style="font-size:1.35rem;font-weight:800;color:#fff;letter-spacing:-0.01em;'
@@ -568,7 +594,7 @@ with st.sidebar:
         unsafe_allow_html=True
     )
 
-    # Navigation label
+    # Navigation section label
     st.markdown(
         '<div style="font-size:0.62rem;font-weight:700;color:rgba(255,255,255,0.35);'
         'text-transform:uppercase;letter-spacing:0.12em;margin-bottom:0.5rem;padding:0 4px;">Navigasi</div>',
@@ -585,7 +611,7 @@ with st.sidebar:
         menu_labels_display.append(f"{m}")  # radio label teks saja
 
     selected = st.radio(
-        "nav",
+        "##nav_hidden",
         MENU_OPTIONS,
         index=current_idx,
         label_visibility="collapsed",
@@ -599,20 +625,35 @@ with st.sidebar:
     icons_js = ""
     for i, m in enumerate(MENU_OPTIONS):
         svg_b64 = MENU_ICONS_SVG[m]
+        # Escape backticks dalam SVG untuk template literal JS
+        svg_escaped = svg_b64.replace('`', r'\`')
         icons_js += f"""
-        labels[{i}].innerHTML = `<span style="display:flex;align-items:center;gap:10px;">
-            <span style="opacity:0.75;flex-shrink:0;">{svg_b64}</span>
-            <span style="font-size:0.875rem;font-weight:500;">{m}</span>
-        </span>`;
+        if (labels[{i}]) {{
+            labels[{i}].innerHTML = `<span style="display:flex;align-items:center;gap:10px;width:100%;">
+                <span style="display:flex;align-items:center;justify-content:center;width:20px;height:20px;flex-shrink:0;opacity:0.85;">{svg_escaped}</span>
+                <span style="font-size:0.875rem;font-weight:500;">{m}</span>
+            </span>`;
+        }}
         """
 
     st.markdown(
         f"""<script>
         (function inject() {{
-            const radios = window.parent.document.querySelectorAll('[data-testid="stSidebar"] [data-testid="stRadio"] label');
-            if (radios.length < {len(MENU_OPTIONS)}) {{ setTimeout(inject, 80); return; }}
+            const container = window.parent.document.querySelector('[data-testid="stSidebar"]');
+            if (!container) {{ setTimeout(inject, 100); return; }}
+            const radios = container.querySelectorAll('[data-testid="stRadio"] label');
+            if (radios.length < {len(MENU_OPTIONS)}) {{ setTimeout(inject, 100); return; }}
             const labels = Array.from(radios);
             {icons_js}
+            // Observe untuk re-inject jika Streamlit re-render
+            const obs = new MutationObserver(() => {{
+                const rl = container.querySelectorAll('[data-testid="stRadio"] label');
+                if (rl.length >= {len(MENU_OPTIONS)}) {{
+                    const ll = Array.from(rl);
+                    {icons_js}
+                }}
+            }});
+            obs.observe(container, {{childList:true, subtree:true}});
         }})();
         </script>""",
         unsafe_allow_html=True,
@@ -898,6 +939,20 @@ elif active_page == MENU_OPTIONS[1]:
         unsafe_allow_html=True
     )
 
+    # Info panel untuk user baru
+    if st.session_state.get("first_run", True):
+        st.markdown(
+            '<div style="background:linear-gradient(135deg,#EEF4FF,#E8F6FF);border-radius:14px;'
+            'padding:1rem 1.2rem;border:1px solid rgba(22,96,232,0.15);margin-bottom:1rem;">'
+            '<div style="font-size:0.8rem;font-weight:700;color:#1660E8;margin-bottom:4px;">'
+            '📡 Selamat Datang di EngsetPro</div>'
+            '<div style="font-size:0.78rem;color:#4A5680;line-height:1.6;">'
+            'Isi parameter <strong>S</strong> (jumlah pengguna), <strong>N</strong> (jumlah kanal), '
+            'dan <strong>A</strong> (traffic offered) lalu klik <strong>Jalankan Kalkulasi</strong>.'
+            '</div></div>',
+            unsafe_allow_html=True
+        )
+
     col_s, col_n, col_a = st.columns(3, gap="large")
     with col_s:
         inp_S = st.number_input("S  Jumlah Source (Pengguna)", min_value=2, max_value=200,
@@ -912,11 +967,21 @@ elif active_page == MENU_OPTIONS[1]:
                                  step=0.1, format="%.1f")
 
     st.markdown("<div style='height:0.5rem'></div>", unsafe_allow_html=True)
-    if st.button("▶  Jalankan Kalkulasi", use_container_width=True):
+    st.markdown(
+        '<div style="background:linear-gradient(135deg,rgba(22,96,232,0.08),rgba(14,170,224,0.08));'
+        'border-radius:14px;padding:1rem 1.2rem;border:1.5px solid rgba(22,96,232,0.15);margin-bottom:0.5rem;">'
+        '<div style="font-size:0.75rem;color:#1660E8;font-weight:600;margin-bottom:0.5rem;'
+        'text-transform:uppercase;letter-spacing:0.08em;">▶ Siap Kalkulasi</div>'
+        '<div style="font-size:0.82rem;color:#4A5680;">Parameter sudah diisi? Tekan tombol di bawah untuk menghitung probabilitas blocking.</div>'
+        '</div>',
+        unsafe_allow_html=True
+    )
+    if st.button("▶  Jalankan Kalkulasi", use_container_width=True, type="primary"):
         st.session_state["S_calc"] = inp_S
         st.session_state["N_calc"] = inp_N
         st.session_state["A_calc"] = inp_A
         st.session_state["kalkulasi_done"] = True
+        st.session_state["first_run"] = False
         # Hitung dan simpan ke history
         _S, _N, _A = inp_S, inp_N, inp_A
         _valid = _S > _N and 0 < _A < _S
